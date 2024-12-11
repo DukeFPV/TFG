@@ -1,7 +1,1 @@
-{
-  "/page": "app/page.js",
-  "/sign-in/[[...sign-in]]/page": "app/sign-in/[[...sign-in]]/page.js",
-  "/sara-ia/[[...chatId]]/page": "app/sara-ia/[[...chatId]]/page.js",
-  "/nosotros/page": "app/nosotros/page.js",
-  "/panel-control/[[...rest]]/page": "app/panel-control/[[...rest]]/page.js"
-}
+{}
