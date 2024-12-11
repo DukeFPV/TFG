@@ -38,6 +38,7 @@ El desarrollo de SARA IA ha sido influenciado e inspirado por los siguientes pro
 6. [Tutorial Next.js 14 paso a paso, para Principiantes](https://www.youtube.com/watch?v=jMy4pVZMyLM) - *Autor: MiduDev*
 7. [Desarrollando El Componente Chat | Next.js 13](https://www.youtube.com/watch?v=soJU2_SKy1I&t) - *Autor: MiduDev*
 8. [Build and Deploy Navbar Dropdown Navigation with Tailwind CSS and Next.js](https://youtu.be/lo_BJ6dl7fw?t=571) - *Autor: react with utkarsh*
+9. [Build and Deploy a Full Stack AI SaaS | Next JS 13, DrizzleORM, OpenAI, Stripe, TypeScript, Tailwind] (https://www.youtube.com/watch?v=bZFedu-0emE&t=11228s) - *Autor: Elliott Chong*
 
 ## Empezar
 
@@ -80,7 +81,7 @@ Clona el repositorio:
 2. Copiar código  
 
     ```console
-    npm install
+    pnpm install
     ```  
 
     Configura las variables de entorno creando un archivo .env.local en la raíz del proyecto y añade las siguientes líneas:
