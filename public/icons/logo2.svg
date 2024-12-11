@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 84 27">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 22px;
+      }
+
+      .cls-2 {
+        fill: #50a0dd;
+      }
+
+      .cls-2, .cls-3 {
+        font-family: OpenSans, 'Open Sans';
+      }
+
+      .cls-3 {
+        fill: #000;
+      }
+
+      .cls-4 {
+        fill: #a633d1;
+        font-family: OpenSans-Bold, 'Open Sans';
+        font-weight: 700;
+      }
+    </style>
+  </defs>
+  <text class="cls-1" transform="translate(1.1 20.6)"><tspan class="cls-2" x="0" y="0">SARA</tspan><tspan class="cls-3" x="53.5" y="0"> </tspan><tspan class="cls-4" x="59.2" y="0">IA</tspan></text>
+</svg>
