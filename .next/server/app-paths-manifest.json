@@ -1,6 +1,9 @@
 {
-  "/contacto/page": "app/contacto/page.js",
-  "/sign-in/[[...sign-in]]/page": "app/sign-in/[[...sign-in]]/page.js",
+  "/api/messages/route": "app/api/messages/route.js",
+  "/api/chat/route": "app/api/chat/route.js",
   "/page": "app/page.js",
-  "/sara-ia/[[...chatId]]/page": "app/sara-ia/[[...chatId]]/page.js"
+  "/sara-ia/[[...chatId]]/page": "app/sara-ia/[[...chatId]]/page.js",
+  "/contacto/page": "app/contacto/page.js",
+  "/nosotros/page": "app/nosotros/page.js",
+  "/panel-control/[[...rest]]/page": "app/panel-control/[[...rest]]/page.js"
 }

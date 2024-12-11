@@ -1119,6 +1119,9 @@ video {
   white-space: nowrap;
   border-width: 0;
 }
+.pointer-events-none {
+  pointer-events: none;
+}
 .pointer-events-auto {
   pointer-events: auto;
 }
@@ -1386,6 +1389,9 @@ video {
 .h-px {
   height: 1px;
 }
+.h-96 {
+  height: 24rem;
+}
 .max-h-\[300px\] {
   max-height: 300px;
 }
@@ -1457,6 +1463,9 @@ video {
 }
 .w-full {
   width: 100%;
+}
+.w-96 {
+  width: 24rem;
 }
 .min-w-\[8rem\] {
   min-width: 8rem;
@@ -1998,6 +2007,9 @@ video {
 }
 .fill-current {
   fill: currentColor;
+}
+.object-contain {
+  object-fit: contain;
 }
 .\!p-0 {
   padding: 0px !important;

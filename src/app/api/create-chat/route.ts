@@ -1,4 +1,4 @@
-// /api/create-chat
+
 import { db } from "@/lib/db";
 import { chats } from "@/lib/db/schema";
 import { loadS3IntoPinecone } from "@/lib/pinecone"
@@ -11,13 +11,6 @@ export async function POST(req: Request) {
   const {userId} = await auth()
   if (!userId) {
     return NextResponse.json({ error: "No se ha autenticado el usuario" }, { status: 401 })
-  }
-
-  const isAdmin = userId === 'user_2ooPGvdai0IRYfKUmWh7T5y3rxp';
-
-  // Si quieres que solo el admin pueda subir archivos, comprueba esto:
-  if (!isAdmin) {
-    return NextResponse.json({ error: "No tienes permiso para esta acción" }, { status: 403 })
   }
 
   try {
@@ -37,7 +30,7 @@ export async function POST(req: Request) {
       pdfName: file_name,
       pdfUrl: getS3Url(file_key),
       userId: userId,
-      isPublic: isAdmin,
+      isPublic: false, // Set to false to indicate that the chat is not public
     })
     .returning({
       insertedId: chats.id

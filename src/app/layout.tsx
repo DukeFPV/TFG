@@ -16,6 +16,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Sara IA",
   description: "Sara IA, tu asistente virtual",
+  icons: { icon: 'favicon-24x24.png' }
 };
 
 export default async function RootLayout({

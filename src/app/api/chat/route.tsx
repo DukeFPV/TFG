@@ -1,12 +1,12 @@
 import { streamText, convertToCoreMessages, CoreMessage } from 'ai';
-import { saveChat } from '@/lib/utils/queries'
+import { saveChat } from '@/lib/utils/queries';
 import { db } from '@/lib/db/index';
 import { chats } from '@/lib/db/schema';
-//import { messages  as _messages } from '@/lib/db/schema'; //TODO: comprobar si es necesario
 import { eq } from 'drizzle-orm';
 import { openai } from '@ai-sdk/openai';
 import { NextResponse } from 'next/server';
 import { getContext } from '@/lib/context';
+import { auth } from "@clerk/nextjs/server"; 
 
 // Metodo alternativo para  manejar los logs
 function log(message: string) {
@@ -17,12 +17,18 @@ export async function POST(req: Request) {
   //log('POST function called');  //Log para debug
 
   try {
+    // Verificación de autenticación
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { messages, chatId } = await req.json();
 
     const coreMessages = convertToCoreMessages(messages);
 
-      log('chatId de chatId = ' + JSON.stringify(chatId)); //Log para debug
-      log('Log de messages = ' + JSON.stringify(messages)); //Log para debug
+    log('chatId de chatId = ' + JSON.stringify(chatId)); //Log para debug
+    log('Log de messages = ' + JSON.stringify(messages)); //Log para debug
 
     // Validate chatId
     if (!chatId) {
@@ -30,7 +36,7 @@ export async function POST(req: Request) {
     }
 
     // Ensure chatId is a number
-    const chatIdValue= parseInt(chatId);
+    const chatIdValue = parseInt(chatId);
     if (isNaN(chatIdValue)) {
       return NextResponse.json(
         { error: 'Invalid chat ID format' }, 
@@ -38,12 +44,12 @@ export async function POST(req: Request) {
       );
     }
 
-      log('Type of chatId: ' + typeof chatIdValue); //Log para debug
-      log('Value of chatId: ' + chatIdValue); //Log para debug
+    log('Type of chatId: ' + typeof chatIdValue); //Log para debug
+    log('Value of chatId: ' + chatIdValue); //Log para debug
 
     const _chats = await db.select().from(chats).where(eq(chats.id, chatIdValue));
 
-      log('Log de _chats = ' + JSON.stringify(_chats)); //Log para debug
+    log('Log de _chats = ' + JSON.stringify(_chats)); //Log para debug
 
     if (_chats.length !== 1) {
       return NextResponse.json({ error: 'Chat no encontrado' }, { status: 404 });
@@ -52,10 +58,9 @@ export async function POST(req: Request) {
     const fileKey = _chats[0].fileKey;
     const lastMessage = messages[messages.length - 1];
 
-
     const context = await getContext(lastMessage.content, fileKey);
 
-    log('Log de context = ' + JSON.stringify(context));//Log para debug
+    log('Log de context = ' + JSON.stringify(context)); //Log para debug
 
     // Definición de los mensajes iniciales que SARA utiliza para entender su contexto y cómo debe interactuar, se mantienen en ingles para facilitar la comprensión de la API de OpenAI
     const prompt: CoreMessage[] = [{
@@ -71,7 +76,7 @@ export async function POST(req: Request) {
       START CONTEXT BLOCK
         ${context}
       END OF CONTEXT BLOCK
-      `,  
+      `,
     },
     {
       // Mensaje del usuario que describe sus necesidades y expectativas al interactuar con SARA
@@ -84,15 +89,13 @@ export async function POST(req: Request) {
       "Mostly you will try to help me with the task of making a doctor's appointment or how to navigate a bank page. " +
       "If at any point you don't understand the answer or need more information, don't hesitate to ask." +
       "Please communicate in the language in which I speak to you, and I will respond in the same language. If you do not understand me, you must respond in Spanish.",
-    }]
+    }];
 
-    
     const response = await streamText({
       model: openai('gpt-4o-mini'),
       messages: [...prompt, ...coreMessages],
       async onFinish({ text }) {
         try {
-          // Primeramente se guarda el mensaje del usuario
           const userMessage = messages[messages.length - 1];
           await saveChat({ 
             id: chatIdValue, 
@@ -103,7 +106,6 @@ export async function POST(req: Request) {
             userId: _chats[0].userId 
           });
     
-          // Se guarda el mensaje de respuesta de SARA
           await saveChat({ 
             id: chatIdValue, 
             messages: [{
@@ -120,9 +122,9 @@ export async function POST(req: Request) {
 
     return response.toDataStreamResponse();
   } catch (error) {
-      console.error('Error in POST /api/chat:', error);
-      log('error en chat/route ' + (error as Error).message); // Mejora registro de errores
-      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('Error in POST /api/chat:', error);
+    log('error en chat/route ' + (error as Error).message);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
