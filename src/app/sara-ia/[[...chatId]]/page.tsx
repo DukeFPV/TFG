@@ -10,14 +10,16 @@ import ChatSideBarLeft from '@/components/ChatSideBarLeft';
 import ChatComponent from '@/components/ChatComponent';
 import ResponsiveChatWrapper from '@/components/ResponsiveChatWrapper';
 
-type Props = {
+
+type Params = Promise<{ chatId: string }>;
+/* type Props = {
   params: {
     chatId?: string[];
   };
-};
+}; */
 
-const ChatPage = async ({ params }: Props) => {
-  params = await params;
+const ChatPage = async (props: { params : Params }) => {
+  const params = await props.params;
   const chatIdStr = params.chatId ? params.chatId[0] : null;
   const { userId } = await auth();
 

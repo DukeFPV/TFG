@@ -1,4 +1,4 @@
-import js from '@eslint/js'
+/* import js from '@eslint/js'
 import { FlatCompat } from '@eslint/eslintrc'
 
 const compat = new FlatCompat({
@@ -13,4 +13,4 @@ const eslintConfig = [
   }),
 ]
 
-export default eslintConfig
+export default eslintConfig */
