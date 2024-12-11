@@ -1,6 +1,6 @@
 {
-  "name": "chatpdf-test",
-  "version": "0.1.0",
+  "name": "sara-ia",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "export NODE_OPTIONS='--max-old-space-size=8192' && next dev",

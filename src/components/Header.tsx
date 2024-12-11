@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { IoIosArrowDown, IoMdMenu, IoMdClose } from 'react-icons/io';
@@ -51,7 +51,7 @@ const protectedNavItems: NavItem[] = [
 ];
 
 export default function Navbar() {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { isSignedIn, user } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [animationParent] = useAutoAnimate();
 
