@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { IoIosArrowDown, IoMdMenu, IoMdClose } from 'react-icons/io';
@@ -170,13 +170,11 @@ function MobileNav({ closeMenu }: { closeMenu: () => void }) {
                 </span>
               </Link>
               {ajustesItem?.children?.map((c, i) => (
-                <SingleNavItem
-                  key={i}
-                  label={c.label}
-                  link={c.link}
-                  iconImage={c.iconImage}
-                  children={c.children}
-                />
+                <SingleNavItem key={i} label={c.label} iconImage={c.iconImage}>
+                  {c.children?.map((child, index) => (
+                    <SingleNavItem key={index} label={child.label} iconImage={child.iconImage} />
+                  ))}
+                </SingleNavItem>
               ))}
             </>
           )}
@@ -211,7 +209,7 @@ function MobileNav({ closeMenu }: { closeMenu: () => void }) {
   );
 }
 
-function SingleNavItem({ label, link, iconImage, children }: NavItem) {
+function SingleNavItem({ label, iconImage, children }: { label: string, iconImage?: string, children?: ReactNode }) {
   const [animationParent] = useAutoAnimate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -232,40 +230,7 @@ function SingleNavItem({ label, link, iconImage, children }: NavItem) {
       </div>
       {isOpen && children && (
         <div className="w-auto flex flex-col gap-1 rounded-lg bg-white py-3 transition-all">
-          {children.map((c, i) => (
-            <div key={i} className="flex items-center justify-between py-1 pl-6 pr-8 text-neutral-400 hover:text-black">
-              {c.iconImage && (
-                <Image src={c.iconImage} alt="item-icon" width={20} height={20} />
-              )}
-              <span className="whitespace-nowrap pl-2 pr-5">
-                {c.label}
-              </span>
-              {c.label === "Sugerencias" && (
-                <div className="flex items-center ml-auto">
-                  <Switch 
-                    size="lg"
-                    color="success"
-                  />
-                </div>
-              )}
-              {c.label === "Modo Oscuro" && (
-                <div className="flex items-center ml-auto">
-                  <Switch
-                    defaultSelected
-                    size="lg"
-                    color="secondary"
-                    thumbIcon={({ isSelected, className }) =>
-                      isSelected ? (
-                        <SunIcon className={className} />
-                      ) : (
-                        <MoonIcon className={className} />
-                      )
-                    }
-                  />
-                </div>
-              )}
-            </div>
-          ))}
+          {children}
         </div>
       )}
     </div>

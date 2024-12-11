@@ -1,4 +1,4 @@
-// components/PanelLayout.tsx
+
 'use client'
 import { useState } from 'react';
 import { NavigationMenu } from './NavigationMenu';
@@ -14,7 +14,7 @@ interface PanelDataProps {
 }
 
 // Panel de datos
-export function PanelData({ totalConversations, lastConversationDate, messages }: PanelDataProps) {
+export function PanelData({ totalConversations, lastConversationDate}: PanelDataProps) {
   return (
     <div className="space-y-6">
       <DataForm />
