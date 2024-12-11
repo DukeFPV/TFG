@@ -22,14 +22,14 @@ export default function Contact() {
 
   return (
     // Contenedor principal de la página de contacto
-    <div className="min-h-screen bg-neutral-50 flex flex-col justify-center items-left pl-20">
+    <div className="min-h-screen bg-gradient-to-br from-pink-400 via-indigo-400 to-neutral-50 flex flex-col justify-center items-left pl-20">
       <Head>
         {/* Metadatos de la página */}
         <title>Contacto</title>
       </Head>
 
       {/* Contenedor del formulario de contacto */}
-      <div className="bg-neutral-200 p-8 rounded-lg shadow-lg max-w-md w-full">
+      <div className="bg-purple-200 p-8 rounded-lg shadow-lg max-w-md w-full">
         <h1 className="text-2xl font-bold mb-4">Cuéntanos lo que quieras</h1>
         {/* Formulario de contacto, los estilos van definidos en cada contenedor y campo */}
         <form onSubmit={handleSubmit}>
