@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       pdfName: file_name,
       pdfUrl: getS3Url(file_key),
       userId: userId,
-      isPublic: false, // Set to false to indicate that the chat is not public
+      isPublic: false, // Set to false to indicate that the files are private
     })
     .returning({
       insertedId: chats.id

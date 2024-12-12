@@ -1,12 +1,14 @@
 'use client'
 import { useState } from 'react';
+import { Activity, BarChart2, BookOpen, ChevronDown, ChevronUp, CreditCard, LogOut, MessageSquare, User } from 'lucide-react';
+import { SignOutButton } from '@clerk/nextjs';
+
 
 interface NavigationMenuProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
-import { Activity, BarChart2, BookOpen, ChevronDown, ChevronUp, CreditCard, LogOut, MessageSquare, User } from 'lucide-react';
-import { SignOutButton } from '@clerk/nextjs';
+
 
 export function NavigationMenu({ activeTab, onTabChange }: NavigationMenuProps) {
   const [isOpen, setIsOpen] = useState(false);

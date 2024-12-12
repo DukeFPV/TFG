@@ -72,7 +72,7 @@ export default function Navbar() {
     <nav className={`z-50 mr-auto flex max-w-7xl justify-between px-4 py-5 text-sm ${isHomePage ? 'text-neutral-200' : 'text-neutral-800 hover:text-purple-700'}`}>
       <section ref={animationParent} className='flex items-center gap-10'>
         <Link href="/">
-          <Image src='/icons/logo2.svg' className='' width={150} height={50} alt='logo' />
+          <Image src={`${isHomePage ?'/icons/logo3.svg' : '/icons/logo2.svg'}`} className='shadow-purple-200' width={150} height={50} alt='logo' />
         </Link>
         {isMenuOpen && <MobileNav closeMenu={closeMenu} />}
         <div className={`hidden md:flex items-center gap-4 transition-all ${isHomePage ? 'text-neutral-200' : 'text-neutral-800 '}`}>

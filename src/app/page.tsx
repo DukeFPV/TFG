@@ -19,11 +19,11 @@ export default function Home() {
         {/* Contenedor de textos en la sección Hero */}
         <div className='flex flex-col items-center gap-6 pt-8 text-center md:w-1/2 md:items-center md:gap-10 md:pt-5 md:text-center'>
           <Balancer>
-            <h1 className='text-6xl font-semibold text-cyan-500 sm:text-cyan-400 md:text-8xl pb-5'>
+            <h1 className='text-6xl font-semibold text-cyan-300 sm:text-cyan-300 md:text-8xl pb-5'>
               SARA
             </h1>
             <h2 className='text-4xl md:text-5xl md:text-white text-neutral-800'>
-              <span className='text-purple-500 sm:text-purple-400 font-bold'>IA</span> para ayudarte
+              <span className='text-purple-300 sm:text-purple-300 font-bold'>IA</span> para ayudarte
             </h2>
           </Balancer>
           
@@ -33,7 +33,7 @@ export default function Home() {
             </Balancer>
           </p>
           
-          <button className="w-fit rounded-full border-2 bg-purple-400 sm:bg-purple-400 px-14 py-5 text-white transition-all hover:border-purple-400 hover:bg-transparent sm:hover:text-white/90 hover:text-black/90">
+          <button className="w-fit rounded-full border-2 border-purple-400 bg-purple-400 sm:bg-purple-400 px-14 py-5 text-white transition-all hover:border-purple-300 hover:bg-transparent sm:hover:text-white/90 hover:text-black/90">
             Saber más
           </button>
         </div>
@@ -68,10 +68,10 @@ export default function Home() {
           <p>Descubre el nuevo método para comunicarte con a través de la mayor app de mensajería utilizada por todo el mundo.</p>
         
           <div className='flex flex-col-reverse sm:flex-row items-center justify-center gap-6 pt-8 text-center md:w-1/2 md:items-center md:gap-10 md:pt-5 md:text-center'>
-            <button className="border-black w-fit rounded-full border-2 bg-purple-400 px-20 sm:px-6 py-4 text-white transition-all hover:border-purple-400 hover:bg-transparent hover:text-black/90">
+            <button className="border-black w-fit rounded-full border-2 bg-purple-600 px-20 sm:px-6 py-4 text-white transition-all hover:border-purple-600 hover:bg-transparent hover:text-black/90">
               Comenzar
             </button>
-            <button className="border-black w-fit rounded-full border-2 bg-purple-400 text-nowrap px-20 sm:px-6 py-4 text-white transition-all hover:border-purple-400 hover:bg-transparent hover:text-black/90">
+            <button className="border-black w-fit rounded-full border-2 bg-purple-600 text-nowrap px-20 sm:px-6 py-4 text-white transition-all hover:border-purple-600 hover:bg-transparent hover:text-black/90">
               Saber más
             </button>
           </div>

@@ -2,6 +2,7 @@ import { Settings, Mic, History } from "lucide-react";
 import FeatureCard from './FeatureCard'; // Assuming FeatureCard is a local component
 import Image from 'next/image'; // Assuming using Next.js for <Image> component
 import Link from "next/link";
+import { ConvAI } from "./ConvAI";
 
 
 const ChatSideBarR: React.FC = () => (
@@ -41,9 +42,10 @@ const ChatSideBarR: React.FC = () => (
 
       {/* Mic Button */}
       <div className="hidden sm:block sm:mt-4 md:mt-6 sm:text-center">
-        <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full w-24 h-24 md:w-32 md:h-32 flex items-center justify-center mx-auto">
+        {/* <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full w-24 h-24 md:w-32 md:h-32 flex items-center justify-center mx-auto">
           <Mic size={36} className="md:w-12 md:h-12" />
-        </button>
+        </button> */}
+        <ConvAI />
         <p className="mt-2 text-sm text-gray-600">Pulsa aquí para hablar</p>
       </div>
     </aside>

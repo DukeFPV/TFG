@@ -11,6 +11,7 @@ import ChatComponent from '@/components/ChatComponent';
 import ResponsiveChatWrapper from '@/components/ResponsiveChatWrapper';
 
 
+// Modificacion de los Props para que sean una promesa por la actulización de Next.js v15
 type Params = Promise<{ chatId: string }>;
 /* type Props = {
   params: {
