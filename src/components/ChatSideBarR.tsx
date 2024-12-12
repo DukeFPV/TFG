@@ -19,13 +19,13 @@ const ChatSideBarR: React.FC = () => (
       {/* Avatar Section */}
       <div className="hidden sm:block sm:text-center sm:mb-4 md:mb-6">
         <h2 className="text-xl md:text-2xl font-bold mb-2">SARA</h2>
-        <Image 
+        {/* <Image 
           src="/icons/sara-avatar.png" 
           alt="SARA" 
           width={150} 
           height={150} 
           className="mx-auto w-[80px] h-[80px] md:w-[150px] md:h-[150px]"
-        />
+        /> */}
       </div>
 
       {/* Buttons Section */}

@@ -7,6 +7,7 @@ import {useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Conversation} from "@11labs/client";
 import {cn} from "@/lib/utils";
+import Image from "next/image";
 // import { useConversation } from '@11labs/react';
 // import { useCallback } from 'react';
 
@@ -86,10 +87,15 @@ export function ConvAI() {
                         </CardTitle>
                     </CardHeader>
                     <div className={'flex flex-col gap-y-4 text-center'}>
-                        <div className={cn('orb my-16 mx-12',
-                            isSpeaking ? 'animate-orb' : (conversation && 'animate-orb-slow'),
-                            isConnected ? 'orb-active' : 'orb-inactive')}
-                        ></div>
+                        <div className={'rounded-3xl'}>
+                          <Image 
+                            src="/icons/sara-avatar.png" 
+                            alt="SARA" 
+                            width={150} 
+                            height={150} 
+                            className="mx-auto w-[80px] h-[80px] md:w-[150px] md:h-[150px] rounded-full"
+                          />
+                        </div>
 
 
                         <Button
