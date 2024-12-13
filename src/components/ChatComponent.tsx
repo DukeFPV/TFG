@@ -5,6 +5,7 @@ import { useChat, Message } from 'ai/react'
 import { Button } from './ui/button'
 import { Send } from 'lucide-react'
 import MessageList from './MessageList'
+import LoadingBubble from './LoadingBubble'
 
 type Props = {chatId: number}
 
@@ -68,7 +69,7 @@ const ChatComponent = ({ chatId }: Props) => {
   }, [messages])
 
   if (loading) {
-    return <div>Cargando...</div>
+    return <div><LoadingBubble /></div>
   }
 //! h-[calc(100vh-10vh)] comparar con h-full
   return (

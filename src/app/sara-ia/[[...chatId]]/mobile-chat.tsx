@@ -4,6 +4,7 @@ import { ArrowLeft, LayoutDashboard, MessageCircle, MessagesSquare } from 'lucid
 import FeatureCard from '@/components/FeatureCard'
 import ChatComponent from '@/components/ChatComponent'
 import { useRouter } from 'next/navigation'
+import LoadingBubble from '@/components/LoadingBubble'
 
 
 interface Chat {
@@ -89,7 +90,7 @@ const MobileChat: React.FC<Props> = ({ initialChats = [], initialChatId }) => { 
     <div className="flex-1 overflow-y-auto h-[calc(100vh-var(--header-height)-var(--bottom-nav-height))]">
       {isLoading ? (
         <div className="flex items-center justify-center h-full">
-          <p>Cargando...</p>
+          <p><LoadingBubble /></p>
         </div>
       ) : initialChats && initialChats.length > 0 ? (
         initialChats.map((chat) => (
@@ -146,7 +147,7 @@ const MobileChat: React.FC<Props> = ({ initialChats = [], initialChatId }) => { 
     <div className="overflow-hidden h-[calc(100vh-var(--header-height)-var(--bottom-nav-height))] flex flex-col">
       {isLoading ? (
         <div className="flex items-center justify-center flex-1">
-          <p>Cargando chat...</p>
+          <p><LoadingBubble /></p>
         </div>
       ) : currentChatId ? (
         <div className="flex-1 overflow-hidden">

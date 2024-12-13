@@ -9,6 +9,8 @@ import ChatSideBarLeft from '@/components/ChatSideBarLeft';
 // TODO Visible en el componente de chat mitad para cada uno import PDFViewer from '@/components/PDFViewer';
 import ChatComponent from '@/components/ChatComponent';
 import ResponsiveChatWrapper from '@/components/ResponsiveChatWrapper';
+import LoadingBubble from '@/components/LoadingBubble';
+import PromtCards from '@/components/PromtCards';
 
 
 // Modificacion de los Props para que sean una promesa por la actulización de Next.js v15
