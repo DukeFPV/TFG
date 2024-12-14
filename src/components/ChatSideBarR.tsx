@@ -1,3 +1,4 @@
+'use client'
 import { Settings, Mic, History } from "lucide-react";
 import FeatureCard from './FeatureCard'; // Assuming FeatureCard is a local component
 import Image from 'next/image'; // Assuming using Next.js for <Image> component
@@ -5,16 +6,58 @@ import Link from "next/link";
 import { ConvAI } from "./ConvAI";
 
 
-const ChatSideBarR: React.FC = () => (
+const cardsConfig = [
+  {
+    backgroundColor: "bg-cyan-50",
+    icon: "/icons/salud.svg",
+    title: "Salud digital",
+    description: "Te puedo guiar paso a paso como pedir la cita.",
+    text: "¿Como me puedes ayudar en temas de salud?"
+  },
+  {
+    backgroundColor: "bg-yellow-50",
+    icon: "/icons/banca.svg",
+    title: "Banca digital",
+    description: "Aprender a usar la banca digital",
+    text: "¿Como me puedes ayudar para utilizar mi banco?"
+  },
+  {
+    backgroundColor: "bg-green-50",
+    icon: "/icons/buscar.svg",
+    title: "Buscar en internet",
+    description: "Te puedo ayudar a buscar",
+    text: "Necesito que busques en internet algo para mi"
+  },
+  {
+    backgroundColor: "bg-purple-50",
+    icon: "/icons/any.svg",
+    title: "Cualquier pregunta",
+    description: "Pregúntame lo que quieras",
+    text: "Quiero saber en que cosas puedes asistirme"
+  }
+];
+
+
+const ChatSideBarR: React.FC = () => {
+
+  const handleCardClick = (text: string) => {
+    console.log("Selected prompt:", text);
+    // TODO implementar la funcionalidad de seleccionar una tarjeta y enviar el promt al chat
+  };
+
+  return (
   <div className="h-[calc(100vh-var(--header-height))] max-h-[calc(100vh-var(--header-height))] overflow-hidden w-full md:w-auto">
     <aside className="h-full bg-gray-50 p-4 md:p-6 lg:w-80 md:w-60 sm:w-40 overflow-y-auto">
       {/* Feature Cards Grid */}
       <div className="hidden sm:grid sm:grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 mb-3">
-        <FeatureCard backgroundColor="bg-cyan-50" icon="/icons/salud.svg" title="Salud digital" description="Te puedo guiar paso a paso como pedir la cita." />
-        <FeatureCard backgroundColor="bg-yellow-50" icon="/icons/banca.svg" title="Banca digital" description="Aprender a usar la banca digital" />
-        <FeatureCard backgroundColor="bg-green-50" icon="/icons/buscar.svg" title="Buscar en internet" description="Te puedo ayudar a buscar" />
-        <FeatureCard backgroundColor="bg-purple-50" icon="/icons/any.svg" title="Cualquier pregunta" description="Pregúntame lo que quieras" />
-      </div>
+          {cardsConfig.map((card, index) => (
+            <FeatureCard
+              key={index}
+              {...card}
+              onClick={() => handleCardClick(card.text)}
+            />
+          ))}
+        </div>
 
       {/* Avatar Section */}
       <div className="hidden sm:block sm:text-center sm:mb-4 md:mb-6">
@@ -51,7 +94,7 @@ const ChatSideBarR: React.FC = () => (
     </aside>
   </div>
 );
-
+}
 export default ChatSideBarR;
   
       {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

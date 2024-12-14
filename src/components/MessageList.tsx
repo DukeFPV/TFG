@@ -20,7 +20,7 @@ const MessageList = ({ messages }: Props) => {
             })}
             >
               <div className={
-                cn('px-3 text-sm py-1 shadow-md ring-1 ring-gray-900/10', {
+                cn('px-3 text-sm py-3 shadow-md ring-1 ring-gray-900/10', {
                   'bg-purple-800 text-white rounded-t-lg rounded-bl-lg': message.role === 'user',
                   'rounded-t-lg rounded-br-lg': message.role === 'assistant',
                 })
