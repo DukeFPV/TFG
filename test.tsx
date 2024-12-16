@@ -1,10 +1,14 @@
 "use client"
+import React from "react"
 import { Settings, Mic, History } from "lucide-react"
 import FeatureCard from "./FeatureCard" // Assuming FeatureCard is a local component
 import Image from "next/image" // Assuming using Next.js for <Image> component
 import Link from "next/link"
 import { ConvAI } from "./ConvAI"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { Message } from "ai/react"
+import LoadingBubble from "./LoadingBubble"
+import MessageList from "./MessageList"
 
 const cardsConfig = [
   {
@@ -37,9 +41,18 @@ const cardsConfig = [
   },
 ]
 
-const ChatSideBarR: React.FC = () => {
-  const [chatId, setChatId] = useState<string>("")
+interface ChatSideBarRProps {
+  initialChatId: string
+}
+
+const ChatSideBarR: React.FC<ChatSideBarRProps> = ({ initialChatId }) => {
+  const [chatId, setChatId] = useState<string>(initialChatId)
   const [isLoading, setIsLoading] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
+
+  useEffect(() => {
+    setChatId(initialChatId)
+  }, [initialChatId])
 
   const handleCardClick = async (text: string) => {
     if (!chatId) return
@@ -64,6 +77,26 @@ const ChatSideBarR: React.FC = () => {
       if (!response.ok) {
         throw new Error("Failed to send message")
       }
+
+      const reader = response.body?.getReader()
+      if (!reader) return
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const text = new TextDecoder().decode(value)
+        const data = JSON.parse(text)
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            content: data.text,
+            role: "assistant",
+          },
+        ])
+      }
     } catch (error) {
       console.error("Error sending message:", error)
     } finally {
@@ -81,10 +114,12 @@ const ChatSideBarR: React.FC = () => {
               key={index}
               {...card}
               onClick={() => handleCardClick(card.text)}
+              isLoading={isLoading}
             />
           ))}
         </div>
-
+        {isLoading && <LoadingBubble />}
+        <MessageList messages={messages} />
         {/* Avatar Section */}
         <div className="hidden sm:block sm:text-center sm:mb-4 md:mb-6">
           <h2 className="text-xl md:text-2xl font-bold mb-2">SARA</h2>

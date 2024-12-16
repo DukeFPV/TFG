@@ -69,7 +69,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Error retrieving messages" },
+      { error: "Error obteniendo mensajes" },
       { status: 500 }
     );
   }

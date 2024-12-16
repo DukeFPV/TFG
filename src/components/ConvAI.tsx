@@ -6,7 +6,7 @@ import * as React from "react";
 import {useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Conversation} from "@11labs/client";
-import {cn} from "@/lib/utils";
+//import {cn} from "@/lib/utils";
 import Image from "next/image";
 // import { useConversation } from '@11labs/react';
 // import { useCallback } from 'react';

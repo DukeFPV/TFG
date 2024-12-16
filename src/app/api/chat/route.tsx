@@ -8,13 +8,13 @@ import { NextResponse } from 'next/server';
 import { getContext } from '@/lib/context';
 import { auth } from "@clerk/nextjs/server"; 
 
-// Metodo alternativo para  manejar los logs
-function log(message: string) {
-  console.log(message);
-}
+    // Metodo alternativo para  manejar los logs
+    function log(message: string) {
+      console.log(message);
+    }
 
 export async function POST(req: Request) {
-  //log('POST function called');  //Log para debug
+      //log('POST function called');  //Log para debug
 
   try {
     // Verificación de autenticación
@@ -27,8 +27,8 @@ export async function POST(req: Request) {
 
     const coreMessages = convertToCoreMessages(messages);
 
-    log('chatId de chatId = ' + JSON.stringify(chatId)); //Log para debug
-    log('Log de messages = ' + JSON.stringify(messages)); //Log para debug
+        log('chatId de chatId = ' + JSON.stringify(chatId)); //Log para debug
+        log('Log de messages = ' + JSON.stringify(messages)); //Log para debug
 
     // Validate chatId
     if (!chatId) {
@@ -44,12 +44,12 @@ export async function POST(req: Request) {
       );
     }
 
-    log('Type of chatId: ' + typeof chatIdValue); //Log para debug
-    log('Value of chatId: ' + chatIdValue); //Log para debug
+        log('Type of chatId: ' + typeof chatIdValue); //Log para debug
+        log('Value of chatId: ' + chatIdValue); //Log para debug
 
     const _chats = await db.select().from(chats).where(eq(chats.id, chatIdValue));
 
-    log('Log de _chats = ' + JSON.stringify(_chats)); //Log para debug
+        log('Log de _chats = ' + JSON.stringify(_chats)); //Log para debug
 
     if (_chats.length !== 1) {
       return NextResponse.json({ error: 'Chat no encontrado' }, { status: 404 });
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 
     const context = await getContext(lastMessage.content, fileKey);
 
-    log('Log de context = ' + JSON.stringify(context)); //Log para debug
+        log('Log de context = ' + JSON.stringify(context)); //Log para debug
 
     // Definición de los mensajes iniciales que SARA utiliza para entender su contexto y cómo debe interactuar, se mantienen en ingles para facilitar la comprensión de la API de OpenAI
     const prompt: CoreMessage[] = [{
