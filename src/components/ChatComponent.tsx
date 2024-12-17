@@ -1,63 +1,58 @@
 "use client"
-import React, { useEffect, useState } from "react"
+
+import React, { useEffect } from "react"
 import { Input } from "./ui/input"
-import { useChat, Message } from "ai/react"
 import { Button } from "./ui/button"
-import { Send } from "lucide-react"
+import { Send, CircleStop } from "lucide-react" // Importar CircleStop
 import MessageList from "./MessageList"
 import LoadingBubble from "./LoadingBubble"
+import { useChatContext } from "@/context/ChatContext"
 
 type Props = { chatId: number }
 
+/**
+ * Componente de chat que maneja la funcionalidad de chat con la IA.
+ *
+ * @param {number} chatId - Identificador único para la sesión de chat.
+ *
+ * @returns Interfaz de chat funcional con opciones de envío y cancelación.
+ */
 const ChatComponent = ({ chatId }: Props) => {
-  const [initialMessages, setInitialMessages] = useState<Message[]>([])
-  const [loading, setLoading] = useState(true)
+  const {
+    isSubmitting,
+    error,
+    isLoading,
+    messages,
+    submitExternalMessage,
+    cancelRequest,
+  } = useChatContext()
 
-  const { input, handleInputChange, handleSubmit, messages, setMessages } =
-    useChat({
-      api: "/api/chat",
-      body: {
-        chatId,
-      },
-      initialMessages,
-      onError: (error) => {
-        console.error("Chat error:", error)
-      },
-    })
+  const [input, setInput] = React.useState("")
 
-  useEffect(() => {
-    const loadMessages = async () => {
-      if (!chatId) {
-        setLoading(false)
-        return
-      }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value)
+  }
 
-      try {
-        const response = await fetch(`/api/messages?chatId=${chatId}`)
-        if (!response.ok) {
-          throw new Error("Failed to load messages")
-        }
-        const data = await response.json()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const message = input.trim()
 
-        const formattedMessages: Message[] = data.map((msg: any) => ({
-          id: msg.id.toString(),
-          content: msg.content,
-          role: msg.role,
-          createdAt: new Date(msg.createdAt),
-        }))
-
-        setInitialMessages(formattedMessages)
-        setMessages(formattedMessages)
-      } catch (error) {
-        console.error("Error loading messages:", error)
-      } finally {
-        setLoading(false)
-      }
+    if (!message) {
+      // Opcional: Puedes mostrar una alerta o algún indicador si el mensaje está vacío
+      return
     }
 
-    loadMessages()
-  }, [chatId, setMessages])
+    setInput("") // Limpiar el campo de entrada inmediatamente
 
+    try {
+      await submitExternalMessage(message)
+    } catch (err) {
+      console.error("Error al enviar el mensaje:", err)
+      // Opcional: Maneja el error según tus necesidades (por ejemplo, mostrar una notificación al usuario)
+    }
+  }
+
+  // Auto-scroll al último mensaje en el contenedor de mensajes.
   useEffect(() => {
     const messageContainer = document.getElementById("message-container")
     if (messageContainer) {
@@ -68,19 +63,20 @@ const ChatComponent = ({ chatId }: Props) => {
     }
   }, [messages])
 
-  if (loading) {
-    return (
-      <div>
-        <LoadingBubble />
-      </div>
-    )
-  }
-  //! h-[calc(100vh-10vh)] comparar con h-full
   return (
     <div className="flex flex-col h-full max-h-screen overflow-hidden w-full transition-all duration-300">
+      {/* Contenedor de mensajes */}
       <div id="message-container" className="flex-1 overflow-y-auto px-4">
-        <MessageList messages={messages} />
+        {isLoading ? (
+          <LoadingBubble />
+        ) : error ? (
+          <div className="text-red-500">{error}</div>
+        ) : (
+          <MessageList messages={messages} />
+        )}
       </div>
+
+      {/* Formulario de entrada de mensajes */}
       <div className="sticky bottom-0 left-0 right-0 bg-white border-t p-4">
         <form onSubmit={handleSubmit}>
           <div className="flex">
@@ -89,12 +85,24 @@ const ChatComponent = ({ chatId }: Props) => {
               onChange={handleInputChange}
               placeholder="Pregunta lo que necesites..."
               className="w-full p-4 pr-24 rounded-full border border-gray-300 focus:outline-none focus:border-purple-500"
+              disabled={isSubmitting} // Deshabilitar el input mientras espera respuesta
             />
-            <Button className="bg-purple-600 ml-2">
-              <Send className="w-4 h-4" />
+            <Button
+              type={isSubmitting ? "button" : "submit"} // Cambiar tipo según el estado
+              className={`ml-2 ${isSubmitting ? "bg-red-600" : "bg-purple-600"}`} // Cambiar color según el estado
+              onClick={isSubmitting ? cancelRequest : undefined} // Asignar función de cancelación
+              disabled={false} // Permitir cancelar siempre que esté enviando
+            >
+              {isSubmitting ? (
+                <CircleStop className="w-4 h-4" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}{" "}
+              {/* Cambiar ícono */}
             </Button>
           </div>
         </form>
+        {isSubmitting && <LoadingBubble />} {/* Indicador de envío */}
       </div>
     </div>
   )
