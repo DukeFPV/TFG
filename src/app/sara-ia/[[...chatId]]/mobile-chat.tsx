@@ -1,3 +1,5 @@
+// src/components/mobile-chat.tsx
+
 "use client"
 
 import React, { useEffect, useState } from "react"
@@ -9,7 +11,7 @@ import {
 } from "lucide-react"
 import FeatureCard from "@/components/FeatureCard"
 import ChatComponent from "@/components/ChatComponent"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation" // Importar useParams
 import LoadingBubble from "@/components/LoadingBubble"
 import { toast } from "react-hot-toast"
 import { useChatContext } from "@/context/ChatContext"
@@ -24,35 +26,42 @@ interface Chat {
 
 interface Props {
   initialChats?: Chat[] // Hacer opcional
-  initialChatId?: number
 }
 
 type Screen = "saved" | "chat" | "topics"
 
-const MobileChat: React.FC<Props> = ({ initialChats = [], initialChatId }) => {
-  // Añadir arreglo vacío por defecto
+const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
+  // Eliminar initialChatId
+  const params = useParams()
+  const chatIdFromRoute = params?.chatId ? Number(params.chatId) : null // Obtener chatId desde la URL
   const [currentScreen, setCurrentScreen] = useState<Screen>("saved")
   const [activeCategory, setActiveCategory] = useState("todos")
   const [currentChatId, setCurrentChatId] = useState<number | null>(
-    initialChatId || null,
+    chatIdFromRoute,
   )
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { submitExternalMessage, isSubmitting, error } = useChatContext()
 
+  // useEffect para manejar cambios en chatId desde la URL
+  useEffect(() => {
+    if (chatIdFromRoute) {
+      setCurrentChatId(chatIdFromRoute)
+      setCurrentScreen("chat")
+    }
+  }, [chatIdFromRoute])
+
   const handleChatSelect = async (chatId: number) => {
+    console.log("Selecting chat with ID:", chatId)
     try {
       setIsLoading(true)
       setCurrentChatId(chatId)
 
-      // Cargar el id del chat en la URL
+      // Navegar a la nueva ruta con chatId
       await router.push(`/sara-ia/${chatId}`, { scroll: false })
 
       // Esperar a que se cargue la pantalla
       await new Promise((resolve) => setTimeout(resolve, 100))
-
-      // Cambiar de pantalla cuando se haya cargado
-      setCurrentScreen("chat")
     } catch (error) {
       console.error("Error selecting chat:", error)
       toast.error(
@@ -63,19 +72,54 @@ const MobileChat: React.FC<Props> = ({ initialChats = [], initialChatId }) => {
     }
   }
 
-  // Añadir useEffect para manejar el chat inicial
-  useEffect(() => {
-    if (initialChatId) {
-      setCurrentChatId(initialChatId)
-      setCurrentScreen("chat")
-    }
-  }, [initialChatId])
-
   const categories = [
     { id: "todos", label: "Todos" },
     { id: "salud", label: "Salud" },
     { id: "banca", label: "Banca" },
   ]
+
+  // Función para manejar el click en una FeatureCard
+  const handleFeatureClick = async (text: string) => {
+    console.log("FeatureCard clicked with text:", text)
+    try {
+      setIsLoading(true)
+
+      // Cambiar la pantalla a 'chat' inmediatamente
+      setCurrentScreen("chat")
+
+      // Verificar si hay un chat activo, si no, crear uno nuevo
+      if (!currentChatId) {
+        // Crear un nuevo chat
+        const response = await fetch("/api/create-chat/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            file_key: "",
+            file_name: "Nuevo Chat",
+          }),
+        })
+        if (!response.ok) throw new Error("Fallo al crear un nuevo chat")
+
+        const data = await response.json()
+        if (data.chat_id) {
+          await handleChatSelect(data.chat_id) // Seleccionar el nuevo chat
+        } else {
+          throw new Error("No se recibió el ID del chat")
+        }
+      }
+
+      // Enviar el mensaje predefinido
+      await submitExternalMessage(text)
+      toast.success("Mensaje enviado correctamente")
+    } catch (error) {
+      console.error("Error al enviar el mensaje externo:", error)
+      toast.error("Error al enviar el mensaje. Por favor, intenta nuevamente.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const renderHeader = () => (
     <header className="p-4 border-b">
@@ -147,14 +191,14 @@ const MobileChat: React.FC<Props> = ({ initialChats = [], initialChatId }) => {
         },
         body: JSON.stringify({
           file_key: "",
-          file_name: "New Chat",
+          file_name: "Nuevo Chat",
         }),
       })
       if (!response.ok) throw new Error("Failed to create chat")
 
       const data = await response.json()
       if (data.chat_id) {
-        handleChatSelect(data.chat_id)
+        await handleChatSelect(data.chat_id)
       }
     } catch (error) {
       console.error("Error creating chat:", error)
@@ -242,48 +286,6 @@ const MobileChat: React.FC<Props> = ({ initialChats = [], initialChatId }) => {
     </div>
   )
 
-  // Función para manejar el click en una FeatureCard
-  const handleFeatureClick = async (text: string) => {
-    try {
-      setIsLoading(true)
-
-      // Verificar si hay un chat activo, si no, crear uno nuevo
-      if (!currentChatId) {
-        // Crear un nuevo chat
-        const response = await fetch("/api/create-chat/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            file_key: "",
-            file_name: "Nuevo Chat",
-          }),
-        })
-        if (!response.ok) throw new Error("Fallo al crear un nuevo chat")
-
-        const data = await response.json()
-        if (data.chat_id) {
-          await handleChatSelect(data.chat_id) // Seleccionar el nuevo chat
-        } else {
-          throw new Error("No se recibió el ID del chat")
-        }
-      }
-
-      // Enviar el mensaje predefinido
-      await submitExternalMessage(text)
-      toast.success("Mensaje enviado correctamente")
-
-      // Cambiar la pantalla a 'chat'
-      setCurrentScreen("chat")
-    } catch (error) {
-      console.error("Error al enviar el mensaje externo:", error)
-      toast.error("Error al enviar el mensaje. Por favor, intenta nuevamente.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const renderContent = () => {
     switch (currentScreen) {
       case "saved":
@@ -292,6 +294,8 @@ const MobileChat: React.FC<Props> = ({ initialChats = [], initialChatId }) => {
         return renderChat()
       case "topics":
         return renderTopics()
+      default:
+        return null
     }
   }
 
@@ -301,16 +305,18 @@ const MobileChat: React.FC<Props> = ({ initialChats = [], initialChatId }) => {
         onClick={() => setCurrentScreen("chat")}
         className={`p-2 ${currentScreen === "chat" ? "text-purple-50" : ""}`}
       >
-        <span className="flex flex-row place-items-center">
+        <span className="flex flex-row items-center">
           <MessageCircle className="mr-1" size={16} />
           Chat
         </span>
       </button>
       <button
         onClick={() => setCurrentScreen("topics")}
-        className={`p-2 pl-4 ml-4 mr-2 ${currentScreen === "topics" ? "text-purple-50" : ""}`}
+        className={`p-2 pl-4 ml-4 mr-2 ${
+          currentScreen === "topics" ? "text-purple-50" : ""
+        }`}
       >
-        <span className="flex flex-row place-items-center">
+        <span className="flex flex-row items-center">
           <LayoutDashboard className="mr-1" size={16} />
           Temas
         </span>
@@ -319,7 +325,7 @@ const MobileChat: React.FC<Props> = ({ initialChats = [], initialChatId }) => {
         onClick={() => setCurrentScreen("saved")}
         className={`p-2 ${currentScreen === "saved" ? "text-purple-50" : ""}`}
       >
-        <span className="flex flex-row place-items-center">
+        <span className="flex flex-row items-center">
           <MessagesSquare className="mr-1" size={16} />
           Guardados
         </span>
