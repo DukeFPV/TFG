@@ -1,10 +1,10 @@
 "use client"
-import { Settings, Mic, History } from "lucide-react"
-import FeatureCard from "./FeatureCard" // Assuming FeatureCard is a local component
-import Image from "next/image" // Assuming using Next.js for <Image> component
+import { Settings, History } from "lucide-react"
+import FeatureCard from "./FeatureCard"
 import Link from "next/link"
 import { ConvAI } from "./ConvAI"
 import { useState } from "react"
+import { useChatContext } from "@/context/ChatContext"
 
 const cardsConfig = [
   {
@@ -12,62 +12,49 @@ const cardsConfig = [
     icon: "/icons/salud.svg",
     title: "Salud digital",
     description: "Te puedo guiar paso a paso como pedir la cita.",
-    text: "¿Como me puedes ayudar en temas de salud?",
+    text: "¿Cómo me puedes ayudar en temas de salud?",
   },
   {
     backgroundColor: "bg-yellow-50",
     icon: "/icons/banca.svg",
     title: "Banca digital",
     description: "Aprender a usar la banca digital",
-    text: "¿Como me puedes ayudar para utilizar mi banco?",
+    text: "¿Cómo me puedes ayudar para utilizar mi banco?",
   },
   {
     backgroundColor: "bg-green-50",
     icon: "/icons/buscar.svg",
     title: "Buscar en internet",
     description: "Te puedo ayudar a buscar",
-    text: "Necesito que busques en internet algo para mi",
+    text: "Necesito que busques en internet algo para mí",
   },
   {
     backgroundColor: "bg-purple-50",
     icon: "/icons/any.svg",
     title: "Cualquier pregunta",
     description: "Pregúntame lo que quieras",
-    text: "Quiero saber en que cosas puedes asistirme",
+    text: "Quiero saber en qué cosas puedes asistirme",
   },
 ]
 
-const ChatSideBarR: React.FC = () => {
-  const [chatId, setChatId] = useState<string>("")
+type ChatSideBarRProps = {
+  chatId: number
+}
+
+const ChatSideBarR = ({ chatId }: ChatSideBarRProps) => {
+  const { submitExternalMessage, isSubmitting, error } = useChatContext()
   const [isLoading, setIsLoading] = useState(false)
 
   const handleCardClick = async (text: string) => {
-    if (!chatId) return
-
-    try {
+    if (submitExternalMessage && !isLoading) {
       setIsLoading(true)
-
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [
-            {
-              content: text,
-              role: "user",
-            },
-          ],
-          chatId,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to send message")
+      try {
+        await submitExternalMessage(text)
+      } catch (error) {
+        console.error("Error al enviar el mensaje externo:", error)
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error("Error sending message:", error)
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -81,6 +68,7 @@ const ChatSideBarR: React.FC = () => {
               key={index}
               {...card}
               onClick={() => handleCardClick(card.text)}
+              isLoading={isLoading}
             />
           ))}
         </div>
@@ -88,13 +76,14 @@ const ChatSideBarR: React.FC = () => {
         {/* Avatar Section */}
         <div className="hidden sm:block sm:text-center sm:mb-4 md:mb-6">
           <h2 className="text-xl md:text-2xl font-bold mb-2">SARA</h2>
-          {/* <Image 
-          src="/icons/sara-avatar.png" 
-          alt="SARA" 
-          width={150} 
-          height={150} 
-          className="mx-auto w-[80px] h-[80px] md:w-[150px] md:h-[150px]"
-        /> */}
+          {/* Imagen de Sara en la posicion original
+          <Image 
+            src="/icons/sara-avatar.png" 
+            alt="SARA" 
+            width={150} 
+            height={150} 
+            className="mx-auto w-[80px] h-[80px] md:w-[150px] md:h-[150px]"
+          /> */}
         </div>
 
         {/* Buttons Section */}
@@ -113,45 +102,17 @@ const ChatSideBarR: React.FC = () => {
           </button>
         </div>
 
-        {/* Mic Button */}
+        {/* Manejo de voz con ElevenLabs */}
         <div className="hidden sm:block sm:mt-4 md:mt-6 sm:text-center">
-          {/* <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full w-24 h-24 md:w-32 md:h-32 flex items-center justify-center mx-auto">
-          <Mic size={36} className="md:w-12 md:h-12" />
-        </button> */}
           <ConvAI />
           <p className="mt-2 text-sm text-gray-600">Pulsa aquí para hablar</p>
         </div>
+
+        {/* Mostrar error si existe */}
+        {error && <div className="text-red-500 mt-2 text-center">{error}</div>}
       </aside>
     </div>
   )
 }
-export default ChatSideBarR
 
-{
-  /* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-      <div className="flex items-center">
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Escribeme lo que necesites..."
-          className="flex-grow border rounded-full py-2 px-4 mr-2"
-        />
-        <button className="bg-gray-200 hover:bg-gray-300 rounded-full p-2">
-          <Send size={20} />
-        </button>
-      </div> */
-}
-{
-  /* <div className="mt-4 flex justify-between items-center text-sm text-gray-500">
-        <p>Copyright © 2024 J.Carlos Lorenzo | Todos los derechos reservados</p>
-        <div className="flex space-x-4">
-          <Link href="/privacidad">Privacidad</Link>
-          <Link href="/">Inicio</Link>
-          <Link href="/aviso-legal">Aviso legal</Link>
-          <Link href="/contacto">Contacto</Link>
-        </div>
-      </div> 
-    </div>
-  </div> */
-}
+export default ChatSideBarR
