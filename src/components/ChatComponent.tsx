@@ -11,7 +11,7 @@ import { useChatContext } from "@/context/ChatContext"
 type Props = { chatId: number }
 
 /**
- * Componente de chat que maneja la funcionalidad de chat con la IA.
+ * Componente de chat que maneja la funcionalidad de chat en tiempo real.
  *
  * @param {number} chatId - Identificador único para la sesión de chat.
  *
