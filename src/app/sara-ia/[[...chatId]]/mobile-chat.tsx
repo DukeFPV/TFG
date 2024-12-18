@@ -26,6 +26,7 @@ interface Chat {
 
 interface Props {
   initialChats?: Chat[] // Hacer opcional
+  initialChatId?: number // Requerido por ResponsiveChatWrapper
 }
 
 type Screen = "saved" | "chat" | "topics"
