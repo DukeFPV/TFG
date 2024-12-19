@@ -1,5 +1,3 @@
-// src/components/mobile-chat.tsx
-
 "use client"
 
 import React, { useEffect, useState } from "react"
@@ -11,7 +9,7 @@ import {
 } from "lucide-react"
 import FeatureCard from "@/components/FeatureCard"
 import ChatComponent from "@/components/ChatComponent"
-import { useRouter, useParams } from "next/navigation" // Importar useParams
+import { useRouter, useParams } from "next/navigation"
 import LoadingBubble from "@/components/LoadingBubble"
 import { toast } from "react-hot-toast"
 import { useChatContext } from "@/context/ChatContext"

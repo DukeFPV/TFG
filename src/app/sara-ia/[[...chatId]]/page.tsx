@@ -12,6 +12,7 @@ import ResponsiveChatWrapper from "@/components/ResponsiveChatWrapper"
 // import PromtCards from "@/components/PromtCards"
 import QueryProvider from "@/components/Provider" // Importar el Provider existente
 import ChatProviderWrapper from "@/components/ChatProviderWrapper" // Importar el ChatProviderWrapper
+import { revalidatePath } from "next/cache"
 
 // Modificación de los Props para que sean una promesa por la actualización de Next.js v15
 type Params = Promise<{ chatId: string }>
@@ -36,22 +37,34 @@ const ChatPage = async (props: { params: Params }) => {
     .from(chats)
     .where(eq(chats.userId, userId))
 
+  // Crear un nuevo chat si el usuario no tiene chats
   if (!userChats || userChats.length === 0) {
-    return redirect("/")
+    const [newChat] = await db
+      .insert(chats)
+      .values({
+        userId,
+        pdfName: "New Chat",
+        pdfUrl: "",
+        fileKey: "",
+        isPublic: false,
+        createdAt: new Date(),
+      })
+      .returning({ id: chats.id })
+
+    return redirect(`/sara-ia/${newChat.id}`)
   }
 
-  let currentChat
-
+  // Handle missing chatId
   if (!chatIdStr) {
-    const mostRecentChat = userChats[0]
-    return redirect(`/sara-ia/${mostRecentChat.id}`)
-  } else {
-    const chatId = parseInt(chatIdStr, 10)
-    currentChat = userChats.find((chat) => chat.id === chatId)
+    return redirect(`/sara-ia/${userChats[0].id}`)
+  }
 
-    if (!currentChat) {
-      return redirect("/")
-    }
+  // Get current chat
+  const chatId = parseInt(chatIdStr, 10)
+  const currentChat = userChats.find((chat) => chat.id === chatId)
+
+  if (!currentChat) {
+    return redirect(`/sara-ia/${userChats[0].id}`)
   }
 
   return (
