@@ -43,6 +43,27 @@
       "when": 1733877039558,
       "tag": "0005_light_kree",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1734729548009,
+      "tag": "0006_familiar_nightcrawler",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1734994844594,
+      "tag": "0007_redundant_supernaut",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1734997698264,
+      "tag": "0008_broad_sue_storm",
+      "breakpoints": true
     }
   ]
 }

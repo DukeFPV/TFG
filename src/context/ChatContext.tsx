@@ -11,7 +11,7 @@ import React, {
 import { Message } from "ai/react"
 import toast from "react-hot-toast"
 
-// Definir el tipo para el contexto
+// Definir los tipos
 type ChatContextType = {
   submitExternalMessage: (text: string) => Promise<void>
   cancelRequest: () => void
@@ -21,9 +21,14 @@ type ChatContextType = {
   messages: Message[]
 }
 
+/**
+ * Contexto para manejar el estado y la lógica del chat en la aplicación.
+ * @type {React.Context<ChatContextType | undefined>}
+ * @remarks Este contexto se crea con un valor inicial undefined y espera un tipo ChatContextType
+ * @see ChatContextType
+ */
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
 
-// Crear un proveedor para el contexto
 export const ChatProvider = ({
   children,
   chatId,
@@ -194,7 +199,12 @@ export const ChatProvider = ({
   )
 }
 
-// Custom hook para usar el contexto
+/**
+ * Hook personalizado para acceder al ChatContext.
+ * @returns El valor del ChatContext.
+ * @throws {Error} Si se usa fuera de un componente ChatProvider.
+ */
+
 export const useChatContext = () => {
   const context = useContext(ChatContext)
   if (!context) {

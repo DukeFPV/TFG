@@ -1,0 +1,319 @@
+{
+  "provincias": [
+    {
+      "CODAUTO": 1,
+      "Comunidad Autónoma": "Andalucía",
+      "CPRO": 4,
+      "Provincia": "Almería"
+    },
+    {
+      "CODAUTO": 1,
+      "Comunidad Autónoma": "Andalucía",
+      "CPRO": 11,
+      "Provincia": "Cádiz"
+    },
+    {
+      "CODAUTO": 1,
+      "Comunidad Autónoma": "Andalucía",
+      "CPRO": 14,
+      "Provincia": "Córdoba"
+    },
+    {
+      "CODAUTO": 1,
+      "Comunidad Autónoma": "Andalucía",
+      "CPRO": 18,
+      "Provincia": "Granada"
+    },
+    {
+      "CODAUTO": 1,
+      "Comunidad Autónoma": "Andalucía",
+      "CPRO": 21,
+      "Provincia": "Huelva"
+    },
+    {
+      "CODAUTO": 1,
+      "Comunidad Autónoma": "Andalucía",
+      "CPRO": 23,
+      "Provincia": "Jaén"
+    },
+    {
+      "CODAUTO": 1,
+      "Comunidad Autónoma": "Andalucía",
+      "CPRO": 29,
+      "Provincia": "Málaga"
+    },
+    {
+      "CODAUTO": 1,
+      "Comunidad Autónoma": "Andalucía",
+      "CPRO": 41,
+      "Provincia": "Sevilla"
+    },
+    {
+      "CODAUTO": 2,
+      "Comunidad Autónoma": "Aragón",
+      "CPRO": 22,
+      "Provincia": "Huesca"
+    },
+    {
+      "CODAUTO": 2,
+      "Comunidad Autónoma": "Aragón",
+      "CPRO": 44,
+      "Provincia": "Teruel"
+    },
+    {
+      "CODAUTO": 2,
+      "Comunidad Autónoma": "Aragón",
+      "CPRO": 50,
+      "Provincia": "Zaragoza"
+    },
+    {
+      "CODAUTO": 3,
+      "Comunidad Autónoma": "Asturias, Principado de",
+      "CPRO": 33,
+      "Provincia": "Asturias"
+    },
+    {
+      "CODAUTO": 4,
+      "Comunidad Autónoma": "Balears, Illes",
+      "CPRO": 7,
+      "Provincia": "Balears, Illes"
+    },
+    {
+      "CODAUTO": 5,
+      "Comunidad Autónoma": "Canarias",
+      "CPRO": 35,
+      "Provincia": "Palmas, Las"
+    },
+    {
+      "CODAUTO": 5,
+      "Comunidad Autónoma": "Canarias",
+      "CPRO": 38,
+      "Provincia": "Santa Cruz de Tenerife"
+    },
+    {
+      "CODAUTO": 6,
+      "Comunidad Autónoma": "Cantabria",
+      "CPRO": 39,
+      "Provincia": "Cantabria"
+    },
+    {
+      "CODAUTO": 7,
+      "Comunidad Autónoma": "Castilla y León",
+      "CPRO": 5,
+      "Provincia": "Ávila"
+    },
+    {
+      "CODAUTO": 7,
+      "Comunidad Autónoma": "Castilla y León",
+      "CPRO": 9,
+      "Provincia": "Burgos"
+    },
+    {
+      "CODAUTO": 7,
+      "Comunidad Autónoma": "Castilla y León",
+      "CPRO": 24,
+      "Provincia": "León"
+    },
+    {
+      "CODAUTO": 7,
+      "Comunidad Autónoma": "Castilla y León",
+      "CPRO": 34,
+      "Provincia": "Palencia"
+    },
+    {
+      "CODAUTO": 7,
+      "Comunidad Autónoma": "Castilla y León",
+      "CPRO": 37,
+      "Provincia": "Salamanca"
+    },
+    {
+      "CODAUTO": 7,
+      "Comunidad Autónoma": "Castilla y León",
+      "CPRO": 40,
+      "Provincia": "Segovia"
+    },
+    {
+      "CODAUTO": 7,
+      "Comunidad Autónoma": "Castilla y León",
+      "CPRO": 42,
+      "Provincia": "Soria"
+    },
+    {
+      "CODAUTO": 7,
+      "Comunidad Autónoma": "Castilla y León",
+      "CPRO": 47,
+      "Provincia": "Valladolid"
+    },
+    {
+      "CODAUTO": 7,
+      "Comunidad Autónoma": "Castilla y León",
+      "CPRO": 49,
+      "Provincia": "Zamora"
+    },
+    {
+      "CODAUTO": 8,
+      "Comunidad Autónoma": "Castilla-La Mancha",
+      "CPRO": 2,
+      "Provincia": "Albacete"
+    },
+    {
+      "CODAUTO": 8,
+      "Comunidad Autónoma": "Castilla-La Mancha",
+      "CPRO": 13,
+      "Provincia": "Ciudad Real"
+    },
+    {
+      "CODAUTO": 8,
+      "Comunidad Autónoma": "Castilla-La Mancha",
+      "CPRO": 16,
+      "Provincia": "Cuenca"
+    },
+    {
+      "CODAUTO": 8,
+      "Comunidad Autónoma": "Castilla-La Mancha",
+      "CPRO": 19,
+      "Provincia": "Guadalajara"
+    },
+    {
+      "CODAUTO": 8,
+      "Comunidad Autónoma": "Castilla-La Mancha",
+      "CPRO": 45,
+      "Provincia": "Toledo"
+    },
+    {
+      "CODAUTO": 9,
+      "Comunidad Autónoma": "Cataluña",
+      "CPRO": 8,
+      "Provincia": "Barcelona"
+    },
+    {
+      "CODAUTO": 9,
+      "Comunidad Autónoma": "Cataluña",
+      "CPRO": 17,
+      "Provincia": "Girona"
+    },
+    {
+      "CODAUTO": 9,
+      "Comunidad Autónoma": "Cataluña",
+      "CPRO": 25,
+      "Provincia": "Lleida"
+    },
+    {
+      "CODAUTO": 9,
+      "Comunidad Autónoma": "Cataluña",
+      "CPRO": 43,
+      "Provincia": "Tarragona"
+    },
+    {
+      "CODAUTO": 10,
+      "Comunidad Autónoma": "Comunitat Valenciana",
+      "CPRO": 3,
+      "Provincia": "Alicante\/Alacant"
+    },
+    {
+      "CODAUTO": 10,
+      "Comunidad Autónoma": "Comunitat Valenciana",
+      "CPRO": 12,
+      "Provincia": "Castellón\/Castelló"
+    },
+    {
+      "CODAUTO": 10,
+      "Comunidad Autónoma": "Comunitat Valenciana",
+      "CPRO": 46,
+      "Provincia": "Valencia\/València"
+    },
+    {
+      "CODAUTO": 11,
+      "Comunidad Autónoma": "Extremadura",
+      "CPRO": 6,
+      "Provincia": "Badajoz"
+    },
+    {
+      "CODAUTO": 11,
+      "Comunidad Autónoma": "Extremadura",
+      "CPRO": 10,
+      "Provincia": "Cáceres"
+    },
+    {
+      "CODAUTO": 12,
+      "Comunidad Autónoma": "Galicia",
+      "CPRO": 15,
+      "Provincia": "Coruña, A"
+    },
+    {
+      "CODAUTO": 12,
+      "Comunidad Autónoma": "Galicia",
+      "CPRO": 27,
+      "Provincia": "Lugo"
+    },
+    {
+      "CODAUTO": 12,
+      "Comunidad Autónoma": "Galicia",
+      "CPRO": 32,
+      "Provincia": "Ourense"
+    },
+    {
+      "CODAUTO": 12,
+      "Comunidad Autónoma": "Galicia",
+      "CPRO": 36,
+      "Provincia": "Pontevedra"
+    },
+    {
+      "CODAUTO": 13,
+      "Comunidad Autónoma": "Madrid, Comunidad de",
+      "CPRO": 28,
+      "Provincia": "Madrid"
+    },
+    {
+      "CODAUTO": 14,
+      "Comunidad Autónoma": "Murcia, Región de",
+      "CPRO": 30,
+      "Provincia": "Murcia"
+    },
+    {
+      "CODAUTO": 15,
+      "Comunidad Autónoma": "Navarra, Comunidad Foral de",
+      "CPRO": 31,
+      "Provincia": "Navarra"
+    },
+    {
+      "CODAUTO": 16,
+      "Comunidad Autónoma": "País Vasco",
+      "CPRO": 1,
+      "Provincia": "Araba\/Álava"
+    },
+    {
+      "CODAUTO": 16,
+      "Comunidad Autónoma": "País Vasco",
+      "CPRO": 48,
+      "Provincia": "Bizkaia"
+    },
+    {
+      "CODAUTO": 16,
+      "Comunidad Autónoma": "País Vasco",
+      "CPRO": 20,
+      "Provincia": "Gipuzkoa"
+    },
+    {
+      "CODAUTO": 17,
+      "Comunidad Autónoma": "Rioja, La",
+      "CPRO": 26,
+      "Provincia": "Rioja, La"
+    },
+    {
+      "CODAUTO": "Ciudades Autónomas:"
+    },
+    {
+      "CODAUTO": 18,
+      "Comunidad Autónoma": "Ceuta",
+      "CPRO": 51,
+      "Provincia": "Ceuta"
+    },
+    {
+      "CODAUTO": 19,
+      "Comunidad Autónoma": "Melilla",
+      "CPRO": 52,
+      "Provincia": "Melilla"
+    }
+  ]
+}
