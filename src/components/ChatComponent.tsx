@@ -38,7 +38,7 @@ const ChatComponent = ({ chatId }: Props) => {
     const message = input.trim()
 
     if (!message) {
-      // Opcional: Puedes mostrar una alerta o algún indicador si el mensaje está vacío
+      // Opcional: mostrar una alerta o algún indicador si el mensaje está vacío
       return
     }
 
@@ -48,7 +48,6 @@ const ChatComponent = ({ chatId }: Props) => {
       await submitExternalMessage(message)
     } catch (err) {
       console.error("Error al enviar el mensaje:", err)
-      // Opcional: Maneja el error según tus necesidades (por ejemplo, mostrar una notificación al usuario)
     }
   }
 
