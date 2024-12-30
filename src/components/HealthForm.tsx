@@ -1,15 +1,17 @@
+// src/components/HealthForm.tsx
+
 "use client"
-import React, { useState, FormEvent, useMemo, useEffect } from "react"
+import React, { useState, useEffect, FormEvent, useMemo, useRef } from "react"
 import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
-import { useLocations } from "@/components/hooks/useLocations"
-import { useHealthCenters } from "@/components/hooks/useHealthCenters"
-import provinciasData from "@/data/provincias.json"
 import Radio from "@mui/material/Radio"
-import { useUser } from "@clerk/nextjs" // Importar el hook de Clerk
+import { useUser } from "@clerk/nextjs"
 import Snackbar from "@mui/material/Snackbar"
 import MuiAlert, { AlertProps } from "@mui/material/Alert"
-import { SelectHealthCenter } from "@/lib/db/schema" // Importa el tipo inferido
+import { SelectHealthCenter } from "@/lib/db/schema"
+import { useLocations } from "@/components/hooks/useLocations" // Asegúrate de importar correctamente
+import { useHealthCenters } from "@/components/hooks/useHealthCenters" // Asegúrate de importar correctamente
+import provinciasData from "@/data/provincias.json" // Asegúrate de importar correctamente
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   function Alert(props, ref) {
@@ -19,6 +21,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 
 interface SearchFormData {
   name?: string
+  regionCA?: string
   province?: string
   municipality?: string
   locality?: string
@@ -53,6 +56,9 @@ export default function HealthForm() {
     address: "",
     postal_code: "",
   })
+  const [selectedCenter, setSelectedCenter] =
+    useState<SelectHealthCenter | null>(null)
+  const [isReadOnly, setIsReadOnly] = useState<boolean>(false)
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean
@@ -75,6 +81,46 @@ export default function HealthForm() {
       ...prev,
       [name]: value || "",
     }))
+  }
+
+  // Definición de la función resetFields
+  const resetFields = (field: string) => {
+    switch (field) {
+      case "province":
+        setSelectedMunicipio(null)
+        setFormData((prev) => ({
+          ...prev,
+          municipality: "",
+          address: "",
+          postal_code: "",
+          phone: "",
+        }))
+        break
+
+      case "municipality":
+        setFormData((prev) => {
+          const newData = { ...prev }
+          delete newData.address
+          delete newData.postal_code
+          delete newData.phone
+          return newData
+        })
+        break
+
+      case "address":
+        if (!formData.address) {
+          setFormData((prev) => {
+            const newData = { ...prev }
+            delete newData.postal_code
+            return newData
+          })
+        }
+        break
+
+      // Puedes añadir más casos si es necesario
+      default:
+        break
+    }
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -106,13 +152,51 @@ export default function HealthForm() {
           const selectedHealthCenterId = selection.selectedHealthCenterId
 
           if (selectedHealthCenterId) {
-            const index = data.results.findIndex(
+            const selectedCenter = data.results.find(
               (center: SelectHealthCenter) =>
                 center.id === selectedHealthCenterId,
             )
-            console.log("Index of selectedHealthCenterId:", index)
-            if (index !== -1) {
-              setSelectedRow(index)
+            if (selectedCenter) {
+              // Limitar los resultados a solo el centro seleccionado
+              setResults([selectedCenter])
+              setSelectedRow(0)
+              setIsReadOnly(true) // Activar modo de lectura
+
+              // Actualizar formData con todos los campos
+              setFormData({
+                name: selectedCenter.name,
+                province: selectedCenter.province,
+                municipality: selectedCenter.municipality,
+                address: selectedCenter.address,
+                postal_code: selectedCenter.postalCode,
+                phone: selectedCenter.phone,
+                // Agrega otros campos si es necesario
+              })
+
+              // Actualizar inputValues
+              setInputValues({
+                address: selectedCenter.address,
+                postal_code: selectedCenter.postalCode,
+              })
+
+              // Encontrar la opción de Provincia correspondiente
+              const selectedProvinciaOption = provincias.find(
+                (prov) => prov.label === selectedCenter.province,
+              )
+
+              if (selectedProvinciaOption) {
+                // Llamar a handleProvinciaChange para establecer Provincia y CA
+                handleProvinciaChange(selectedProvinciaOption)
+              }
+
+              // Encontrar la opción de Municipio correspondiente
+              const selectedMunicipioOption = ciudades.find(
+                (mun) => mun.label === selectedCenter.municipality,
+              )
+
+              if (selectedMunicipioOption) {
+                setSelectedMunicipio(selectedMunicipioOption)
+              }
             }
           }
         }
@@ -140,6 +224,7 @@ export default function HealthForm() {
         delete newData.postal_code
         return newData
       })
+      setIsReadOnly(false) // Reactivar el formulario
     }
   }, [selectedMunicipio])
 
@@ -163,12 +248,115 @@ export default function HealthForm() {
         delete newData.municipality
         delete newData.address
         delete newData.postal_code
+        delete newData.phone
         return newData
       })
+
+      setIsReadOnly(false) // Reactivar el formulario
     }
   }, [selectedCA, setSelectedMunicipio, setSelectedProvincia])
 
-  // Actualizar memo de códigos postales filtrados
+  const hasFetchedSelection = useRef(false)
+
+  // Cargar la selección almacenada al montar el componente
+  useEffect(() => {
+    const fetchUserSelection = async () => {
+      try {
+        const res = await fetch("/api/user-selection", { method: "GET" })
+        if (res.ok) {
+          const data = await res.json()
+          console.log("Initial selection data:", data)
+          if (data.selectedHealthCenterId) {
+            const centersResponse = await fetch("/api/health-centers", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({}), // Puedes agregar filtros si es posible
+            })
+            if (centersResponse.ok) {
+              const centersData = await centersResponse.json()
+              const foundCenter = centersData.results.find(
+                (center: SelectHealthCenter) =>
+                  center.id === data.selectedHealthCenterId,
+              )
+              if (foundCenter) {
+                // Actualizar el estado de selectedCenter
+                setSelectedCenter(foundCenter)
+
+                // Limitar los resultados a solo el centro seleccionado
+                setResults([foundCenter])
+                setSelectedRow(0)
+                setIsReadOnly(true) // Activar modo de lectura
+
+                // Actualizar formData con todos los campos
+                setFormData({
+                  name: foundCenter.name,
+                  regionCA: foundCenter.region,
+                  province: foundCenter.province,
+                  municipality: foundCenter.municipality,
+                  address: foundCenter.address,
+                  postal_code: foundCenter.postalCode,
+                  phone: foundCenter.phone,
+                  // Agrega otros campos si es necesario
+                })
+
+                // Actualizar inputValues
+                setInputValues({
+                  address: foundCenter.address,
+                  postal_code: foundCenter.postalCode,
+                })
+
+                // Encontrar la opción de Provincia correspondiente
+                const selectedProvinciaOption = provincias.find(
+                  (prov) => prov.label === foundCenter.province,
+                )
+
+                if (selectedProvinciaOption) {
+                  // Llamar a handleProvinciaChange para establecer Provincia y CA
+                  handleProvinciaChange(selectedProvinciaOption)
+                }
+
+                // Encontrar la opción de Municipio correspondiente
+                const selectedMunicipioOption = ciudades.find(
+                  (mun) => mun.label === foundCenter.municipality,
+                )
+
+                if (selectedMunicipioOption) {
+                  setSelectedMunicipio(selectedMunicipioOption)
+                }
+
+                // **Agregar console.log para verificar cada campo**
+                console.log("Centro Seleccionado:")
+                console.log("Nombre:", foundCenter.name)
+                console.log("Provincia:", foundCenter.province)
+                console.log("Municipio:", foundCenter.municipality)
+                console.log("Dirección:", foundCenter.address)
+                console.log("Código Postal:", foundCenter.postalCode)
+                console.log("Teléfono:", foundCenter.phone)
+                // Agrega más console.log si tienes otros campos
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching initial user selection:", error)
+      }
+    }
+
+    // Solo si el usuario está cargado y autenticado, y aún no se ha hecho la llamada
+    if (isLoaded && isSignedIn && !hasFetchedSelection.current) {
+      hasFetchedSelection.current = true // Marcar que ya se ha hecho la llamada
+      fetchUserSelection()
+    }
+  }, [
+    isLoaded,
+    isSignedIn,
+    provincias,
+    ciudades,
+    handleProvinciaChange,
+    setSelectedMunicipio,
+  ])
+
+  // Filtro para los códigos postales
   const filteredPostalCodes = useMemo(() => {
     if (!groupedData?.centers) return []
 
@@ -191,7 +379,7 @@ export default function HealthForm() {
     return Array.from(new Set(postalCodes))
   }, [groupedData, formData.address, selectedMunicipio])
 
-  // Actualizar memo de direcciones filtradas
+  // Filtro para las direcciones
   const filteredAddresses = useMemo(() => {
     if (!groupedData?.centers) return []
 
@@ -238,42 +426,6 @@ export default function HealthForm() {
     provincias,
   ])
 
-  // Actualizar los inputs en caso de borrar un campo
-  const resetFields = (field: string) => {
-    switch (field) {
-      case "province":
-        setSelectedMunicipio(null)
-        setFormData((prev) => ({
-          ...prev,
-          municipality: "",
-          address: "",
-          postal_code: "",
-          phone: "",
-        }))
-        break
-
-      case "municipality":
-        setFormData((prev) => {
-          const newData = { ...prev }
-          delete newData.address
-          delete newData.postal_code
-          delete newData.phone
-          return newData
-        })
-        break
-
-      case "address":
-        if (!formData.address) {
-          setFormData((prev) => {
-            const newData = { ...prev }
-            delete newData.postal_code
-            return newData
-          })
-        }
-        break
-    }
-  }
-
   // Manejar la selección del teléfono
   const handlePhoneSelection = (
     value: { id: string; phone: string; center?: SelectHealthCenter } | null,
@@ -288,6 +440,7 @@ export default function HealthForm() {
         address: "",
         postal_code: "",
       })
+      setIsReadOnly(false) // Asegurar que el formulario está activo
       return
     }
 
@@ -393,6 +546,9 @@ export default function HealthForm() {
         message: "Selección guardada con éxito",
         severity: "success",
       })
+
+      // Activar modo de lectura
+      setIsReadOnly(true)
     } catch (error: any) {
       console.error("Error al guardar la selección:", error)
       setSnackbar({
@@ -433,6 +589,13 @@ export default function HealthForm() {
       console.log("Data received from /api/user-selection DELETE:", data)
 
       setSelectedRow(null)
+      setIsReadOnly(false) // Reactivar el formulario
+      setFormData({})
+      setInputValues({
+        address: "",
+        postal_code: "",
+      })
+
       setSnackbar({
         open: true,
         message: "Selección borrada exitosamente",
@@ -448,6 +611,13 @@ export default function HealthForm() {
     }
   }
 
+  // useEffect adicional para depurar los estados
+  useEffect(() => {
+    console.log("Selected CA:", selectedCA)
+    console.log("Selected Provincia:", selectedProvincia)
+    console.log("Selected Municipio:", selectedMunicipio)
+  }, [selectedCA, selectedProvincia, selectedMunicipio])
+
   return (
     <div className="max-w-6xl mx-auto p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -457,12 +627,20 @@ export default function HealthForm() {
             options={comunidadesAutonomas}
             getOptionLabel={(option) => option.label}
             renderInput={(params) => (
-              <TextField {...params} label="Comunidad Autónoma" />
+              <TextField
+                {...params}
+                label={
+                  isReadOnly && selectedCenter
+                    ? selectedCenter.region
+                    : "Comunidad Autónoma"
+                }
+              />
             )}
             onChange={(_, value) => setSelectedCA(value)}
             isOptionEqualToValue={(option, value) =>
               option?.value === value?.value
             }
+            disabled={isReadOnly} // Deshabilitar en modo lectura
           />
 
           <Autocomplete
@@ -470,35 +648,50 @@ export default function HealthForm() {
             options={provincias}
             getOptionLabel={(option) => option.label}
             renderInput={(params) => (
-              <TextField {...params} label="Provincia" />
+              <TextField
+                {...params}
+                label={
+                  isReadOnly && selectedCenter
+                    ? selectedCenter.province
+                    : "Provincia"
+                }
+              />
             )}
             onChange={(_, value) => {
               handleProvinciaChange(value)
               handleAutocompleteChange("province", value?.label || null)
-              resetFields("province")
+              resetFields("province") // Utilizar resetFields
             }}
             isOptionEqualToValue={(option, value) =>
               option?.value === value?.value
             }
+            disabled={isReadOnly} // Deshabilitar en modo lectura
           />
 
           <Autocomplete
-            disabled={!selectedProvincia}
+            disabled={!selectedProvincia || isReadOnly} // Deshabilitar si no hay provincia seleccionada o en modo lectura
             value={selectedMunicipio}
             options={ciudades}
             getOptionLabel={(option) => option.label}
             renderInput={(params) => (
-              <TextField {...params} label="Municipio" />
+              <TextField
+                {...params}
+                label={
+                  isReadOnly && selectedCenter
+                    ? selectedCenter.municipality
+                    : "Municipio"
+                }
+              />
             )}
             onChange={(_, value) => {
               setSelectedMunicipio(value)
               handleAutocompleteChange("municipality", value?.label || null)
-              resetFields("municipality")
+              resetFields("municipality") // Utilizar resetFields
             }}
           />
 
           <Autocomplete
-            disabled={!selectedMunicipio}
+            disabled={!selectedMunicipio || isReadOnly} // Deshabilitar si no hay municipio seleccionado o en modo lectura
             options={filteredAddresses}
             freeSolo
             value={inputValues.address}
@@ -532,7 +725,7 @@ export default function HealthForm() {
           />
 
           <Autocomplete
-            disabled={!selectedMunicipio}
+            disabled={!selectedMunicipio || isReadOnly} // Deshabilitar si no hay municipio seleccionado o en modo lectura
             options={filteredPostalCodes}
             freeSolo
             value={inputValues.postal_code}
@@ -557,34 +750,47 @@ export default function HealthForm() {
           <Autocomplete
             options={filteredPhones}
             getOptionLabel={(option) => option.phone}
-            renderInput={(params) => <TextField {...params} label="Teléfono" />}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={
+                  isReadOnly && selectedCenter
+                    ? selectedCenter.phone
+                    : "Teléfono"
+                }
+              />
+            )}
             onChange={(_, value) => handlePhoneSelection(value)}
             isOptionEqualToValue={(option, value) => option.id === value?.id}
+            disabled={isReadOnly} // Deshabilitar en modo lectura
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-700"
+          className={`w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-700 ${
+            isReadOnly ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={isReadOnly} // Deshabilitar en modo lectura
         >
           Buscar
         </button>
         <button
           type="button"
-          disabled={selectedRow === null}
+          disabled={!isReadOnly} // Habilitar solo en modo lectura
           onClick={handleDelete}
           className={`w-[45%] border-2 border-red-600 text-purple-950 hover:text-white p-2 rounded-3xl hover:bg-red-700 mr-10 ${
-            selectedRow === null ? "opacity-50 cursor-not-allowed" : ""
+            !isReadOnly ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
           Borrar
         </button>
         <button
           type="button"
-          disabled={selectedRow === null}
+          disabled={isReadOnly} // Deshabilitar en modo lectura
           onClick={handleSave}
           className={`w-[45%] border-2 border-lime-600 text-purple-950 hover:text-white p-2 rounded-3xl hover:bg-lime-700 ml-10 ${
-            selectedRow === null ? "opacity-50 cursor-not-allowed" : ""
+            isReadOnly ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
           Guardar
@@ -618,12 +824,16 @@ export default function HealthForm() {
                       <Radio
                         checked={selectedRow === index}
                         onChange={() => {
-                          console.log(`Radio button for row ${index} clicked`)
-                          setSelectedRow(index)
+                          if (!isReadOnly) {
+                            // Evitar cambiar selección en modo lectura
+                            console.log(`Radio button for row ${index} clicked`)
+                            setSelectedRow(index)
+                          }
                         }}
                         value={index}
                         name="row-radio"
                         size="small"
+                        disabled={isReadOnly} // Deshabilitar en modo lectura
                       />
                     </td>
                     <td className="px-4 py-2">{center.name}</td>

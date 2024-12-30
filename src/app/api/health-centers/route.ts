@@ -4,9 +4,9 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { healthCenters } from "@/lib/db/schema"
 import { eq, ilike, and } from "drizzle-orm"
-import { SelectHealthCenter } from "@/lib/db/schema" // Importa el tipo
 
 interface SearchFormData {
+  id?: number
   name?: string
   province?: string
   municipality?: string
@@ -19,7 +19,7 @@ interface SearchFormData {
 
 export async function GET() {
   try {
-    const results: SelectHealthCenter[] = await db.select().from(healthCenters)
+    const results = await db.select().from(healthCenters)
     return NextResponse.json({ results })
   } catch (error) {
     console.error("Error fetching health centers:", error)
@@ -35,6 +35,7 @@ export async function POST(req: Request) {
     const formData: SearchFormData = await req.json()
     const filters: any[] = []
 
+    if (formData.id) filters.push(eq(healthCenters.id, formData.id))
     if (formData.name)
       filters.push(ilike(healthCenters.name, `%${formData.name}%`))
     if (formData.province)
@@ -59,7 +60,7 @@ export async function POST(req: Request) {
       )
 
     const query = db.select().from(healthCenters)
-    const results: SelectHealthCenter[] =
+    const results =
       filters.length > 0 ? await query.where(and(...filters)) : await query
 
     return NextResponse.json({ results })

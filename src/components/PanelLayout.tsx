@@ -6,6 +6,9 @@ import { ConversationHistory } from "./ConversationHistory"
 import { UserData } from "./UserData"
 import DataForm from "./DataForm"
 import HealthForm from "./HealthForm"
+//import BankData from "./BankData"
+//import ConversationsHistory from "./ConversationsHistory"
+//import SavedChats from "./SavedChats"
 
 interface PanelDataProps {
   totalConversations: number
@@ -30,6 +33,7 @@ export function PanelData({
     </div>
   )
 }
+
 // Panel de Datos de usuario
 export function UserProfile() {
   return (
@@ -41,17 +45,11 @@ export function UserProfile() {
 }
 
 // panel de datos de salud
-export function HealthData() {
+export function HealthDataComponentWrapper() {
   return (
     <div className="space-y-6 max-w-6xl">
       <HealthForm />
-      {/* Añadir contenido de salud */}
-      {/* <div className="space-y-6">
-        <h3>
-          <span className="text-orange-600 font-semibold italic">TO-DO: </span>
-          Espacio para mostrar los datos de la salud
-        </h3>
-      </div> */}
+      {/* Puedes añadir más contenido si es necesario */}
     </div>
   )
 }
@@ -85,17 +83,13 @@ export function ConversationsHistory({ messages }: PanelHistoryProps) {
   )
 }
 
-// TODO interface PanelSavedProps {
-//   savedMessages: any[];
-// }
-
 // Panel de Chats guardados
 export function SavedChats() {
   return (
     <div className="space-y-6">
       <h3>
         <span className="text-orange-600 font-semibold italic">TO-DO: </span>
-        Espacio para mostrar los chats guardados los chats
+        Espacio para mostrar los chats guardados
       </h3>
       {/* Add saved chats components */}
     </div>
@@ -137,15 +131,15 @@ export function PanelLayout({
       case "panel":
         return <PanelData {...panelData} />
       case "usuario":
-        return <UserProfile {...userData} />
+        return <UserProfile />
       case "salud":
-        return <HealthData {...healthData} />
+        return <HealthDataComponentWrapper />
       case "banca":
-        return <BankData {...bankData} />
+        return <BankData />
       case "historial":
         return <ConversationsHistory {...conversationsHistory} />
       case "chats":
-        return <SavedChats {...savedChats} />
+        return <SavedChats />
       default:
         return null
     }
