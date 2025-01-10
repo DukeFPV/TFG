@@ -12,7 +12,7 @@ const cardsConfig = [
     icon: "/icons/salud.svg",
     title: "Salud digital",
     description: "Te puedo guiar paso a paso como pedir la cita.",
-    text: "¿Cómo me puedes ayudar en temas de salud?",
+    text: "¿Cómo puedo pedir cita en mi centro de salud paso a paso?",
   },
   {
     backgroundColor: "bg-yellow-50",

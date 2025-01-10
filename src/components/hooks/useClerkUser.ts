@@ -4,7 +4,7 @@ export const useClerkUserData = () => {
   const { user, isLoaded, isSignedIn } = useClerkUser()
 
   return {
-    user,
+    user: isLoaded && isSignedIn ? user : null,
     isLoaded,
     isSignedIn,
   }

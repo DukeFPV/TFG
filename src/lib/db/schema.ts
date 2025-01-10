@@ -50,6 +50,7 @@ export const user_profiles = pgTable("user_profiles", {
   selectedHealthCenterId: integer("selected_health_center_id").references(
     () => healthCenters.id,
   ),
+  currentStep: integer("current_step").default(1),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 })
 
@@ -83,6 +84,7 @@ export const messages = pgTable("messages", {
   content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   role: userSystemEnum("role").notNull(),
+  image: text("image"), // Columna de imagen opcional
 })
 
 export type InsertChat = typeof chats.$inferInsert

@@ -1,3 +1,5 @@
+// src/components/ChatComponent.tsx
+
 "use client"
 
 import React, { useEffect } from "react"
@@ -7,6 +9,8 @@ import { Send, CircleStop } from "lucide-react" // Importar CircleStop
 import MessageList from "./MessageList"
 import LoadingBubble from "./LoadingBubble"
 import { useChatContext } from "@/context/ChatContext"
+import { CustomMessage } from "@/types/location" // Importa CustomMessage
+import toast from "react-hot-toast" // Asegúrate de importar toast
 
 type Props = { chatId: number }
 
@@ -25,6 +29,10 @@ const ChatComponent = ({ chatId }: Props) => {
     messages,
     submitExternalMessage,
     cancelRequest,
+    advanceStep,
+    goBackStep,
+    exitStepByStep,
+    isAtFirstStep, // Mantener si aún se usa
   } = useChatContext()
 
   const [input, setInput] = React.useState("")
@@ -48,6 +56,7 @@ const ChatComponent = ({ chatId }: Props) => {
       await submitExternalMessage(message)
     } catch (err) {
       console.error("Error al enviar el mensaje:", err)
+      toast.error("Error al enviar el mensaje. Por favor, intenta nuevamente.")
     }
   }
 
@@ -87,10 +96,12 @@ const ChatComponent = ({ chatId }: Props) => {
               disabled={isSubmitting} // Deshabilitar el input mientras espera respuesta
             />
             <Button
-              type={isSubmitting ? "button" : "submit"} // Cambiar tipo según el estado
-              className={`ml-2 ${isSubmitting ? "bg-red-600" : "bg-purple-600"}`} // Cambiar color según el estado
+              type="submit"
+              className={`ml-2 ${
+                isSubmitting ? "bg-red-600" : "bg-purple-600"
+              }`}
               onClick={isSubmitting ? cancelRequest : undefined} // Asignar función de cancelación
-              disabled={false} // Permitir cancelar siempre que esté enviando
+              disabled={isSubmitting} // Deshabilitar mientras se está enviando
             >
               {isSubmitting ? (
                 <CircleStop className="w-4 h-4" />

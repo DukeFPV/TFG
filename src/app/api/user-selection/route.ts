@@ -1,5 +1,3 @@
-// src/app/api/user-selection/route.ts
-
 import { NextResponse, NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { user_profiles, healthCenters } from "@/lib/db/schema"
