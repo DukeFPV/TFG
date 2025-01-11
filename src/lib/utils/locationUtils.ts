@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react"
 import provinciasData from "@/data/provincias.json"
 import ciudadesData from "@/data/ciudades.json"
-import { LocationOption } from "@/types/location"
+import { LocationOption } from "@/types/interfaceTypes"
 
 export const useLocations = () => {
   const [selectedCA, setSelectedCA] = useState<LocationOption | null>(null)

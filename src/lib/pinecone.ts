@@ -23,7 +23,7 @@ type PDFPage = {
     loc: { pageNumber: number }
   }
 }
-//! se elimina url: string,
+
 export async function loadS3IntoPinecone(fileKey: string) {
   //* 1. Obtener el pdf -> descargar y leer el contenido
   console.log("Descargando el archivo desde S3")

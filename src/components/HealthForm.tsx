@@ -1,5 +1,3 @@
-// src/components/HealthForm.tsx
-
 "use client"
 import React, { useState, useEffect, FormEvent, useMemo, useRef } from "react"
 import TextField from "@mui/material/TextField"
@@ -9,12 +7,14 @@ import { useUser } from "@clerk/nextjs"
 import Snackbar from "@mui/material/Snackbar"
 import MuiAlert, { AlertProps } from "@mui/material/Alert"
 import { SelectHealthCenter } from "@/lib/db/schema"
-import { useLocations } from "@/components/hooks/useLocations" // Asegúrate de importar correctamente
-import { useHealthCenters } from "@/components/hooks/useHealthCenters" // Asegúrate de importar correctamente
-import provinciasData from "@/data/provincias.json" // Asegúrate de importar correctamente
+import { useLocations } from "@/components/hooks/useLocations"
+import { useHealthCenters } from "@/components/hooks/useHealthCenters"
+import provinciasData from "@/data/provincias.json"
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   function Alert(props, ref) {
+    // Componente que muestra mensajes de estado
+    // Se usa para notificar al usuario sobre el resultado de operaciones
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
   },
 )
@@ -117,7 +117,7 @@ export default function HealthForm() {
         }
         break
 
-      // Puedes añadir más casos si es necesario
+      // Añadir más casos si es necesario
       default:
         break
     }
@@ -228,20 +228,20 @@ export default function HealthForm() {
     }
   }, [selectedMunicipio])
 
-  // Add new useEffect at the top level of the component
+  // useEffect para limpiar campos al cambiar la CA
   useEffect(() => {
     if (!selectedCA) {
-      // Clear provincia and municipio
+      // Limpiar provincia y municipio
       setSelectedProvincia(null)
       setSelectedMunicipio(null)
 
-      // Clear input values
+      // Limpiar input values
       setInputValues({
         address: "",
         postal_code: "",
       })
 
-      // Clear form data
+      // Limpiar form data
       setFormData((prev) => {
         const newData = { ...prev }
         delete newData.province
@@ -270,7 +270,7 @@ export default function HealthForm() {
             const centersResponse = await fetch("/api/health-centers", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({}), // Puedes agregar filtros si es posible
+              body: JSON.stringify({}),
             })
             if (centersResponse.ok) {
               const centersData = await centersResponse.json()

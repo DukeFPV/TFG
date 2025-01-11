@@ -1,5 +1,3 @@
-// src/context/ChatContext.tsx
-
 "use client"
 
 import React, {
@@ -10,11 +8,11 @@ import React, {
   useState,
   useEffect,
 } from "react"
-import { CustomMessage } from "@/types/location"
+import { CustomMessage } from "@/types/interfaceTypes"
 import toast from "react-hot-toast"
 import { useClerkUserData } from "@/components/hooks/useClerkUser"
-import stepsSergas from "@/data/stepMedicoSergas"
-import { set } from "zod"
+// import stepsSergas from "@/data/stepMedicoSergas"
+// import { set } from "zod"
 
 // Definir el tipo para el perfil del usuario
 type UserProfile = {

@@ -2,7 +2,7 @@ import useSWR from "swr"
 import { useMemo } from "react"
 
 interface HealthCenter {
-  id?: number // Add id field if not present
+  id?: number // Añade el id si es necesario
   address: string
   municipality: string
   postalCode: string

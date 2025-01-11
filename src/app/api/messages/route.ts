@@ -1,5 +1,3 @@
-// src/app/api/messages/route.ts
-
 import { db } from "@/lib/db"
 import { messages } from "@/lib/db/schema"
 import { auth } from "@clerk/nextjs/server"

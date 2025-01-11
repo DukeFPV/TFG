@@ -1,4 +1,3 @@
-// /api/delete-chat/route.ts
 import { db } from "@/lib/db"
 import { chats, messages } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"

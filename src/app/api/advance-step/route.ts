@@ -1,5 +1,3 @@
-// src/app/api/advance-step/route.ts
-
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { user_profiles, messages } from "@/lib/db/schema"

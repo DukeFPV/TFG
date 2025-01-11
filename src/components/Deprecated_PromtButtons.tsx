@@ -1,4 +1,4 @@
-//!! No se implementa en el proyecto
+//!! No se implementa en el proyecto, se puede eliminar. Siguiendo el tutorial de
 
 interface PromtButtonsProps {
   text: string

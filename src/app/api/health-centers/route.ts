@@ -1,5 +1,3 @@
-// src/app/api/health-centers/route.ts
-
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { healthCenters } from "@/lib/db/schema"

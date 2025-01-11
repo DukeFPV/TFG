@@ -1,14 +1,14 @@
-// src/components/MessageList.tsx
-
 "use client"
 
+import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { CustomMessage } from "@/types/location" // Importa el tipo personalizado
+import { CustomMessage } from "@/types/interfaceTypes" // Importa el tipo personalizado
 import React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import Image from "next/image"
-import { useChatContext } from "@/context/ChatContext" // Importa el hook
+import { useChatContext } from "@/context/ChatContext" // Importa el contexto
+import ImageModal from "./ImageModal"
 
 type Props = {
   messages: CustomMessage[]
@@ -16,6 +16,32 @@ type Props = {
 
 const MessageList = ({ messages }: Props) => {
   const { advanceStep, goBackStep, exitStepByStep } = useChatContext()
+
+  // Estados para el modal de imagen
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalImageSrc, setModalImageSrc] = useState<string>("")
+  const [modalImageAlt, setModalImageAlt] = useState<string>("")
+  const [modalImageWidth, setModalImageWidth] = useState<number>(600) // Ajusta según necesidad
+  const [modalImageHeight, setModalImageHeight] = useState<number>(400) // Ajusta según necesidad
+
+  // Función para abrir el modal con la imagen seleccionada
+  const openModal = (
+    src: string,
+    alt: string,
+    width: number,
+    height: number,
+  ) => {
+    setModalImageSrc(src)
+    setModalImageAlt(alt)
+    setModalImageWidth(width)
+    setModalImageHeight(height)
+    setIsModalOpen(true)
+  }
+
+  // Función para cerrar el modal
+  const closeModal = () => {
+    setIsModalOpen(false)
+  }
 
   return (
     <div className="flex flex-col gap-2 px-4 pb-3">
@@ -76,9 +102,17 @@ const MessageList = ({ messages }: Props) => {
                   <Image
                     src={`/docs/${message.image}`} // Ruta corregida
                     alt={`Imagen para el mensaje ${message.id}`}
-                    width={1200} // Ajusta el tamaño según tus necesidades
-                    height={800}
+                    width={600} // Ajusta el tamaño según tus necesidades
+                    height={400}
                     className="rounded-md max-w-full h-auto"
+                    onClick={() =>
+                      openModal(
+                        `/docs/${message.image}`,
+                        `Imagen para el mensaje ${message.id}`,
+                        1200, // Nuevo width al ampliar
+                        800, // Nuevo height al ampliar
+                      )
+                    }
                   />
                 </div>
               )}
@@ -123,6 +157,15 @@ const MessageList = ({ messages }: Props) => {
           </div>
         )
       })}
+      {/* Componente Modal para la Imagen */}
+      <ImageModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        src={modalImageSrc}
+        alt={modalImageAlt}
+        width={modalImageWidth}
+        height={modalImageHeight}
+      />
     </div>
   )
 }

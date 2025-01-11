@@ -1,4 +1,3 @@
-// Importaciones necesarias desde React y Next.js
 import Link from "next/link"
 import React from "react"
 

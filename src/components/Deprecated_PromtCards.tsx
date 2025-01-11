@@ -1,6 +1,6 @@
 import FeatureCard from "./FeatureCard"
-import PromtButtons from "./PromtButtons"
 
+//!!Deprecated, se implementó ChatSideBarR.tsx
 //!!Componente complicado para implementar de esta forma, alternativa en el archivo ChatSideBarR.tsx
 
 const PromtCards = ({

@@ -1,5 +1,3 @@
-// src/components/ChatComponent.tsx
-
 "use client"
 
 import React, { useEffect } from "react"
@@ -9,7 +7,6 @@ import { Send, CircleStop } from "lucide-react" // Importar CircleStop
 import MessageList from "./MessageList"
 import LoadingBubble from "./LoadingBubble"
 import { useChatContext } from "@/context/ChatContext"
-import { CustomMessage } from "@/types/location" // Importa CustomMessage
 import toast from "react-hot-toast" // Asegúrate de importar toast
 
 type Props = { chatId: number }
@@ -18,7 +15,6 @@ type Props = { chatId: number }
  * Componente de chat que maneja la funcionalidad de chat en tiempo real.
  *
  * @param {number} chatId - Identificador único para la sesión de chat.
- *
  * @returns Interfaz de chat funcional con opciones de envío y cancelación.
  */
 const ChatComponent = ({ chatId }: Props) => {
@@ -29,10 +25,6 @@ const ChatComponent = ({ chatId }: Props) => {
     messages,
     submitExternalMessage,
     cancelRequest,
-    advanceStep,
-    goBackStep,
-    exitStepByStep,
-    isAtFirstStep, // Mantener si aún se usa
   } = useChatContext()
 
   const [input, setInput] = React.useState("")
