@@ -5,9 +5,9 @@ import { eq } from "drizzle-orm"
 
 export async function GET(
   request: Request,
-  context: { params: { id: string } },
+  context: { params: Promise<{ id: string }> },
 ) {
-  const { id } = context.params
+  const id = (await context).params
 
   try {
     const center = await db
