@@ -4,10 +4,10 @@ import { healthCenters } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 
 export async function GET(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
-) {
-  const id = (await context).params
+  _request: Request,
+  { params }: { params: { id: string } },
+): Promise<NextResponse> {
+  const id = params.id
 
   try {
     const center = await db
