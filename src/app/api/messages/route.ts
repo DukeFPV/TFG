@@ -82,7 +82,7 @@ export async function GET(req: Request) {
       .execute()
 
     // Retornar los mensajes dentro de un objeto con la propiedad 'messages'
-    return NextResponse.json({ messages: savedMessages }) // Modificación clave
+    return NextResponse.json({ messages: savedMessages })
   } catch (error) {
     console.error(error)
     return NextResponse.json(

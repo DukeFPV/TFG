@@ -11,8 +11,8 @@ import React, {
 import { CustomMessage } from "@/types/interfaceTypes"
 import toast from "react-hot-toast"
 import { useClerkUserData } from "@/components/hooks/useClerkUser"
-// import stepsSergas from "@/data/stepMedicoSergas"
-// import { set } from "zod"
+import { parseMarkdownIntoBlocks } from "@/lib/utils/markdownUtils" // Importar la función para dar formato a Markdown
+import { v4 as uuidv4 } from "uuid"
 
 // Definir el tipo para el perfil del usuario
 type UserProfile = {
@@ -22,9 +22,13 @@ type UserProfile = {
 }
 
 type ChatContextType = {
-  submitExternalMessage: (text: string) => Promise<void>
+  submitExternalMessage: (
+    text: string,
+    shouldAdvanceStep?: boolean,
+  ) => Promise<string | undefined>
   cancelRequest: () => void
   isSubmitting: boolean
+  isProcessingChunk: boolean
   error: string | null
   isLoading: boolean
   messages: CustomMessage[]
@@ -34,39 +38,154 @@ type ChatContextType = {
   exitStepByStep: () => void
   isAtFirstStep: boolean
   currentStep: number
+  handleSTTText: (text: string) => void
+  isStepByStep: boolean
+  reiniciarStep: () => Promise<void>
+  startConversation: () => Promise<void>
+  endConversation: () => Promise<void>
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
 
-export const ChatProvider = ({
-  children,
-  chatId,
-}: {
+interface ChatProviderProps {
   children: ReactNode
   chatId: number
-}) => {
+}
+
+export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [messages, setMessages] = useState<CustomMessage[]>([])
   const [abortController, setAbortController] =
     useState<AbortController | null>(null)
+
+  // Estados para el modo paso a paso
+  const [isStepByStep, setIsStepByStep] = useState(false)
   const [isAtFirstStep, setIsAtFirstStep] = useState(false)
   const [currentStep, setCurrentStep] = useState<number>(1)
 
-  // Obtener los datos del usuario
+  // Estado para controlar el audio
+  const [audioPlay, setAudioPlay] = useState(false)
+  const [isProcessingChunk, setIsProcessingChunk] = useState(false)
+  const CHUNK_SIZE = 100 // characters
+  const [audioQueue, setAudioQueue] = useState<string[]>([])
+
+  // Obtener datos de Clerk
   const { user, isLoaded, isSignedIn } = useClerkUserData()
   const userId = isLoaded && isSignedIn ? user?.id : null
+  console.log("audioPlay 74:", audioPlay)
 
-  // Función para agregar mensajes
-  const addMessage = useCallback(
-    (msg: CustomMessage) => {
-      setMessages((prev) => [...prev, msg])
+  // Función para manejar TTS
+  const handleTTS = useCallback(
+    async (message: string): Promise<string | null> => {
+      // Validate message
+      if (!message || message.trim() === "") {
+        console.error("Empty message received in handleTTS")
+        return null
+      }
+
+      console.log("handleTTS received message 85:", message) // Debug log
+
+      try {
+        const response = await fetch("/api/tts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: message.trim(),
+          }),
+        })
+
+        console.log("TTS API request payload 98:", { text: message.trim() }) // Debug log
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error("TTS API error:", errorData)
+          throw new Error(
+            `Failed to generate speech: ${errorData.error || response.statusText}`,
+          )
+        }
+
+        const data = await response.json()
+        console.log("TTS API response:", data) // Debug log
+        return data.url
+      } catch (error) {
+        console.error("Error generating TTS:", error)
+        return null
+      }
     },
-    [setMessages],
+    [],
   )
 
-  // Función para obtener mensajes iniciales y el perfil del usuario
+  const processStreamingTTS = useCallback(
+    async (textChunk: string) => {
+      if (!audioPlay || isProcessingChunk || textChunk.length < CHUNK_SIZE)
+        return
+
+      setIsProcessingChunk(true)
+      try {
+        const audioUrl = await handleTTS(textChunk)
+        if (audioUrl) {
+          setAudioQueue((prev) => [...prev, audioUrl])
+        }
+      } finally {
+        setIsProcessingChunk(false)
+      }
+    },
+    [audioPlay, isProcessingChunk, CHUNK_SIZE, handleTTS],
+  )
+
+  // Función para agregar mensajes al estado
+  const addMessage = useCallback((msg: CustomMessage) => {
+    setMessages((prev) => [...prev, msg])
+  }, [])
+
+  // --- Función para enviar mensajes del asistente a través de la API de chat ---
+  // const sendAssistantMessage = useCallback(
+  //   async (text: string) => {
+  //     try {
+  //       // Crear mensaje del asistente
+  //       const assistantMessage: CustomMessage = {
+  //         id: uuidv4(),
+  //         role: "assistant",
+  //         content: text,
+  //         image: null,
+  //         buttons: [],
+  //         markdownBlocks: parseMarkdownIntoBlocks(text),
+  //       }
+
+  //       // Enviar mensaje a la API para almacenarlo en la base de datos
+  //       const response = await fetch("/api/chat", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({
+  //           messages: [assistantMessage], // Enviar solo el mensaje del asistente
+  //           chatId,
+  //         }),
+  //       })
+
+  //       if (!response.ok) {
+  //         const errorData = await response.json()
+  //         throw new Error(
+  //           errorData.error || "Error al enviar el mensaje del asistente",
+  //         )
+  //       }
+
+  //       // Añadir el mensaje al estado local (esto también activará TTS si está activo)
+  //       addMessage(assistantMessage)
+  //     } catch (error: any) {
+  //       console.error("Error al enviar mensaje del asistente:", error)
+  //       toast.error(
+  //         "Error al enviar el mensaje del asistente. Por favor, intenta nuevamente.",
+  //       )
+  //     }
+  //   },
+  //   [chatId, addMessage],
+  // )
+
+  // Obtener mensajes iniciales y el perfil del usuario
   const fetchMessagesAndProfile = useCallback(async () => {
     if (!userId) {
       setIsLoading(false)
@@ -79,9 +198,7 @@ export const ChatProvider = ({
       if (!messagesResponse.ok) throw new Error("Error al obtener mensajes")
       const messagesData = await messagesResponse.json()
 
-      // Asegurarse de que 'messagesData.messages' es un array
       if (Array.isArray(messagesData.messages)) {
-        // Mapear los mensajes para que coincidan con CustomMessage
         const formattedMessages: CustomMessage[] = messagesData.messages.map(
           (msg: {
             id: number | string
@@ -90,11 +207,12 @@ export const ChatProvider = ({
             image: string | null
             buttons?: any[]
           }) => ({
-            id: msg.id.toString(), // Convertir id a string si es necesario
+            id: msg.id.toString(),
             role: msg.role,
             content: msg.content,
             image: msg.image,
-            buttons: msg.buttons || undefined, // Añadir buttons si existen
+            buttons: msg.buttons || undefined,
+            markdownBlocks: parseMarkdownIntoBlocks(msg.content),
           }),
         )
         setMessages(formattedMessages)
@@ -102,29 +220,34 @@ export const ChatProvider = ({
         setMessages([])
       }
 
-      // Obtener el perfil del usuario
+      // Obtener el perfil
       const profileResponse = await fetch(`/api/get-profile`)
       if (!profileResponse.ok)
         throw new Error("Error al obtener el perfil del usuario")
       const profileData = await profileResponse.json()
       const userProfile: UserProfile = profileData.user
 
-      // Determinar si estamos en el primer paso
-      setCurrentStep(userProfile.currentStep)
+      // Ajustar estado con info del perfil
       setIsAtFirstStep(userProfile.currentStep <= 1)
+      setCurrentStep(userProfile.currentStep)
 
-      setIsLoading(false) // Mensajes y perfil cargados
+      setIsLoading(false)
     } catch (error) {
       console.error("Error al obtener mensajes o perfil:", error)
       toast.error(
         "No se pudieron cargar los mensajes o el perfil. Por favor, inténtalo de nuevo.",
       )
-      setIsLoading(false) // Terminar carga incluso en error
+      setIsLoading(false)
     }
   }, [chatId, userId])
 
-  // Función para avanzar al siguiente paso
+  useEffect(() => {
+    fetchMessagesAndProfile()
+  }, [fetchMessagesAndProfile])
+
+  // --- Funciones Step By Step (advance, back, exit) ---
   const advanceStep = useCallback(async () => {
+    setIsStepByStep(true)
     try {
       if (!userId) {
         toast.error("Usuario no identificado.")
@@ -135,37 +258,30 @@ export const ChatProvider = ({
 
       const response = await fetch("/api/advance-step", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chatId,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chatId }),
       })
-
-      console.log("Respuesta de /api/advance-step:", response)
 
       if (!response.ok) {
         const errorData = await response.json()
-        console.error("Error en /api/advance-step:", errorData)
         throw new Error(errorData.error || "Error al avanzar el paso")
       }
 
       const data = await response.json()
-      console.log("Datos recibidos de /api/advance-step:", data)
       toast.success(data.message)
 
       setIsAtFirstStep(data.currentStep <= 1)
+      setCurrentStep(data.currentStep)
 
-      // Agregar el nuevo mensaje del asistente con botones
       if (data.step) {
         const { text, image, buttons } = data.step
         const newMessage: CustomMessage = {
-          id: Date.now().toString(),
+          id: uuidv4(),
           role: "assistant",
           content: text,
           image: image || null,
           buttons: buttons || [],
+          markdownBlocks: parseMarkdownIntoBlocks(text),
         }
         addMessage(newMessage)
       }
@@ -173,22 +289,67 @@ export const ChatProvider = ({
       if (data.finalMessage) {
         const { content, image, buttons } = data.finalMessage
         const finalMessage: CustomMessage = {
-          id: Date.now().toString(),
+          id: uuidv4(),
           role: "assistant",
           content,
           image: image || null,
           buttons: buttons || [],
+          markdownBlocks: parseMarkdownIntoBlocks(content),
         }
         addMessage(finalMessage)
       }
-    } catch (error: any) {
-      console.error("Error al avanzar al siguiente paso:", error)
-      toast.error("Ocurrió un error al avanzar al siguiente paso.")
+    } catch (err: any) {
+      console.error("Error al avanzar paso:", err)
+      toast.error("Ocurrió un error al avanzar el paso.")
     }
   }, [chatId, addMessage, userId])
 
-  // Función para retroceder al paso anterior
   const goBackStep = useCallback(async () => {
+    try {
+      if (!userId) {
+        toast.error("Usuario no identificado.")
+        return
+      }
+      const response = await fetch("/api/advance-step", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chatId,
+          action: "back",
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Error al retroceder el paso")
+      }
+
+      const data = await response.json()
+      toast.success(data.message)
+
+      setIsAtFirstStep(data.currentStep <= 1)
+      setCurrentStep(data.currentStep)
+
+      if (data.step) {
+        const { text, image, buttons } = data.step
+        const newMessage: CustomMessage = {
+          id: uuidv4(),
+          role: "assistant",
+          content: text,
+          image: image || null,
+          buttons: buttons || [],
+          markdownBlocks: parseMarkdownIntoBlocks(text),
+        }
+        addMessage(newMessage)
+      }
+    } catch (err: any) {
+      console.error("Error al retroceder paso:", err)
+      toast.error("Ocurrió un error al retroceder al paso anterior.")
+    }
+  }, [chatId, addMessage, userId])
+
+  // Añadir la función para reiniciar
+  const reiniciarStep = useCallback(async () => {
     try {
       if (!userId) {
         toast.error("Usuario no identificado.")
@@ -196,91 +357,75 @@ export const ChatProvider = ({
       }
 
       console.log(
-        "Llamando a /api/advance-step para retroceder con chatId:",
+        "Llamando a /api/advance-step con chatId:",
         chatId,
+        "acción: reset",
       )
 
       const response = await fetch("/api/advance-step", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chatId,
-          action: "back",
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chatId, action: "reset" }),
       })
-
-      console.log("Respuesta de /api/advance-step (retroceso):", response)
 
       if (!response.ok) {
         const errorData = await response.json()
-        console.error("Error en /api/advance-step (retroceso):", errorData)
-        throw new Error(errorData.error || "Error al retroceder el paso")
+        throw new Error(errorData.error || "Error al reiniciar el paso")
       }
 
       const data = await response.json()
-      console.log("Datos recibidos de /api/advance-step (retroceso):", data)
       toast.success(data.message)
 
       setIsAtFirstStep(data.currentStep <= 1)
       setCurrentStep(data.currentStep)
 
-      // Agregar el nuevo mensaje del asistente con botones
-      if (data.step) {
-        const { text, image, buttons } = data.step
-        const newMessage: CustomMessage = {
-          id: Date.now().toString(),
+      if (data.reiniciarMessage) {
+        const { content, image, buttons } = data.reiniciarMessage
+        const reiniciarMsg: CustomMessage = {
+          id: uuidv4(),
           role: "assistant",
-          content: text,
+          content: content,
           image: image || null,
           buttons: buttons || [],
+          markdownBlocks: parseMarkdownIntoBlocks(content),
         }
-        addMessage(newMessage)
+        addMessage(reiniciarMsg)
       }
-    } catch (error: any) {
-      console.error("Error al retroceder al paso anterior:", error)
-      toast.error("Ocurrió un error al retroceder al paso anterior.")
+    } catch (err: any) {
+      console.error("Error al reiniciar paso:", err)
+      toast.error("Ocurrió un error al reiniciar la guía paso a paso.")
     }
   }, [chatId, addMessage, userId])
 
-  // Función para salir del modo paso a paso
-  const exitStepByStep = useCallback(async () => {
-    try {
-      if (!userId) {
-        toast.error("Usuario no identificado.")
-        return
-      }
+  // --- Llamada TTS streaming con /api/tts y reproducir en front ---
+  // const playTTS = async (text: string) => {
+  //   try {
+  //     const voiceId = "gD1IexrzCvsXPHUuT0s3" // ID de voz ElevenLabs
+  //     const res = await fetch("/api/tts", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         message: text,
+  //         voice: voiceId,
+  //       }), // O { text, uploadToS3: true }
+  //     })
+  //     console.log("TTS response:", res) //!! Debug
+  //     if (!res.ok) throw new Error("TTS fetch failed")
 
-      // Obtener el paso actual
-      const paso = currentStep
+  //     // Recibir en blob
+  //     const audioBlob = await res.blob()
+  //     const audioUrl = URL.createObjectURL(audioBlob)
+  //     const audio = new Audio(audioUrl)
+  //     audio.play().catch((err) => console.log("Autoplay blocked:", err))
+  //   } catch (err) {
+  //     console.error("Error en playTTS =>", err)
+  //   }
+  // }
 
-      // Crear el mensaje de salida
-      const exitMessage: CustomMessage = {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: `Has salido de la guia paso a paso, te has quedado en el paso ${paso}. Si quieres continuar desde donde lo dejaste vuelve a pulsar en el botón **Salud Digital**.`,
-        image: null, // No imagen
-        buttons: [], // Sin botones
-      }
+  // --- Función para enviar mensajes externos del usuario ---
 
-      // Añadir el mensaje al chat
-      addMessage(exitMessage)
-
-      toast.success("Has salido del modo de guía paso a paso.")
-
-      // Opcional: Puedes actualizar el estado si es necesario
-      // Por ejemplo, podrías establecer un estado para indicar que no estás en la guía
-      // setIsAtStepByStep(false)
-    } catch (error: any) {
-      console.error("Error al salir de la guía paso a paso:", error)
-      toast.error("Ocurrió un error al salir de la guía paso a paso.")
-    }
-  }, [currentStep, addMessage, userId])
-
-  // Función para enviar mensajes
   const submitExternalMessage = useCallback(
-    async (text: string) => {
+    async (text: string, shouldAdvanceStep: boolean = false) => {
       if (!text.trim()) {
         console.error("El mensaje no puede estar vacío.")
         toast.error("El mensaje no puede estar vacío.")
@@ -291,40 +436,84 @@ export const ChatProvider = ({
         setIsSubmitting(true)
         setError(null)
 
-        // Crear un AbortController para esta solicitud
+        // Si debe iniciar paso a paso, establecer el estado y llamar a advanceStep
+        if (shouldAdvanceStep) {
+          setIsStepByStep(true)
+          await advanceStep()
+          return
+        }
+
+        // Si ya estás en modo paso a paso, manejar los comandos
+        if (isStepByStep) {
+          const stepByStepKeywords = ["siguiente", "atrás", "atras", "salir"]
+          if (
+            stepByStepKeywords.some((kw) => text.toLowerCase().includes(kw))
+          ) {
+            if (text.toLowerCase().includes("salir")) {
+              // Enviar acción 'exit' a la API
+              const response = await fetch("/api/advance-step", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  chatId,
+                  action: "exit",
+                }),
+              })
+
+              if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(
+                  errorData.error || "Error al salir de paso a paso",
+                )
+              }
+
+              const data = await response.json()
+
+              if (data.exitMessage) {
+                const exitMsg: CustomMessage = {
+                  id: uuidv4(),
+                  role: "assistant",
+                  content: data.exitMessage.content,
+                  image: data.exitMessage.image,
+                  buttons: data.exitMessage.buttons,
+                  markdownBlocks: parseMarkdownIntoBlocks(
+                    data.exitMessage.content,
+                  ),
+                }
+                addMessage(exitMsg)
+              }
+
+              toast.success("Has salido del modo de guía paso a paso.")
+              setIsStepByStep(false)
+              return
+            } else if (text.toLowerCase().includes("siguiente")) {
+              await advanceStep()
+              return
+            } else if (
+              text.toLowerCase().includes("atrás") ||
+              text.toLowerCase().includes("atras")
+            ) {
+              await goBackStep()
+              return
+            }
+          }
+        }
+
         const controller = new AbortController()
         setAbortController(controller)
 
+        // Añadir mensaje del usuario
         const userMessage: CustomMessage = {
-          id: Date.now().toString(),
+          id: uuidv4(), // Generar ID único
           role: "user",
           content: text,
-          image: null, // Asegúrate de que 'image' es parte de CustomMessage
+          image: null,
+          markdownBlocks: parseMarkdownIntoBlocks(text), // Parsear Markdown si aún lo necesitas
         }
 
-        // Añadir el mensaje del usuario al estado
         addMessage(userMessage)
 
-        // Verificar si el mensaje es una solicitud de guía paso a paso
-        const stepByStepKeywords = [
-          "paso a paso",
-          "cómo puedo",
-          "como puedo",
-          "cómo puedo",
-        ]
-        const isStepByStepRequest = stepByStepKeywords.some((keyword) =>
-          text.toLowerCase().includes(keyword),
-        )
-
-        if (isStepByStepRequest) {
-          console.log("Detectado comando para iniciar guía paso a paso.")
-          await advanceStep()
-          return // Detener el flujo
-        }
-
-        console.log("Enviando mensaje a /api/chat:", userMessage)
-
-        // Llamada a la API para enviar el mensaje con el signal
+        // Llamada a /api/chat para insertar mensaje
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -335,66 +524,101 @@ export const ChatProvider = ({
           signal: controller.signal,
         })
 
-        console.log("Respuesta de /api/chat:", response)
-
         if (!response.ok) {
           const errorData = await response.json()
-          console.error("Error en /api/chat:", errorData)
           throw new Error(errorData.error || "Error al enviar el mensaje")
         }
 
-        // Manejo de la respuesta en streaming
         const reader = response.body?.getReader()
         if (!reader) throw new Error("No se pudo obtener la respuesta")
 
-        let assistantMessage: CustomMessage = {
-          id: (Date.now() + 1).toString(),
+        const assistantId = uuidv4() // Generar ID único para el asistente
+        // Añadir mensaje vacío para mostrar indicador de escritura
+        const initialAssistantMessage: CustomMessage = {
+          id: assistantId,
           role: "assistant",
           content: "",
           image: null,
+          markdownBlocks: [],
         }
+        addMessage(initialAssistantMessage)
+
+        // Acumular contenido de los chunks
+        let accumulatedContent = ""
+
+        let lastProcessedLength = 0
 
         while (true) {
           const { done, value } = await reader.read()
           if (done) break
 
           const chunk = new TextDecoder().decode(value)
-          const lines = chunk.split("\n").filter((line) => line.trim())
+          const lines = chunk.split("\n")
 
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6) // Eliminar "data: "
-              if (data === "[DONE]") continue
+          lines.forEach((line) => {
+            if (line.startsWith('0:"')) {
+              const match = line.match(/^0:"(.*)"$/)
+              if (match && match[1]) {
+                let textChunk = match[1]
+                textChunk = textChunk.replace(/\\n/g, `\n`)
+                accumulatedContent += textChunk
 
-              try {
-                const parsed = JSON.parse(data)
-                if (parsed.content) {
-                  assistantMessage.content += parsed.content
-                  addMessage({
-                    ...assistantMessage,
-                    content: assistantMessage.content,
-                  })
+                // Process TTS for new content when enough has accumulated
+                const newContent = accumulatedContent.slice(lastProcessedLength)
+                if (newContent.length >= CHUNK_SIZE) {
+                  processStreamingTTS(newContent)
+                  lastProcessedLength = accumulatedContent.length
                 }
-              } catch (e) {
-                console.error("Error al convertir el fragmento:", e)
+
+                setMessages((prevMessages) =>
+                  prevMessages.map((msg) =>
+                    msg.id === assistantId
+                      ? {
+                          ...msg,
+                          content: accumulatedContent,
+                        }
+                      : msg,
+                  ),
+                )
               }
             }
+          })
+        }
+
+        // Process any remaining content
+        if (accumulatedContent.slice(lastProcessedLength)) {
+          processStreamingTTS(accumulatedContent.slice(lastProcessedLength))
+        }
+
+        // After streaming completes, process TTS
+        if (audioPlay && accumulatedContent) {
+          console.log(
+            "Processing TTS for accumulated content:",
+            accumulatedContent,
+          )
+          const audioUrl = await handleTTS(accumulatedContent)
+          if (audioUrl) {
+            setMessages((prevMessages) =>
+              prevMessages.map((msg) =>
+                msg.id === assistantId
+                  ? {
+                      ...msg,
+                      audioUrl,
+                    }
+                  : msg,
+              ),
+            )
           }
+          console.log("TTS audio URL:", audioUrl)
         }
 
-        // Añadir el mensaje del asistente si tiene contenido
-        if (assistantMessage.content) {
-          addMessage(assistantMessage)
-        }
-
-        // Actualizar mensajes desde el servidor
-        await fetchMessagesAndProfile()
-      } catch (error: any) {
-        if (error.name === "AbortError") {
+        return accumulatedContent
+      } catch (err: any) {
+        if (err.name === "AbortError") {
           console.log("Solicitud abortada")
           toast.error("La solicitud fue cancelada.")
         } else {
-          console.error("Error al enviar el mensaje:", error)
+          console.error("Error al enviar mensaje:", err)
           toast.error(
             "Error al enviar el mensaje. Por favor, intenta nuevamente.",
           )
@@ -407,15 +631,30 @@ export const ChatProvider = ({
     [
       messages,
       chatId,
-      fetchMessagesAndProfile,
       addMessage,
       advanceStep,
-      // goBackStep,
-      // exitStepByStep,
+      goBackStep,
+      isStepByStep,
+      audioPlay,
+      handleTTS,
+      processStreamingTTS,
     ],
   )
 
-  // Función para cancelar la solicitud actual
+  const exitStepByStep = useCallback(async () => {
+    try {
+      if (!userId) {
+        toast.error("Usuario no identificado.")
+        return
+      }
+      // Al salir, enviamos el mensaje de salida a través de submitExternalMessage
+      await submitExternalMessage("salir")
+    } catch (err: any) {
+      console.error("Error al salir paso a paso:", err)
+      toast.error("Ocurrió un error al salir de la guía paso a paso.")
+    }
+  }, [userId, submitExternalMessage])
+
   const cancelRequest = useCallback(() => {
     if (abortController) {
       abortController.abort()
@@ -425,10 +664,83 @@ export const ChatProvider = ({
     }
   }, [abortController])
 
-  // Obtener mensajes y perfil al montar el componente
-  useEffect(() => {
-    fetchMessagesAndProfile()
-  }, [fetchMessagesAndProfile])
+  const startConversation = useCallback(async () => {
+    try {
+      setAudioPlay(true)
+      const initialMessage = {
+        chatId,
+        content:
+          "A partir de ahora y hasta que hagas click en finalizar, te daré las respuestas habladas.",
+        role: "assistant" as const,
+      }
+
+      // Save message via API
+      const response = await fetch("/api/tts-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(initialMessage),
+      })
+
+      if (!response.ok) throw new Error("Failed to save message")
+
+      // Add to local state
+      const messageWithId: CustomMessage = {
+        id: uuidv4(),
+        ...initialMessage,
+        image: null,
+        markdownBlocks: [],
+      }
+      addMessage(messageWithId)
+    } catch (error) {
+      console.error("Error starting conversation:", error)
+      toast.error("Error al iniciar conversación por voz")
+      setAudioPlay(false)
+    }
+  }, [chatId, addMessage])
+
+  const endConversation = useCallback(async () => {
+    try {
+      setAudioPlay(false)
+      const endMessage = {
+        chatId,
+        content:
+          "Has finalizado la conversación hablada. Puedes seguir chateando normalmente.",
+        role: "assistant" as const,
+      }
+
+      // Save message via API
+      const response = await fetch("/api/tts-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(endMessage),
+      })
+
+      if (!response.ok) throw new Error("Failed to save message")
+
+      // Add to local state
+      const messageWithId: CustomMessage = {
+        id: uuidv4(),
+        ...endMessage,
+        image: null,
+        markdownBlocks: [],
+      }
+      addMessage(messageWithId)
+    } catch (error) {
+      console.error("Error ending conversation:", error)
+      toast.error("Error al finalizar conversación por voz")
+    }
+  }, [chatId, addMessage])
+
+  /**
+   * handleSTTText:
+   * si ElevenLabs STT produce texto, lo mandamos a GPT
+   */
+  const handleSTTText = useCallback(
+    (text: string) => {
+      submitExternalMessage(text)
+    },
+    [submitExternalMessage],
+  )
 
   return (
     <ChatContext.Provider
@@ -445,6 +757,12 @@ export const ChatProvider = ({
         exitStepByStep,
         isAtFirstStep,
         currentStep,
+        handleSTTText,
+        isStepByStep,
+        reiniciarStep,
+        startConversation,
+        endConversation,
+        isProcessingChunk,
       }}
     >
       {children}
@@ -452,15 +770,10 @@ export const ChatProvider = ({
   )
 }
 
-/**
- * Hook personalizado para acceder al ChatContext.
- * @returns El valor del ChatContext.
- * @throws {Error} Si se usa fuera de un componente ChatProvider.
- */
 export const useChatContext = () => {
-  const context = useContext(ChatContext)
-  if (!context) {
+  const ctx = useContext(ChatContext)
+  if (!ctx) {
     throw new Error("useChatContext debe ser usado dentro de ChatProvider")
   }
-  return context
+  return ctx
 }

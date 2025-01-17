@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { Send, CircleStop } from "lucide-react" // Importar CircleStop
@@ -8,6 +8,10 @@ import MessageList from "./MessageList"
 import LoadingBubble from "./LoadingBubble"
 import { useChatContext } from "@/context/ChatContext"
 import toast from "react-hot-toast" // Asegúrate de importar toast
+import axios from "axios"
+import { Message } from "ai"
+import { useQuery } from "@tanstack/react-query"
+import { CustomMessage } from "@/types/interfaceTypes"
 
 type Props = { chatId: number }
 
@@ -18,6 +22,8 @@ type Props = { chatId: number }
  * @returns Interfaz de chat funcional con opciones de envío y cancelación.
  */
 const ChatComponent = ({ chatId }: Props) => {
+  const [input, setInput] = useState("") // Estado para el campo de entrada
+
   const {
     isSubmitting,
     error,
@@ -27,7 +33,17 @@ const ChatComponent = ({ chatId }: Props) => {
     cancelRequest,
   } = useChatContext()
 
-  const [input, setInput] = React.useState("")
+  // const { data: messages, isLoading } = useQuery({
+  //   queryKey: ["chat", chatId],
+  //   queryFn: async () => {
+  //     // Realizar una solicitud GET en lugar de POST
+  //     const response = await axios.get<{ messages: CustomMessage[] }>(
+  //       `/api/messages?chatId=${chatId}`,
+  //     )
+  //     return response.data.messages
+  //   },
+  //   enabled: !!chatId, // Solo ejecutar la consulta si chatId existe
+  // })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value)
@@ -38,7 +54,9 @@ const ChatComponent = ({ chatId }: Props) => {
     const message = input.trim()
 
     if (!message) {
-      // Opcional: mostrar una alerta o algún indicador si el mensaje está vacío
+      toast.error(
+        "Error el mensaje no puede estar vacio. Por favor, intenta nuevamente.",
+      )
       return
     }
 
@@ -72,7 +90,7 @@ const ChatComponent = ({ chatId }: Props) => {
         ) : error ? (
           <div className="text-red-500">{error}</div>
         ) : (
-          <MessageList messages={messages} />
+          <MessageList messages={messages ?? []} />
         )}
       </div>
 

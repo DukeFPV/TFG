@@ -7,7 +7,7 @@ export interface Step {
 const stepsSergas: Step[] = [
   {
     id: 1,
-    text: `**Paso 1** Debes seguir estos pasos:\n\n1. Ve al sitio web: [https://sergas.es](https://sergas.es)\n2. Haz clic en el botón 'Cita atención primaria' como se muestra en la imagen siguiente.\n\nCuando termines, escribe 'siguiente' para seguir.`,
+    text: `Como estoy en fase de pruebas por ahora solo puedo proporcionar los pasos para pedir cita en el SERGAS de Galicia en la versión de escritorio.\n\n\n**Paso 1** Debes seguir estos pasos:\n\n1. Ve al sitio web: [https://sergas.es](https://sergas.es)\n2. Haz clic en el botón 'Cita atención primaria' como se muestra en la imagen siguiente.\n\nCuando termines, pulsa en 'siguiente' para seguir.`,
     image: "medico-paso-1.png",
   },
   {

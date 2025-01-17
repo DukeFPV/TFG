@@ -25,5 +25,10 @@ export interface SelectHealthCenter {
 
 export interface CustomMessage extends AIMessage {
   image?: string | null
-  buttons?: Array<{ label: string; action: "back" | "advance" | "exit" }> // Añadido
+  buttons?: Array<{
+    label: string
+    action: "back" | "advance" | "exit" | "reset" // Añadido para los botones de los mensajes
+  }>
+  audioUrl?: string | null // Audio
+  markdownBlocks?: string[] // Añadido para los bloques de markdown
 }

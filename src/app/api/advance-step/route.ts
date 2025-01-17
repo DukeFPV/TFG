@@ -9,7 +9,7 @@ import stepsSergas from "@/data/stepMedicoSergas"
 // Definir el esquema de validación con Zod
 const AdvanceStepSchema = z.object({
   chatId: z.number(),
-  action: z.enum(["advance", "back"]).optional(), // Nuevo parámetro
+  action: z.enum(["advance", "back", "exit", "reset"]).optional(),
 })
 
 export async function POST(req: Request) {
@@ -89,7 +89,10 @@ export async function POST(req: Request) {
             "¡Enhorabuena! Has completado todos los pasos para pedir una cita médica. Si necesitas más ayuda, no dudes en preguntar.",
           role: "assistant" as const,
           image: null,
-          buttons: [{ label: "Salir", action: "exit" }],
+          buttons: [
+            { label: "Salir", action: "exit" },
+            { label: "Reiniciar", action: "reset" },
+          ],
         }
 
         // Insertar el mensaje de finalización en la base de datos
@@ -107,10 +110,10 @@ export async function POST(req: Request) {
       } else {
         return NextResponse.json(
           { error: "Ya has completado todos los pasos" },
-          { status: 400 },
+          { status: 200 },
         )
       }
-    } else if (action === "back") {
+    } else if (currentStep >= 1 && action === "back") {
       if (currentStep > 1) {
         const newStep = currentStep - 1 // Decrementar en 1
         const step = stepsSergas[newStep - 1] // stepsSergas es 0-indexed
@@ -147,11 +150,71 @@ export async function POST(req: Request) {
           currentStep: newStep,
         })
       } else {
-        return NextResponse.json(
-          { error: "Ya estás en el primer paso" },
-          { status: 400 },
-        )
+        return NextResponse.json({ error: "Ya estás en el primer paso" })
       }
+    } else if (action === "exit") {
+      // Crear el mensaje de salida
+      const exitContent = `Has salido de la guía paso a paso, te has quedado en el paso ${currentStep}. Si quieres continuar desde donde lo dejaste, vuelve a pulsar en el botón **Salud Digital**.`
+      const exitMessage = {
+        chatId,
+        content: exitContent,
+        role: "assistant" as const,
+        image: null,
+        buttons: [],
+      }
+      // Insertar el mensaje de salida en la base de datos
+      await db.insert(messages).values(exitMessage).execute()
+
+      // Actualizar el perfil del usuario si deseas restablecer el paso
+      // await db
+      //   .update(user_profiles)
+      //   .set({ currentStep: 1 }) // O mantener el currentStep actual
+      //   .where(eq(user_profiles.clerkUserId, userId))
+      //   .execute()
+
+      return NextResponse.json({
+        message: "Has salido de la guía paso a paso.",
+        exitMessage: {
+          content: exitMessage.content,
+          image: exitMessage.image,
+          buttons: exitMessage.buttons,
+        },
+        currentStep, // Mantiene el paso actual
+      })
+    } else if (action === "reset") {
+      // Crear el mensaje de reinicio
+      const step = stepsSergas[0]
+      const reiniciarContent = `Has reiniciado la guía paso a paso. Ahora estás en el **paso 1**. Puedes continuar desde el inicio si lo deseas.`
+      const reiniciarMessage = {
+        chatId,
+        content: reiniciarContent,
+        role: "assistant" as const,
+        image: step.image || null,
+        buttons: [
+          { label: "Siguiente", action: "advance" },
+          { label: "Salir", action: "exit" },
+        ],
+      }
+
+      // Insertar el mensaje de reinicio en la base de datos
+      await db.insert(messages).values(reiniciarMessage).execute()
+
+      // Restablecer el paso actual en el perfil del usuario
+      await db
+        .update(user_profiles)
+        .set({ currentStep: 1 })
+        .where(eq(user_profiles.clerkUserId, userId))
+        .execute()
+
+      return NextResponse.json({
+        message: "Has reiniciado la guía paso a paso.",
+        reiniciarMessage: {
+          content: reiniciarMessage.content,
+          image: reiniciarMessage.image,
+          buttons: reiniciarMessage.buttons,
+        },
+        currentStep: 1, // Paso restablecido a 1
+      })
     } else {
       return NextResponse.json({ error: "Acción no válida" }, { status: 400 })
     }

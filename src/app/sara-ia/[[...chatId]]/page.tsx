@@ -17,12 +17,6 @@ import { revalidatePath } from "next/cache"
 // Modificación de los Props para que sean una promesa por la actualización de Next.js v15
 type Params = Promise<{ chatId: string }>
 
-/* type Props = {
-  params: {
-    chatId?: string[];
-  };
-}; */
-
 const ChatPage = async (props: { params: Params }) => {
   const params = await props.params
   const chatIdStr = params.chatId ? params.chatId[0] : null

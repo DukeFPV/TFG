@@ -13,6 +13,7 @@ const cardsConfig = [
     title: "Salud digital",
     description: "Te puedo guiar paso a paso como pedir la cita.",
     text: "¿Cómo puedo pedir cita en mi centro de salud paso a paso?",
+    shouldAdvanceStep: true, // Solo esta tarjeta inicia paso a paso //TODO implementar el paso a paso según el sistema de salud de cada autonomía
   },
   {
     backgroundColor: "bg-yellow-50",
@@ -20,6 +21,7 @@ const cardsConfig = [
     title: "Banca digital",
     description: "Aprender a usar la banca digital",
     text: "¿Cómo me puedes ayudar para utilizar mi banco?",
+    shouldAdvanceStep: false,
   },
   {
     backgroundColor: "bg-green-50",
@@ -27,6 +29,7 @@ const cardsConfig = [
     title: "Buscar en internet",
     description: "Te puedo ayudar a buscar",
     text: "Necesito que busques en internet algo para mí",
+    shouldAdvanceStep: false,
   },
   {
     backgroundColor: "bg-purple-50",
@@ -34,6 +37,7 @@ const cardsConfig = [
     title: "Cualquier pregunta",
     description: "Pregúntame lo que quieras",
     text: "Quiero saber en qué cosas puedes asistirme",
+    shouldAdvanceStep: false,
   },
 ]
 
@@ -45,11 +49,11 @@ const ChatSideBarR = ({ chatId }: ChatSideBarRProps) => {
   const { submitExternalMessage, isSubmitting, error } = useChatContext()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleCardClick = async (text: string) => {
+  const handleCardClick = async (text: string, shouldAdvanceStep: boolean) => {
     if (submitExternalMessage && !isLoading) {
       setIsLoading(true)
       try {
-        await submitExternalMessage(text)
+        await submitExternalMessage(text, shouldAdvanceStep)
       } catch (error) {
         console.error("Error al enviar el mensaje externo:", error)
       } finally {
@@ -67,7 +71,7 @@ const ChatSideBarR = ({ chatId }: ChatSideBarRProps) => {
             <FeatureCard
               key={index}
               {...card}
-              onClick={() => handleCardClick(card.text)}
+              onClick={() => handleCardClick(card.text, card.shouldAdvanceStep)}
               isLoading={isLoading}
             />
           ))}
