@@ -68,7 +68,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
   // Estado para controlar el audio
   const [audioPlay, setAudioPlay] = useState(false)
   const [isProcessingChunk, setIsProcessingChunk] = useState(false)
-  const CHUNK_SIZE = 100 // characters
+  const CHUNK_SIZE = 100 // characters intentando bajar la latencia
   const [audioQueue, setAudioQueue] = useState<string[]>([])
 
   // Obtener datos de Clerk
@@ -107,10 +107,12 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
             `Failed to generate speech: ${errorData.error || response.statusText}`,
           )
         }
-
-        const data = await response.json()
-        console.log("TTS API response:", data) // Debug log
-        return data.url
+        const audioBlob = await response.blob()
+        const audioUrl = URL.createObjectURL(audioBlob)
+        return audioUrl
+        // const data = await response.json()
+        // console.log("TTS API response:", data) // Debug log
+        // return data.url
       } catch (error) {
         console.error("Error generating TTS:", error)
         return null
