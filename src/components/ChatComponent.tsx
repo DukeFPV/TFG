@@ -1,3 +1,4 @@
+//**Revisado */
 "use client"
 
 import React, { useEffect, useState } from "react"
@@ -8,19 +9,37 @@ import MessageList from "./MessageList"
 import LoadingBubble from "./LoadingBubble"
 import { useChatContext } from "@/context/ChatContext"
 import toast from "react-hot-toast" // Asegúrate de importar toast
-import axios from "axios"
-import { Message } from "ai"
-import { useQuery } from "@tanstack/react-query"
-import { CustomMessage } from "@/types/interfaceTypes"
 
 type Props = { chatId: number }
 
 /**
- * Componente de chat que maneja la funcionalidad de chat en tiempo real.
+ * Componente de chat que muestra mensajes y maneja la entrada del usuario (inputs).
  *
- * @param {number} chatId - Identificador único para la sesión de chat.
- * @returns Interfaz de chat funcional con opciones de envío y cancelación.
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {string} props.chatId - Identificador único para la instancia del chat
+ *
+ * @remarks
+ * Este componente proporciona:
+ * - Visualización de mensajes con desplazamiento automático
+ * - Manejo de entrada para nuevos mensajes
+ * - Estados de carga y manejo de errores
+ * - Funcionalidad de envío de mensajes
+ * - Capacidad de cancelación de solicitudes
+ *
+ * El componente utiliza varios hooks y contexto:
+ * - useState para gestión de entrada
+ * - useEffect para desplazamiento automático
+ * - useChatContext para funcionalidad del chat
+ *
+ * Características:
+ * - Desplazamiento automático al último mensaje
+ * - Muestra estados de carga
+ * - Muestra mensajes de error
+ * - Evita el envío de mensajes vacíos
+ * - Permite cancelar solicitudes pendientes
  */
+
 const ChatComponent = ({ chatId }: Props) => {
   const [input, setInput] = useState("") // Estado para el campo de entrada
 
@@ -32,18 +51,6 @@ const ChatComponent = ({ chatId }: Props) => {
     submitExternalMessage,
     cancelRequest,
   } = useChatContext()
-
-  // const { data: messages, isLoading } = useQuery({
-  //   queryKey: ["chat", chatId],
-  //   queryFn: async () => {
-  //     // Realizar una solicitud GET en lugar de POST
-  //     const response = await axios.get<{ messages: CustomMessage[] }>(
-  //       `/api/messages?chatId=${chatId}`,
-  //     )
-  //     return response.data.messages
-  //   },
-  //   enabled: !!chatId, // Solo ejecutar la consulta si chatId existe
-  // })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value)

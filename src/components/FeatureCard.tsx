@@ -1,3 +1,31 @@
+//**Revisado */
+/**
+ * Un componente reutilizable de tarjeta de característica que muestra un icono, título y descripción.
+ *
+ * @component
+ * @param {object} props - Los props del componente
+ * @param {StaticImageData} props.icon - El icono a mostrar en la tarjeta
+ * @param {string} props.title - El texto del título de la tarjeta
+ * @param {string} props.description - El texto de descripción de la tarjeta
+ * @param {string} props.backgroundColor - Nombre de clase CSS para el color de fondo
+ * @param {(text: string) => void} [props.onClick] - Función callback opcional cuando se hace clic en la tarjeta
+ * @param {string} [props.text] - Texto opcional pasado al callback onClick
+ * @param {boolean} [props.isLoading] - Bandera opcional para mostrar estado de carga y deshabilitar la tarjeta
+ *
+ * @returns {JSX.Element} Un botón que contiene el contenido de la tarjeta de característica
+ *
+ * @example
+ * <FeatureCard
+ *   icon={miIcono}
+ *   title="Título de Característica"
+ *   description="Descripción de la característica"
+ *   backgroundColor="bg-blue-100"
+ *   onClick={(text) => console.log(text)}
+ *   text="Texto de ejemplo"
+ *   isLoading={false}
+ * />
+ */
+
 import React from "react"
 import Image from "next/image"
 
@@ -48,7 +76,7 @@ const FeatureCard = React.memo(
   },
 )
 
-// Asignar displayName al componente memoizado para usar con React DevTools
+// Asignar displayName al componente con memo
 FeatureCard.displayName = "FeatureCard"
 
 export default FeatureCard

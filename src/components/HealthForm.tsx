@@ -1,3 +1,44 @@
+//**Revisado */
+/**
+ * Un componente de formulario para gestionar la selección de centros de salud y preferencias de usuario.
+ *
+ * Este componente proporciona funcionalidad para:
+ * - Buscar y seleccionar centros de salud basados en criterios de ubicación
+ * - Gestionar la selección guardada de centros de salud del usuario
+ * - Mostrar resultados de búsqueda en formato tabulado
+ * - Manejar el estado del formulario y validación
+ *
+ * Características:
+ * - Desplegables en cascada para selección de ubicación (Comunidad, Provincia, Municipio)
+ * - Campos de autocompletado para dirección, código postal y teléfono
+ * - Modo de solo lectura cuando se selecciona un centro de salud
+ * - Funcionalidad de guardar y borrar preferencias de usuario
+ * - Retroalimentación mediante notificaciones snackbar
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <HealthForm />
+ * ```
+ *
+ * @returns Una interfaz de formulario para selección y gestión de centros de salud
+ *
+ * @dependencies
+ * - useLocations - Hook personalizado para gestión de datos de ubicación
+ * - useHealthCenters - Hook personalizado para datos de centros de salud
+ * - useUser - Hook para estado de autenticación de usuario
+ * - Componentes Material-UI (Autocomplete, TextField, Radio, Snackbar, Alert)
+ *
+ * @state
+ * - formData - Valores de campos del formulario
+ * - results - Resultados de búsqueda
+ * - selectedRow - Fila de resultado seleccionada actualmente
+ * - inputValues - Valores de entrada para dirección y código postal
+ * - selectedCenter - Centro de salud seleccionado actualmente
+ * - isReadOnly - Estado de solo lectura del formulario
+ * - snackbar - Estado de notificaciones
+ */
+
 "use client"
 import React, { useState, useEffect, FormEvent, useMemo, useRef } from "react"
 import TextField from "@mui/material/TextField"
@@ -10,6 +51,7 @@ import { SelectHealthCenter } from "@/lib/db/schema"
 import { useLocations } from "@/components/hooks/useLocations"
 import { useHealthCenters } from "@/components/hooks/useHealthCenters"
 import provinciasData from "@/data/provincias.json"
+import toast from "react-hot-toast"
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   function Alert(props, ref) {
@@ -125,7 +167,7 @@ export default function HealthForm() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    console.log("handleSubmit called with formData:", formData)
+
     try {
       const response = await fetch("/api/health-centers", {
         method: "POST",
@@ -133,11 +175,9 @@ export default function HealthForm() {
         body: JSON.stringify(formData),
       })
 
-      console.log("Response from /api/health-centers:", response)
-
       if (!response.ok) throw new Error("Search failed")
       const data = await response.json()
-      console.log("Data received from /api/health-centers:", data)
+
       setResults(data.results)
 
       // Si ya hay una selección guardada, seleccionarla automáticamente
@@ -145,10 +185,10 @@ export default function HealthForm() {
         const res = await fetch("/api/user-selection", {
           method: "GET",
         })
-        console.log("Response from /api/user-selection GET:", res)
+
         if (res.ok) {
           const selection = await res.json()
-          console.log("Selection received:", selection)
+
           const selectedHealthCenterId = selection.selectedHealthCenterId
 
           if (selectedHealthCenterId) {
@@ -323,16 +363,6 @@ export default function HealthForm() {
                 if (selectedMunicipioOption) {
                   setSelectedMunicipio(selectedMunicipioOption)
                 }
-
-                // **Agregar console.log para verificar cada campo**
-                console.log("Centro Seleccionado:")
-                console.log("Nombre:", foundCenter.name)
-                console.log("Provincia:", foundCenter.province)
-                console.log("Municipio:", foundCenter.municipality)
-                console.log("Dirección:", foundCenter.address)
-                console.log("Código Postal:", foundCenter.postalCode)
-                console.log("Teléfono:", foundCenter.phone)
-                // Agrega más console.log si tienes otros campos
               }
             }
           }
@@ -430,8 +460,6 @@ export default function HealthForm() {
   const handlePhoneSelection = (
     value: { id: string; phone: string; center?: SelectHealthCenter } | null,
   ) => {
-    console.log("Phone selection value:", value) // Debug
-
     if (!value?.center) {
       setSelectedCA(null)
       setSelectedProvincia(null)
@@ -445,49 +473,46 @@ export default function HealthForm() {
     }
 
     const { center } = value
-    console.log("Center data:", center) // Debug
 
-    // 1. Set form data first
+    // 1. Establecer valores de formulario
     handleAutocompleteChange("phone", value.phone)
     handleAutocompleteChange("address", center.address)
     handleAutocompleteChange("postal_code", center.postalCode)
 
-    // 2. Find and set CA
+    // 2. Encontrar la CA y provincia correspondientes
     const matchingProvinciaData = provinciasData.provincias.find(
       (p) => p.Provincia?.toLowerCase() === center.province?.toLowerCase(),
     )
 
-    console.log("Matching provincia:", matchingProvinciaData) // Debug
-
     if (matchingProvinciaData) {
-      // Set CA
+      // Seleccionar la Comunidad Autónoma
       const matchingCA = comunidadesAutonomas.find(
         (ca) => ca.value === matchingProvinciaData.CODAUTO,
       )
 
       if (matchingCA) {
-        // Set initial values
+        // Valores Iniciales
         setInputValues({
           address: center.address || "",
           postal_code: center.postalCode || "",
         })
 
-        // Set CA
+        // Elegir la Comunidad Autónoma
         setSelectedCA(matchingCA)
 
-        // Create provincia option
+        // Encontrar la provincia por el valor
         const provOption = {
           value: matchingProvinciaData.CPRO || "",
           label: center.province || "",
           CODAUTO: matchingProvinciaData.CODAUTO,
         }
 
-        // Set provincia after small delay
+        // Añadir un retraso para establecer la provincia //?Mejora la respuesta del formulario
         setTimeout(() => {
           setSelectedProvincia(provOption)
           handleProvinciaChange(provOption)
 
-          // Set municipio after provincia
+          // Seleccionar el municipio despues de un retraso
           setTimeout(() => {
             if (center.municipality) {
               const munOption = {
@@ -506,11 +531,9 @@ export default function HealthForm() {
   const handleSave = async () => {
     console.log("handleSave called")
     if (selectedRow === null) {
-      console.log("handleSave: selectedRow is null")
       return
     }
     if (!isSignedIn) {
-      console.log("handleSave: user is not signed in")
       return
     }
     if (!user) {
@@ -519,8 +542,8 @@ export default function HealthForm() {
     }
 
     const selectedCenter = results[selectedRow]
-    console.log("Selected center to save:", selectedCenter)
 
+    // Llamar a la API para guardar la selección
     try {
       const response = await fetch("/api/user-selection", {
         method: "POST",
@@ -530,16 +553,13 @@ export default function HealthForm() {
         }),
       })
 
-      console.log("Response from /api/user-selection POST:", response)
-
       if (!response.ok) {
         const errorData = await response.json()
-        console.log("Error response data:", errorData)
+
         throw new Error(errorData.error || "Error al guardar la selección")
       }
 
       const data = await response.json()
-      console.log("Data received from /api/user-selection POST:", data)
 
       setSnackbar({
         open: true,
@@ -561,32 +581,28 @@ export default function HealthForm() {
 
   // Manejar la acción de borrar la selección
   const handleDelete = async () => {
-    console.log("handleDelete called")
     if (!isSignedIn) {
-      console.log("handleDelete: user is not signed in")
+      toast.error("Debes iniciar sesión para borrar la selección")
       return
     }
     if (!user) {
-      console.log("handleDelete: user data is missing")
+      toast.error("Datos de usuario no identificado")
       return
     }
 
+    // Llamar a la API para borrar la selección
     try {
       const response = await fetch("/api/user-selection", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       })
 
-      console.log("Response from /api/user-selection DELETE:", response)
-
       if (!response.ok) {
         const errorData = await response.json()
-        console.log("Error response data:", errorData)
         throw new Error(errorData.error || "Error al borrar la selección")
       }
 
       const data = await response.json()
-      console.log("Data received from /api/user-selection DELETE:", data)
 
       setSelectedRow(null)
       setIsReadOnly(false) // Reactivar el formulario
@@ -598,11 +614,10 @@ export default function HealthForm() {
 
       setSnackbar({
         open: true,
-        message: "Selección borrada exitosamente",
+        message: "Selección borrada correctamente",
         severity: "success",
       })
     } catch (error: any) {
-      console.error("Error al borrar la selección:", error)
       setSnackbar({
         open: true,
         message: error.message || "Hubo un error al borrar la selección",
@@ -613,9 +628,9 @@ export default function HealthForm() {
 
   // useEffect adicional para depurar los estados
   useEffect(() => {
-    console.log("Selected CA:", selectedCA)
-    console.log("Selected Provincia:", selectedProvincia)
-    console.log("Selected Municipio:", selectedMunicipio)
+    // console.log("Selected CA:", selectedCA)
+    // console.log("Selected Provincia:", selectedProvincia)
+    // console.log("Selected Municipio:", selectedMunicipio)
   }, [selectedCA, selectedProvincia, selectedMunicipio])
 
   return (
@@ -712,7 +727,7 @@ export default function HealthForm() {
               handleAutocompleteChange("address", value as string)
               if (value) {
                 const center = results.find((c) => c.address === value)
-                console.log("Found center based on address:", center)
+
                 if (center) {
                   setInputValues((prev) => ({
                     ...prev,

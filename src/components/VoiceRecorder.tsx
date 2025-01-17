@@ -1,10 +1,12 @@
+//TODO: Implementar un componente VoiceRecorder que permita grabar audio y enviarlo al servidor para ser transcrito a texto.
+
 "use client"
 
 import React, { useRef, useState } from "react"
 import { useChatContext } from "@/context/ChatContext"
 
 export function VoiceRecorder() {
-  const { handleSTTText } = useChatContext()
+  const { handleSTText } = useChatContext()
   const [recording, setRecording] = useState(false)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<BlobPart[]>([])
@@ -36,7 +38,7 @@ export function VoiceRecorder() {
           })
           if (!res.ok) throw new Error("STT fetch fail")
           const data = await res.json()
-          handleSTTText(data.text) // inyectar al chat el texto transcrito
+          handleSTText(data.text) // inyectar al chat el texto transcrito
         } catch (error) {
           console.error("Error STT request:", error)
         }

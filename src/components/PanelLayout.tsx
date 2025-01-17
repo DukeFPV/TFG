@@ -44,12 +44,11 @@ export function UserProfile() {
   )
 }
 
-// panel de datos de salud
+// Panel de datos de salud
 export function HealthDataComponentWrapper() {
   return (
     <div className="space-y-6 max-w-6xl">
       <HealthForm />
-      {/* Puedes añadir más contenido si es necesario */}
     </div>
   )
 }
@@ -91,7 +90,7 @@ export function SavedChats() {
         <span className="text-orange-600 font-semibold italic">TO-DO: </span>
         Espacio para mostrar los chats guardados
       </h3>
-      {/* Add saved chats components */}
+      {/* Añadir los chats guardados*/}
     </div>
   )
 }
@@ -114,6 +113,34 @@ interface PanelLayoutProps {
   conversationsHistory: PanelHistoryProps
   savedChats: any
 }
+
+/**
+ * Un componente de diseño que gestiona diferentes paneles y su contenido.
+ *
+ * @component
+ * @param {object} props - Las propiedades del componente
+ * @param {ReactNode} props.children - Componentes hijos a renderizar
+ * @param {object} props.panelData - Datos requeridos para la visualización del panel
+ * @param {object} props.userData - Datos de información del usuario
+ * @param {object} props.healthData - Datos relacionados con la salud
+ * @param {object} props.bankData - Datos de información bancaria
+ * @param {object} props.conversationsHistory - Historial de conversaciones
+ * @param {object} props.savedChats - Datos de chats guardados
+ *
+ * @returns {JSX.Element} Un diseño responsive con una barra de navegación lateral y área de contenido principal
+ *
+ * @example
+ * <PanelLayout
+ *   panelData={panelData}
+ *   userData={userData}
+ *   healthData={healthData}
+ *   bankData={bankData}
+ *   conversationsHistory={conversationsHistory}
+ *   savedChats={savedChats}
+ * >
+ *   {children}
+ * </PanelLayout>
+ */
 
 export function PanelLayout({
   children,

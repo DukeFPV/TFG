@@ -1,7 +1,24 @@
+//**Revisado */
+// Definición del componente Footer
+/**
+ * Componente Footer que muestra enlaces de navegación, iconos de redes sociales e información de copyright.
+ * Solo visible en pantallas pequeñas y más grandes (oculto en pantallas extra pequeñas).
+ *
+ * @component
+ * @returns {JSX.Element} Una sección de pie de página que contiene:
+ *  - Enlaces de navegación a diferentes páginas (Qué es SARA, Contacto, Quiénes somos, Aviso legal)
+ *  - Enlaces a redes sociales (Facebook, Instagram, Twitter) con sus respectivos iconos
+ *  - Aviso de copyright
+ *
+ * @example
+ * ```tsx
+ * <Footer />
+ * ```
+ */
+
 import Link from "next/link"
 import React from "react"
 
-// Definición del componente Footer
 const Footer = () => {
   return (
     // Sección del pie de página visible solo en pantallas pequeñas y mayores (hidden sm:flex)
@@ -91,7 +108,8 @@ const Footer = () => {
 
         {/* Nota de derechos de autor */}
         <p className="mt-8 text-base leading-6 text-center text-gray-600">
-          © 2024 José Carlos Lorenzo García, CC BY-NC-SA 4.0.
+          2024 - {new Date().getFullYear()} José Carlos Lorenzo García, CC
+          BY-NC-SA 4.0.
         </p>
       </footer>
     </section>

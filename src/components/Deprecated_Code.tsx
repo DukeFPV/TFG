@@ -1,4 +1,4 @@
-//Componente para props de ElevenLabs. Verificar la utilidad de este componente, sacado del GitHub de ElevenLabs
+//!! Componente para props de ElevenLabs. Verificar la utilidad de este componente, sacado del GitHub de ElevenLabs
 
 import { PropsWithChildren } from "react"
 

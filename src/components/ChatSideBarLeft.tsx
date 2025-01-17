@@ -1,3 +1,34 @@
+//**Revisado */
+/**
+ * El componente ChatSideBarLeft representa la barra lateral izquierda de una interfaz de chat.
+ *
+ * @component
+ *
+ * @param {Object} props - Propiedades del componente
+ * @param {Array<Chat>} props.chats - Array de objetos de chat para mostrar en la barra lateral
+ * @param {number} props.chatId - ID del chat actualmente seleccionado
+ *
+ * @returns {JSX.Element} Un componente de barra lateral que contiene la lista de chats y controles
+ *
+ * @description
+ * Este componente incluye:
+ * - Funcionalidad de barra lateral plegable
+ * - Botón de creación de nuevo chat
+ * - Modal de subida de archivos (solo para usuarios admin)
+ * - Lista de chats existentes con distinción visual entre chats regulares y chats con archivos
+ * - Funcionalidad de eliminación de chat (solo admin)
+ * - Enlaces de navegación
+ *
+ * La barra lateral se puede alternar entre estados expandido y contraído.
+ * Muestra los chats de manera diferente según sean chats regulares o contengan archivos subidos.
+ * Los usuarios administradores tienen funcionalidades adicionales como subida de archivos y eliminación de chats.
+ *
+ * @example
+ * ```jsx
+ * <ChatSideBarLeft />
+ * ```
+ */
+
 "use client"
 
 import { useState } from "react"
@@ -22,6 +53,7 @@ type Props = {
   chatId: number
 }
 
+// ID del admin
 const ADMIN_ID = "user_2ooPGvdai0IRYfKUmWh7T5y3rxp"
 
 const ChatSideBarLeft = ({ chats, chatId }: Props) => {
@@ -32,10 +64,12 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
   const { user } = useUser()
   const isAdmin = user?.id === ADMIN_ID
 
+  // --- Función para alternar la barra lateral con el botón ---
   const toggleSidebar = () => {
     setIsOpen(!isOpen)
   }
 
+  // --- Función para crear un nuevo chat ---
   const createNewChat = async (): Promise<number | null> => {
     try {
       const response = await fetch("/api/create-chat/", {
@@ -64,14 +98,17 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
     }
   }
 
+  // --- Función para abrir el modal de subida de archivos ---
   const openFileUploadModal = () => {
     setShowFileUpload(true)
   }
 
+  // --- Función para cerrar el modal de subida de archivos ---
   const closeFileUploadModal = () => {
     setShowFileUpload(false)
   }
 
+  // --- Función para borrar un chat ---
   const deleteChat = async (idToDelete: number) => {
     try {
       const res = await fetch(`/api/delete-chat?chat_id=${idToDelete}`, {
@@ -81,11 +118,10 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
         throw new Error("Failed to delete chat")
       }
 
-      // Una vez borrado, necesitamos seleccionar el chat anterior:
       // Encontrar el índice del chat borrado en 'chats'
       const index = chats.findIndex((c) => c.id === idToDelete)
       let newChatIdToSelect: number | null = null
-
+      // Una vez borrado, necesitamos seleccionar el chat anterior
       if (index > 0) {
         // Hay un chat anterior
         newChatIdToSelect = chats[index - 1].id
@@ -96,9 +132,6 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
 
       if (newChatIdToSelect) {
         router.push(`/sara-ia/${newChatIdToSelect}`)
-      } else {
-        // Si por alguna razón no se creó el nuevo chat, refrescar
-        // (aunque no debería pasar)
       }
 
       router.refresh()
@@ -118,7 +151,7 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
       )}
     >
       {showFileUpload && (
-        // Modal overlay para FileUpload
+        // Modal de subida de archivos
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
           <div className="bg-white p-4 rounded-lg shadow-lg relative max-w-md w-full">
             <button
@@ -130,6 +163,7 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
             <h2 className="text-lg font-semibold mb-4 text-black">
               Subir Archivo
             </h2>
+            {/* Componente FileUpload con redirección al nuevo chat*/}
             <FileUpload
               onUploadSuccess={(newChatId) => {
                 closeFileUploadModal()
@@ -206,12 +240,12 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
                     {
                       // Chats subidos (verde)
                       "bg-green-300 text-black": isUploadedChat && isSelected,
-                      "bg-purple-900 border-2 border-green-300 text-green-100 hover:text-green-50":
+                      "bg-purple-900 border-2 border-green-500 text-green-100 hover:bg-green-300 hover:text-green-800":
                         isUploadedChat && !isSelected,
 
                       // Chats normales (morado)
                       "bg-purple-300 text-black": !isUploadedChat && isSelected,
-                      "border-2 border-purple-300 hover:text-purple-50":
+                      "border-2 border-purple-300 hover:bg-purple-500 hover:text-purple-50":
                         !isUploadedChat && !isSelected,
                     },
                   )}
@@ -226,7 +260,7 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
           })}
       </div>
 
-      {isOpen && (
+      {isOpen && ( // TODO Enlaces de navegación
         <div className="mt-4">
           <div className="flex items-center gap-2 text-xs text-slate-500 flex-wrap">
             <Link href="/">Inicio</Link>

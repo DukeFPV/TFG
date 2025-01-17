@@ -1,11 +1,11 @@
+//**Revisado */
+
 "use client"
 
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { CustomMessage } from "@/types/interfaceTypes" // Importa el tipo personalizado
 import React from "react"
-// import ReactMarkdown from "react-markdown"
-// import remarkGfm from "remark-gfm"
 import Image from "next/image"
 import { useChatContext } from "@/context/ChatContext" // Importa el contexto
 import ImageModal from "./ImageModal"
@@ -21,6 +21,30 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+
+/**
+ * El componente `MessageList` renderiza una lista de mensajes con varias características interactivas.
+ *
+ * @param props - El objeto de propiedades.
+ * @param props.messages - Un array de objetos de mensaje que se mostrarán en la lista.
+ *
+ * Características:
+ * - Muestra mensajes tanto del usuario como del asistente con estilos distintos.
+ * - Reproduce audio automáticamente para mensajes que incluyen un `audioUrl`, asegurando que cada audio se reproduzca solo una vez.
+ * - Renderiza imágenes dentro de los mensajes y permite a los usuarios verlas en un modal con dimensiones ajustables.
+ * - Proporciona botones interactivos dentro de los mensajes para navegar a través de pasos, incluyendo acciones como avanzar, retroceder, salir y reiniciar.
+ * - Gestiona el estado para modales de imagen y diálogos de confirmación para reiniciar pasos.
+ *
+ * Dependencias:
+ * - Utiliza `useChatContext` para gestionar acciones y estado relacionados con el chat.
+ * - Usa `MemoizedMarkdown` para renderizar el contenido del mensaje en Markdown.
+ * - Incorpora los componentes `ImageModal` y `AlertDialog` para interacciones de usuario mejoradas.
+ *
+ * Gestión de Estado:
+ * - Mantiene el estado para la visibilidad del modal, la fuente y dimensiones de la imagen, y la visibilidad del diálogo de confirmación.
+ * - Rastrea los mensajes reproducidos para evitar la reproducción repetida de audio.
+ *
+ */
 
 type Props = {
   messages: CustomMessage[]
@@ -42,6 +66,10 @@ const MessageList = ({ messages }: Props) => {
   const [modalImageAlt, setModalImageAlt] = useState<string>("")
   const [modalImageWidth, setModalImageWidth] = useState<number>(600)
   const [modalImageHeight, setModalImageHeight] = useState<number>(400)
+
+  // Añana un estado para rastrear si se está reproduciendo un audio
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null)
 
   // Estados para el AlertDialog de reiniciar
   const [isReiniciarDialogOpen, setIsReiniciarDialogOpen] = useState(false)
@@ -74,10 +102,9 @@ const MessageList = ({ messages }: Props) => {
     setIsReiniciarDialogOpen(true)
   }
 
-  // Función para confirmar reinicio
+  // Función para confirmar reinicio desde chatContext
   const confirmReiniciar = () => {
     if (reiniciarMessageId) {
-      // Llamar a la función para reiniciar desde el contexto
       reiniciarStep()
     }
     setIsReiniciarDialogOpen(false)
@@ -86,16 +113,19 @@ const MessageList = ({ messages }: Props) => {
 
   // Mantener un registro de los mensajes cuyos audios ya se han reproducido
   const playedMessages = useRef<Set<string>>(new Set())
+  console.log("playedMessages 115 MessagesList", playedMessages)
+
+  // Reproducir audio automáticamente para mensajes con `audioUrl`
+  const { playAudio } = useChatContext()
 
   useEffect(() => {
     messages.forEach((message) => {
       if (message.audioUrl && !playedMessages.current.has(message.id)) {
-        const audio = new Audio(message.audioUrl)
-        audio.play().catch((err) => console.log("Autoplay blocked:", err))
+        playAudio(message.audioUrl)
         playedMessages.current.add(message.id)
       }
     })
-  }, [messages])
+  }, [messages, playAudio])
 
   return (
     <div className="flex flex-col gap-2 px-4 pb-3">
@@ -120,7 +150,7 @@ const MessageList = ({ messages }: Props) => {
               )}
             >
               <MemoizedMarkdown id={message.id} content={message.content} />
-              {/* Renderizar la imagen si existe */}
+              {/* Renderizar la imagen si existe y abre el modal con la imagen ampliada si lo permite*/}
               {message.image && (
                 <div className="mt-2">
                   <Image
@@ -140,7 +170,7 @@ const MessageList = ({ messages }: Props) => {
                   />
                 </div>
               )}
-              {/* Renderizar botones si existen */}
+              {/* Renderizar botones si existen dentro de los mensajes para facilitar la interacción*/}
               {isStepByStep &&
                 message.buttons &&
                 message.buttons.length > 0 && (

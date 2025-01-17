@@ -1,3 +1,36 @@
+//**Revisado */
+/**
+ * Un componente de formulario para manejar los datos del perfil de usuario se utiliza en el panel de ajustes.
+ *
+ * @component
+ * @returns {JSX.Element} Un formulario con campos para fecha de nacimiento, género, provincia y número de teléfono
+ *
+ * @description
+ * Este componente proporciona una interfaz de formulario que:
+ * - Carga y muestra los datos existentes del perfil de usuario
+ * - Permite a los usuarios actualizar su información personal
+ * - Maneja el envío de formularios y la comunicación con la API
+ * - Proporciona cálculo de edad en tiempo real basado en la fecha de nacimiento
+ *
+ * @dependencies
+ * - useUser: Para gestión del estado de autenticación
+ * - useForm: Para manejo del formulario
+ * - dayjs: Para manipulación de fechas
+ * - toast: Para mostrar notificaciones
+ *
+ * @remarks
+ * El componente incluye:
+ * - Selector de fecha para fecha de nacimiento
+ * - Menú desplegable de género con múltiples opciones
+ * - Campo de provincia con autocompletado
+ * - Campo para número de teléfono
+ * - Botón de envío para guardar cambios
+ *
+ * @state
+ * - selectedDate: Almacena la fecha de nacimiento seleccionada
+ * - age: Almacena la edad calculada basada en la fecha de nacimiento
+ */
+
 "use client"
 
 import * as React from "react"
@@ -11,7 +44,7 @@ import toast from "react-hot-toast"
 export default function DataForm() {
   const { isLoaded, isSignedIn, user } = useUser()
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(
-    dayjs("1990-01-31"),
+    dayjs("1990-01-31"), // Fecha por defecto
   )
   const [age, setAge] = useState<number>(0)
 
@@ -61,7 +94,7 @@ export default function DataForm() {
 
   const onSubmit = async (data: any) => {
     if (!isLoaded || !isSignedIn || !user) {
-      console.error("User not authenticated")
+      toast.error("Usuario no autenticado")
       return
     }
     try {

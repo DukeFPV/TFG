@@ -2,7 +2,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import * as React from "react"
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,53 +10,56 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 // import { useChatContext } from "@/context/ChatContext"
 // import {cn} from "@/lib/utils";
 import Image from "next/image"
-import { useConversation } from "@11labs/react"
 import { useChatContext } from "@/context/ChatContext"
 import { set } from "zod"
-//import { console } from "inspector"
+import { cn } from "@/lib/utils"
+import { Pause, Play, Square } from "lucide-react"
 
-// async function requestMicrophonePermission() {
-//   try {
-//     await navigator.mediaDevices.getUserMedia({ audio: true })
-//     return true
-//   } catch {
-//     console.error("Permiso al microfono denegado")
-//     return false
-//   }
-// }
-
-// async function getSignedUrl(): Promise<string> {
-//   const response = await fetch("/api/tts")
-//   if (!response.ok) {
-//     throw Error("Error al obtener signed-url")
-//   }
-//   const data = await response.json()
-//   return data.signedUrl
-// }
-
-/**
- * Este componente:
- * - Inicia la sesión de ElevenLabs (STT),
- * - Detecta la voz del usuario y la transcribe.
- * - Pasa el texto transcrito al ChatContext => GPT => TTS.
- */
 /**
  * Este componente:
  * - Inicia la conversación de TTS,
  * - Finaliza la conversación de TTS.
  */
 export function ConvAI() {
-  const { startConversation, endConversation, isProcessingChunk } =
-    useChatContext()
+  const {
+    startConversation,
+    endConversation,
+    audioPlay,
+    pauseAudio,
+    stopAudio,
+  } = useChatContext()
 
   // Estados para el componente
   const [isConnected, setIsConnected] = useState(false)
-  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
 
+  const handlePause = () => {
+    pauseAudio()
+    setIsPaused(!isPaused)
+  }
+
+  const handleStop = () => {
+    stopAudio()
+    setIsPaused(false)
+  }
+
+  // Monitorea los cambios en audioPlay para cambiar el estado de la conversación
   useEffect(() => {
-    setIsSpeaking(isProcessingChunk)
-  }, [isProcessingChunk])
-  console.log("audioPlay ConvAI", isProcessingChunk)
+    const handleAudioStateChange = (event: CustomEvent) => {
+      setIsAudioPlaying(event.detail.isPlaying)
+    }
+    window.addEventListener(
+      "audioStateChange",
+      handleAudioStateChange as EventListener,
+    )
+    return () => {
+      window.removeEventListener(
+        "audioStateChange",
+        handleAudioStateChange as EventListener,
+      )
+    }
+  }, [])
 
   const handleStart = useCallback(async () => {
     setIsConnected(true)
@@ -64,6 +67,7 @@ export function ConvAI() {
   }, [startConversation])
 
   const handleEnd = useCallback(async () => {
+    setIsConnected(false)
     await endConversation()
   }, [endConversation])
 
@@ -122,15 +126,17 @@ export function ConvAI() {
         <CardContent>
           <CardHeader>
             <CardTitle className="text-center">
-              {isConnected
-                ? isSpeaking
+              {!isConnected
+                ? "Desconectada"
+                : isAudioPlaying
                   ? "Sara está hablando"
-                  : "Sara está escuchando"
-                : "Desconectado"}
+                  : audioPlay
+                    ? "Conectada"
+                    : "Sara conectada en espera"}
             </CardTitle>
           </CardHeader>
           <div className="flex flex-col gap-y-4 text-center">
-            <div className="rounded-3xl">
+            <div className="rounded-3xl relative z-10">
               <Image
                 src="/icons/sara-avatar.png"
                 alt="SARA"
@@ -138,17 +144,50 @@ export function ConvAI() {
                 height={150}
                 className="mx-auto w-[80px] h-[80px] md:w-[150px] md:h-[150px] rounded-full"
               />
+              <div
+                className={cn(
+                  "absolute mx-auto w-[80px] h-[80px] md:w-[150px] md:h-[150px] -inset-1 rounded-full blur-md -z-20",
+                  {
+                    hidden: !isConnected,
+                    "bg-gradient-to-br from-amber-500 via-red-500 to-yellow-500":
+                      isAudioPlaying,
+                    "bg-gradient-to-br from-teal-500 via-lime-500 to-green-500":
+                      isConnected && !isAudioPlaying,
+                  },
+                )}
+              ></div>
             </div>
-
-            <Button
-              variant="outline"
-              className="rounded-full"
-              size="lg"
-              //disabled={status === "connected"}
-              onClick={handleStart}
-            >
-              Empezar conversación
-            </Button>
+            <div className="flex justify-center gap-4">
+              {!isConnected ? (
+                <Button
+                  variant="outline"
+                  className="rounded-full"
+                  size="lg"
+                  onClick={handleStart}
+                >
+                  Empezar conversación
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    className="rounded-full"
+                    size="lg"
+                    onClick={handlePause}
+                  >
+                    {isPaused ? <Play /> : <Pause />}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="rounded-full"
+                    size="lg"
+                    onClick={handleStop}
+                  >
+                    <Square />
+                  </Button>
+                </>
+              )}
+            </div>
             <Button
               variant="outline"
               className="rounded-full"

@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useState,
   useEffect,
+  useRef,
 } from "react"
 import { CustomMessage } from "@/types/interfaceTypes"
 import toast from "react-hot-toast"
@@ -14,13 +15,13 @@ import { useClerkUserData } from "@/components/hooks/useClerkUser"
 import { parseMarkdownIntoBlocks } from "@/lib/utils/markdownUtils" // Importar la función para dar formato a Markdown
 import { v4 as uuidv4 } from "uuid"
 
-// Definir el tipo para el perfil del usuario
+// Definir el type para el perfil del usuario
 type UserProfile = {
   clerkUserId: string
   currentStep: number
-  // Agrega otros campos del perfil si es necesario
 }
 
+//Se exportan todas las funciones que se necesitan utilizan en otros componentes
 type ChatContextType = {
   submitExternalMessage: (
     text: string,
@@ -28,7 +29,7 @@ type ChatContextType = {
   ) => Promise<string | undefined>
   cancelRequest: () => void
   isSubmitting: boolean
-  isProcessingChunk: boolean
+  audioPlay: boolean
   error: string | null
   isLoading: boolean
   messages: CustomMessage[]
@@ -38,13 +39,18 @@ type ChatContextType = {
   exitStepByStep: () => void
   isAtFirstStep: boolean
   currentStep: number
-  handleSTTText: (text: string) => void
+  handleSTText: (text: string) => void
   isStepByStep: boolean
   reiniciarStep: () => Promise<void>
   startConversation: () => Promise<void>
   endConversation: () => Promise<void>
+  isAudioPlaying: boolean
+  playAudio: (url: string) => void
+  pauseAudio: () => void
+  stopAudio: () => void
 }
 
+// Se crea el contexto
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
 
 interface ChatProviderProps {
@@ -53,6 +59,7 @@ interface ChatProviderProps {
 }
 
 export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
+  // Estados para manejar la carga y envío de mensajes
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -74,18 +81,61 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
   // Obtener datos de Clerk
   const { user, isLoaded, isSignedIn } = useClerkUserData()
   const userId = isLoaded && isSignedIn ? user?.id : null
-  console.log("audioPlay 74:", audioPlay)
 
-  // Función para manejar TTS
+  // Mantén la referencia al objeto Audio
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+
+  // --- Funciones para controlar el audio ---
+  const playAudio = useCallback((url: string) => {
+    // Si ya hay un audio reproduciéndose, lo paramos
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+      audioRef.current = null
+    }
+
+    audioRef.current = new Audio(url)
+
+    // Registramos eventos si quieres controlar el estado
+    audioRef.current.addEventListener("play", () => setIsAudioPlaying(true))
+    audioRef.current.addEventListener("pause", () => setIsAudioPlaying(false))
+    audioRef.current.addEventListener("ended", () => setIsAudioPlaying(false))
+
+    // Reproducir
+    audioRef.current.play().catch((err) => {
+      console.error("Autoplay bloqueado:", err)
+    })
+  }, [])
+  // --- Pausar el audio ---
+  const pauseAudio = useCallback(() => {
+    if (!audioRef.current) return
+    if (!audioRef.current.paused) {
+      // Está reproduciendo, lo pausamos
+      audioRef.current.pause()
+      setIsAudioPlaying(false)
+    } else {
+      // Estaba en pausa, reanudamos
+      audioRef.current.play().catch((err) => console.error(err))
+      setIsAudioPlaying(true)
+    }
+  }, [])
+  // --- Detener el audio --- Snipet de: https://codetogo.io/how-to-stop-video-in-javascript/
+  const stopAudio = useCallback(() => {
+    if (!audioRef.current) return
+    audioRef.current.pause()
+    audioRef.current.currentTime = 0
+    setIsAudioPlaying(false)
+  }, [])
+
+  // --- Función para manejar TTS ---
   const handleTTS = useCallback(
     async (message: string): Promise<string | null> => {
-      // Validate message
+      // Validar mensaje
       if (!message || message.trim() === "") {
-        console.error("Empty message received in handleTTS")
+        console.error("Mensaje vacío recibido en handleTTS")
         return null
       }
-
-      console.log("handleTTS received message 85:", message) // Debug log
 
       try {
         const response = await fetch("/api/tts", {
@@ -98,29 +148,25 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
           }),
         })
 
-        console.log("TTS API request payload 98:", { text: message.trim() }) // Debug log
-
         if (!response.ok) {
           const errorData = await response.json()
-          console.error("TTS API error:", errorData)
+          console.error("Error de la API de TTS:", errorData)
           throw new Error(
-            `Failed to generate speech: ${errorData.error || response.statusText}`,
+            `Fallo al generar el habla: ${errorData.error || response.statusText}`,
           )
         }
         const audioBlob = await response.blob()
         const audioUrl = URL.createObjectURL(audioBlob)
         return audioUrl
-        // const data = await response.json()
-        // console.log("TTS API response:", data) // Debug log
-        // return data.url
       } catch (error) {
-        console.error("Error generating TTS:", error)
+        console.error("Error generando TTS:", error)
         return null
       }
     },
     [],
   )
 
+  // Procesar TTS en streaming para bajar la latencia en mensajes largos
   const processStreamingTTS = useCallback(
     async (textChunk: string) => {
       if (!audioPlay || isProcessingChunk || textChunk.length < CHUNK_SIZE)
@@ -143,49 +189,6 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
   const addMessage = useCallback((msg: CustomMessage) => {
     setMessages((prev) => [...prev, msg])
   }, [])
-
-  // --- Función para enviar mensajes del asistente a través de la API de chat ---
-  // const sendAssistantMessage = useCallback(
-  //   async (text: string) => {
-  //     try {
-  //       // Crear mensaje del asistente
-  //       const assistantMessage: CustomMessage = {
-  //         id: uuidv4(),
-  //         role: "assistant",
-  //         content: text,
-  //         image: null,
-  //         buttons: [],
-  //         markdownBlocks: parseMarkdownIntoBlocks(text),
-  //       }
-
-  //       // Enviar mensaje a la API para almacenarlo en la base de datos
-  //       const response = await fetch("/api/chat", {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           messages: [assistantMessage], // Enviar solo el mensaje del asistente
-  //           chatId,
-  //         }),
-  //       })
-
-  //       if (!response.ok) {
-  //         const errorData = await response.json()
-  //         throw new Error(
-  //           errorData.error || "Error al enviar el mensaje del asistente",
-  //         )
-  //       }
-
-  //       // Añadir el mensaje al estado local (esto también activará TTS si está activo)
-  //       addMessage(assistantMessage)
-  //     } catch (error: any) {
-  //       console.error("Error al enviar mensaje del asistente:", error)
-  //       toast.error(
-  //         "Error al enviar el mensaje del asistente. Por favor, intenta nuevamente.",
-  //       )
-  //     }
-  //   },
-  //   [chatId, addMessage],
-  // )
 
   // Obtener mensajes iniciales y el perfil del usuario
   const fetchMessagesAndProfile = useCallback(async () => {
@@ -305,7 +308,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
       toast.error("Ocurrió un error al avanzar el paso.")
     }
   }, [chatId, addMessage, userId])
-
+  // --- Retroceder un paso ---
   const goBackStep = useCallback(async () => {
     try {
       if (!userId) {
@@ -350,7 +353,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
     }
   }, [chatId, addMessage, userId])
 
-  // Añadir la función para reiniciar
+  // --- Reiniciar los pasos ---
   const reiniciarStep = useCallback(async () => {
     try {
       if (!userId) {
@@ -399,33 +402,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
     }
   }, [chatId, addMessage, userId])
 
-  // --- Llamada TTS streaming con /api/tts y reproducir en front ---
-  // const playTTS = async (text: string) => {
-  //   try {
-  //     const voiceId = "gD1IexrzCvsXPHUuT0s3" // ID de voz ElevenLabs
-  //     const res = await fetch("/api/tts", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         message: text,
-  //         voice: voiceId,
-  //       }), // O { text, uploadToS3: true }
-  //     })
-  //     console.log("TTS response:", res) //!! Debug
-  //     if (!res.ok) throw new Error("TTS fetch failed")
-
-  //     // Recibir en blob
-  //     const audioBlob = await res.blob()
-  //     const audioUrl = URL.createObjectURL(audioBlob)
-  //     const audio = new Audio(audioUrl)
-  //     audio.play().catch((err) => console.log("Autoplay blocked:", err))
-  //   } catch (err) {
-  //     console.error("Error en playTTS =>", err)
-  //   }
-  // }
-
   // --- Función para enviar mensajes externos del usuario ---
-
   const submitExternalMessage = useCallback(
     async (text: string, shouldAdvanceStep: boolean = false) => {
       if (!text.trim()) {
@@ -642,7 +619,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
       processStreamingTTS,
     ],
   )
-
+  // --- Función para salir del modo paso a paso ---
   const exitStepByStep = useCallback(async () => {
     try {
       if (!userId) {
@@ -656,7 +633,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
       toast.error("Ocurrió un error al salir de la guía paso a paso.")
     }
   }, [userId, submitExternalMessage])
-
+  // --- Función para cancelar la solicitud ---
   const cancelRequest = useCallback(() => {
     if (abortController) {
       abortController.abort()
@@ -665,7 +642,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
       toast.error("Solicitud cancelada por el usuario.")
     }
   }, [abortController])
-
+  // --- Función para iniciar la conversación hablada ---
   const startConversation = useCallback(async () => {
     try {
       setAudioPlay(true)
@@ -699,7 +676,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
       setAudioPlay(false)
     }
   }, [chatId, addMessage])
-
+  // --- Función para finalizar la conversación hablada ---
   const endConversation = useCallback(async () => {
     try {
       setAudioPlay(false)
@@ -735,9 +712,9 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
 
   /**
    * handleSTTText:
-   * si ElevenLabs STT produce texto, lo mandamos a GPT
+   * si el usuario STT produce texto, lo mandamos a GPT para obtener respuesta
    */
-  const handleSTTText = useCallback(
+  const handleSTText = useCallback(
     (text: string) => {
       submitExternalMessage(text)
     },
@@ -759,12 +736,16 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
         exitStepByStep,
         isAtFirstStep,
         currentStep,
-        handleSTTText,
+        handleSTText,
         isStepByStep,
         reiniciarStep,
         startConversation,
         endConversation,
-        isProcessingChunk,
+        audioPlay,
+        isAudioPlaying,
+        playAudio,
+        pauseAudio,
+        stopAudio,
       }}
     >
       {children}

@@ -1,3 +1,25 @@
+//**Revisado */
+/**
+ * Un componente modal que muestra una imagen con efectos de animación.
+ *
+ * @component
+ * @param {Object} props - Las propiedades del componente
+ * @param {boolean} props.isOpen - Controla si el modal está visible
+ * @param {() => void} props.onClose - Función a llamar cuando el modal debe cerrarse
+ * @param {string} props.src - URL de origen de la imagen a mostrar
+ * @param {string} props.alt - Texto alternativo para la imagen
+ * @param {number} props.width - Ancho de la imagen en píxeles
+ * @param {number} props.height - Alto de la imagen en píxeles
+ *
+ * @remarks
+ * El modal se puede cerrar:
+ * - Haciendo clic en el fondo
+ * - Haciendo clic en la imagen misma
+ * - Haciendo clic en el botón de cerrar en la esquina superior derecha
+ *
+ * Utiliza Framer Motion para animaciones e incluye un fondo semi-transparente.
+ */
+
 "use client"
 
 import React, { FC } from "react"
@@ -24,6 +46,7 @@ const modalVariants = {
   visible: { scale: 1, opacity: 1 },
 }
 
+// Modal de imagen con animaciones
 const ImageModal: FC<ImageModalProps> = ({
   isOpen,
   onClose,

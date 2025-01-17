@@ -1,3 +1,6 @@
+//**Revisado */
+//! NOTA: No se ha implementado la subida de archivos a S3 en la aplicación
+
 import {
   S3Client,
   PutObjectCommand,
@@ -16,17 +19,19 @@ const {
   NEXT_PUBLIC_S3_BUCKET_NAME,
 } = process.env
 
-// Validate environment variables
+// Validar variables de entorno
 if (
   !NEXT_PUBLIC_S3_ACCESS_KEY_ID ||
   !NEXT_PUBLIC_S3_SECRET_ACCESS_KEY ||
   !NEXT_PUBLIC_S3_REGION_NAME ||
   !NEXT_PUBLIC_S3_BUCKET_NAME
 ) {
-  throw new Error("One or more AWS environment variables are not set.")
+  throw new Error(
+    "Una o más variables de entorno de AWS no están configuradas.",
+  )
 }
 
-// Initialize S3 Client
+// Inicializar cliente S3
 const s3 = new S3Client({
   credentials: {
     accessKeyId: NEXT_PUBLIC_S3_ACCESS_KEY_ID,
@@ -36,9 +41,9 @@ const s3 = new S3Client({
 })
 
 /**
- * Uploads an audio buffer to S3 and returns the object key.
- * @param audioBuffer - The audio data as a Buffer.
- * @returns The S3 object key.
+ * Sube un buffer de audio a S3 y devuelve la clave del objeto.
+ * @param audioBuffer - Los datos de audio como un Buffer.
+ * @returns La clave del objeto en S3.
  */
 export const uploadAudioStreamToS3 = async (
   audioBuffer: Buffer,
@@ -56,15 +61,15 @@ export const uploadAudioStreamToS3 = async (
     )
     return remotePath
   } catch (error) {
-    console.error("Error uploading to S3:", error)
-    throw new Error("Failed to upload audio to S3")
+    console.error("Error subiendo a S3:", error)
+    throw new Error("Error al subir el audio a S3")
   }
 }
 
 /**
- * Generates a presigned URL for the uploaded S3 object.
- * @param objectKey - The S3 object key.
- * @returns The presigned URL.
+ * Genera una URL prefirmada para el objeto subido en S3.
+ * @param objectKey - La clave del objeto en S3.
+ * @returns La URL prefirmada.
  */
 export const generatePresignedUrl = async (
   objectKey: string,
@@ -72,7 +77,7 @@ export const generatePresignedUrl = async (
   const getObjectParams = {
     Bucket: NEXT_PUBLIC_S3_BUCKET_NAME,
     Key: objectKey,
-    Expires: 3600, // URL valid for 1 hour
+    Expires: 3600, // URL válida por 1 hora
   }
 
   try {
@@ -80,7 +85,7 @@ export const generatePresignedUrl = async (
     const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
     return url
   } catch (error) {
-    console.error("Error generating presigned URL:", error)
-    throw new Error("Failed to generate presigned URL")
+    console.error("Error generando URL prefirmada:", error)
+    throw new Error("Error al generar la URL prefirmada")
   }
 }

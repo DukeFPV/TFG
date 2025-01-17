@@ -1,6 +1,6 @@
 {
   "name": "sara-ia",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "scripts": {
     "dev": "export NODE_OPTIONS='--max-old-space-size=8192' && next dev",

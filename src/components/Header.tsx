@@ -1,3 +1,32 @@
+//**Revisado */
+/**
+ * Componente de barra de navegación que muestra el menú principal, el logo y los controles de autenticación de usuario.
+ * @component
+ * @returns {JSX.Element} La barra de navegación renderizada
+ *
+ * @remarks
+ * Este componente maneja:
+ * - Navegación responsiva con soporte para menú móvil
+ * - Visualización del estado de autenticación del usuario
+ * - Estilizado dinámico basado en el estado de la página principal
+ * - Elementos de navegación protegidos para usuarios autenticados
+ * - Menús desplegables para elementos de navegación anidados
+ * - Funcionalidad de inicio/registro de sesión y cierre de sesión
+ *
+ * @example
+ * ```tsx
+ * <Navbar />
+ * ```
+ *
+ * @dependencies
+ * - useUser - Para el estado de autenticación del usuario
+ * - useAutoAnimate - Para animaciones suaves
+ * - usePathname - Para estilizado basado en la ruta
+ * - useClerk - Para acciones de autenticación
+ *
+ * @param {void} props - Este componente no acepta ningún prop
+ */
+
 "use client"
 
 import { useState, ReactNode } from "react"
@@ -5,14 +34,14 @@ import Image from "next/image"
 import Link from "next/link"
 import { IoIosArrowDown, IoMdMenu, IoMdClose } from "react-icons/io"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
-import { Switch } from "@nextui-org/react"
-import { MoonIcon } from "../components/MoonIcon"
-import { SunIcon } from "../components/SunIcon"
+// import { Switch } from "@nextui-org/react"
+// import { MoonIcon } from "../components/MoonIcon"
+// import { SunIcon } from "../components/SunIcon"
 import { usePathname } from "next/navigation"
 import { UserButton, useUser } from "@clerk/nextjs"
 import { useClerk } from "@clerk/nextjs"
 
-// Icons
+// Iconos
 import microIcon from "/public/icons/microphone.svg"
 import microVoice from "/public/icons/voice.svg"
 import microData from "/public/icons/data.svg"
@@ -26,12 +55,14 @@ type NavItem = {
   iconImage?: string
 }
 
+// Contenido de la barra de navegación pública
 const navItems: NavItem[] = [
   { label: "Que es SARA", link: "/nosotros" },
   { label: "Contacto", link: "/contacto" },
   { label: "Quienes somos", link: "/nosotros" },
 ]
 
+// Contenido de la barra de navegación protegida
 const protectedNavItems: NavItem[] = [
   {
     label: "Chat con SARA",
@@ -63,6 +94,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [animationParent] = useAutoAnimate()
 
+  // Comprueba si la página actual es la página de inicio para renderizar el estilizado correcto
   const pathname = usePathname()
   const isHomePage = pathname === "/"
 
@@ -182,7 +214,7 @@ export default function Navbar() {
     </nav>
   )
 }
-
+// --- Funcion de navegacion para dispositivos moviles ---
 function MobileNav({ closeMenu }: { closeMenu: () => void }) {
   const { isSignedIn, user } = useUser()
   const ajustesItem = protectedNavItems.find((item) => item.label === "Ajustes")
@@ -262,7 +294,7 @@ function MobileNav({ closeMenu }: { closeMenu: () => void }) {
     </div>
   )
 }
-
+// Submenu de navegación
 function SingleNavItem({
   label,
   iconImage,
