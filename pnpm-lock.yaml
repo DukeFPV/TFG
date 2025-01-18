@@ -209,6 +209,9 @@ importers:
       tailwind-merge:
         specifier: ^2.5.4
         version: 2.5.5
+      types:
+        specifier: link:@clerk/nextjs/internal/types
+        version: link:@clerk/nextjs/internal/types
       uuid:
         specifier: ^11.0.5
         version: 11.0.5

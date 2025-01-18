@@ -190,7 +190,7 @@ export function ConvAI() {
             </div>
             <Button
               variant="outline"
-              className="rounded-full"
+              className="rounded-full bg-pink-300 border-pink-300 text-red-900"
               size="lg"
               // disabled={status === "disconnected"}
               onClick={handleEnd}

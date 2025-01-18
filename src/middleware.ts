@@ -7,8 +7,25 @@
  * - Incluye la ruta específica de sara-ia y sus sub-rutas
  */
 
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
-import { NextResponse } from "next/server"
+import {
+  clerkMiddleware,
+  createRouteMatcher,
+  ClerkMiddlewareAuth,
+  auth,
+} from "@clerk/nextjs/server"
+import { NextResponse, type NextRequest } from "next/server"
+
+function getTenant(req: NextRequest): "tenant1" {
+  // Add your tenant resolution logic here
+  return "tenant1"
+}
+
+const tenantKeys = {
+  tenant1: {
+    publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    secretkey: process.env.CLERK_SECRET_KEY,
+  },
+}
 
 const isPublicRoute = createRouteMatcher([
   "/",
@@ -18,16 +35,26 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhooks/clerk(.*)",
 ])
 
-export default clerkMiddleware(async (auth, request) => {
-  const { pathname } = request.nextUrl
-  // Excluir rutas específicas
-  if (pathname.startsWith("/api/health-centers/")) {
-    return NextResponse.next()
-  }
-  if (!isPublicRoute(request)) {
-    await auth.protect()
-  }
-})
+export default clerkMiddleware(
+  async (auth, req) => {
+    const { pathname } = req.nextUrl
+
+    // (a) Excluir la ruta /api/health-centers/ para que no aplique la protección
+    if (pathname.startsWith("/api/health-centers/")) {
+      return NextResponse.next()
+    }
+    // (b) Si no es ruta pública, protegerla con Clerk
+    if (!isPublicRoute(req)) {
+      // `auth.protect()` arroja un error 401 o redirige si el usuario no está autenticado
+      await auth.protect()
+    }
+  },
+  (req) => {
+    // Resolve tenant based on the request
+    const tenant = getTenant(req)
+    return tenantKeys[tenant]
+  },
+)
 
 export const config = {
   matcher: [

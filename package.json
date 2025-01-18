@@ -76,6 +76,7 @@
     "svix": "^1.44.0",
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.4",
+    "types": "link:@clerk/nextjs/internal/types",
     "uuid": "^11.0.5",
     "zod": "^3.23.8"
   },
