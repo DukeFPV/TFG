@@ -27,11 +27,11 @@ export function ConvAI() {
     audioPlay,
     pauseAudio,
     stopAudio,
+    isAudioPlaying,
   } = useChatContext()
 
   // Estados para el componente
   const [isConnected, setIsConnected] = useState(false)
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
 
   const handlePause = () => {
@@ -43,23 +43,6 @@ export function ConvAI() {
     stopAudio()
     setIsPaused(false)
   }
-
-  // Monitorea los cambios en audioPlay para cambiar el estado de la conversación
-  useEffect(() => {
-    const handleAudioStateChange = (event: CustomEvent) => {
-      setIsAudioPlaying(event.detail.isPlaying)
-    }
-    window.addEventListener(
-      "audioStateChange",
-      handleAudioStateChange as EventListener,
-    )
-    return () => {
-      window.removeEventListener(
-        "audioStateChange",
-        handleAudioStateChange as EventListener,
-      )
-    }
-  }, [])
 
   const handleStart = useCallback(async () => {
     setIsConnected(true)
