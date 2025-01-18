@@ -29,6 +29,8 @@ const tenantKeys = {
 
 const isPublicRoute = createRouteMatcher([
   "/",
+  "/contacto(.*)",
+  "/nosotros(.*)",
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/panel-control(.*)",
