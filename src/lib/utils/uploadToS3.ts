@@ -1,5 +1,5 @@
-//**Revisado */
-//! NOTA: No se ha implementado la subida de archivos a S3 en la aplicación
+//! NOTA: No se ha implementado la subida de archivos mp3 a S3 generados por TTS
+//! Genera multiples archivos mp3 de cada chunk de texto generado por TTS
 
 import {
   S3Client,

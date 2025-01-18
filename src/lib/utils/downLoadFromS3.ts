@@ -1,7 +1,9 @@
-// src/lib/s3/downLoadFromS3.ts
+/**
+ * //!! Este archivo es un ejemplo de cómo descargar los audios generados y almacenados en un archivo de AWS S3 y guardarlo localmente
+ * !! NOTA: Este archivo no se utiliza en el proyecto, es solo un ejemplo de cómo descargar un archivo de AWS S3 y guardarlo localmente
+ */
 import { S3 } from "@aws-sdk/client-s3"
 import fs from "fs"
-import path from "path"
 import { Readable } from "stream"
 
 /**
@@ -30,7 +32,7 @@ export async function downLoadFromS3(file_key: string): Promise<string | null> {
     if (bodyStream instanceof Readable) {
       const fileWriteStream = fs.createWriteStream(file_name)
 
-      // Pipe la data al file
+      // Guardar el archivo
       await new Promise<void>((resolve, reject) => {
         bodyStream.pipe(fileWriteStream)
         bodyStream.on("error", reject)

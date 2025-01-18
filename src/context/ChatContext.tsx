@@ -1,3 +1,38 @@
+//**Revisado */
+/**
+ * Componente Provider que gestiona la funcionalidad y estado del chat.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {React.ReactNode} props.children - Componentes hijos que serán envueltos por el provider
+ * @param {string} props.chatId - Identificador único para la sesión de chat
+ *
+ * @remarks
+ * Este provider gestiona varias características:
+ * - Manejo y envío de mensajes
+ * - Modo guiado paso a paso
+ * - Funcionalidad de Texto a Voz (TTS)
+ * - Controles de reproducción de audio
+ * - Manejo de Voz a Texto (STT)
+ *
+ * Estados gestionados:
+ * - Mensajes y estados de carga
+ * - Estados del modo paso a paso
+ * - Estados de procesamiento de audio
+ * - Estados de autenticación de usuario
+ *
+ * Características principales:
+ * - Streaming de mensajes en tiempo real
+ * - Procesamiento de mensajes de audio
+ * - Navegación por pasos (avanzar, retroceder, reiniciar)
+ * - Cancelación de mensajes
+ * - Controles de conversación por voz
+ *
+ * @context ChatContext
+ * @provides {Object} ChatContext.Provider
+ *
+ */
+
 "use client"
 
 import React, {

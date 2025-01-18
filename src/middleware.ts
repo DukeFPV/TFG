@@ -1,6 +1,14 @@
+//**Revisado */
+/**
+ * Objeto de configuración para el enrutamiento del middleware de clerk.
+ * @property {string[]} matcher - Array de patrones de ruta para comparar con las solicitudes entrantes
+ * - Excluye rutas internas de Next.js y archivos estáticos (a menos que se encuentren en parámetros de búsqueda)
+ * - Incluye todas las rutas de API (/api/*, /trpc/*)
+ * - Incluye la ruta específica de sara-ia y sus sub-rutas
+ */
+
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
 
 const isPublicRoute = createRouteMatcher([
   "/",
@@ -25,10 +33,10 @@ export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
+    // Siempre incluir las rutas de API
     "/(api|trpc)(.*)",
     "/api/:path*",
-    // Include the sara-ia route
+    // Incluir rutas específicas
     "/sara-ia(.*)",
   ],
 }

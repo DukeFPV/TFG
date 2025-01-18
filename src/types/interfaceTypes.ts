@@ -1,3 +1,6 @@
+//**Revisado */
+// Declara las interfaces y tipos de datos que se utilizan
+
 import { Message as AIMessage } from "ai/react"
 
 export interface LocationOption {
@@ -5,6 +8,7 @@ export interface LocationOption {
   label: string
 }
 
+// Interfaz para los datos de los centros de salud
 export interface SelectHealthCenter {
   id: number
   name: string
@@ -23,6 +27,7 @@ export interface SelectHealthCenter {
   teachingAccreditation: boolean
 }
 
+// Interfaz para los mensajes personalizados
 export interface CustomMessage extends AIMessage {
   image?: string | null
   buttons?: Array<{

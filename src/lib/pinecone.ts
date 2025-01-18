@@ -1,3 +1,17 @@
+//**Revisado */
+/**
+ * Carga un archivo PDF desde S3 en la base de datos vectorial Pinecone
+ * @param fileKey - Archivo PDF en S3 a procesar
+ * @returns Promesa que se resuelve con el primer documento después del procesamiento
+ * @throws Error si falla la descarga del archivo desde S3
+ *
+ * Esta función realiza los siguientes pasos:
+ * 1. Descarga y lee el archivo PDF desde S3
+ * 2. Divide el PDF en segmentos
+ * 3. Crea embeddings vectoriales de los segmentos
+ * 4. Sube los vectores al índice de Pinecone
+ */
+
 import { Pinecone, PineconeRecord } from "@pinecone-database/pinecone"
 import { downLoadFromS3 } from "./s3-server"
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf"
@@ -8,8 +22,6 @@ import {
 import { getEmbeddings } from "./embeddings"
 import md5 from "md5"
 import { convertToAscii } from "./utils"
-
-//*REVISADO*//
 
 export const getPineconeClient = () => {
   return new Pinecone({
@@ -25,7 +37,7 @@ type PDFPage = {
 }
 
 export async function loadS3IntoPinecone(fileKey: string) {
-  //* 1. Obtener el pdf -> descargar y leer el contenido
+  // 1. Obtener el pdf -> descargar y leer el contenido
   console.log("Descargando el archivo desde S3")
   const file_name = await downLoadFromS3(fileKey)
 
@@ -36,23 +48,23 @@ export async function loadS3IntoPinecone(fileKey: string) {
   const loader = new PDFLoader(file_name)
   const pages = (await loader.load()) as PDFPage[]
 
-  //* 2. Dividir el pdf en segmentos
+  // 2. Dividir el pdf en segmentos
   const documents = await Promise.all(pages.map(prepareDocument))
 
-  //* 3. Vectorizar y subir los embeddings a Pinecone
+  // 3. Vectorizar y subir los embeddings a Pinecone
   const vectors = await Promise.all(documents.flat().map(embedDocument))
 
-  //* 4. Agregar los vectores a Pinecone
+  // 4. Agregar los vectores a Pinecone
   const client = await getPineconeClient()
   const pineconeIndex = client.Index("sara-ia")
   const namespace = pineconeIndex.namespace(convertToAscii(fileKey))
 
-  console.log("Agregando los vectores a Pinecone")
   await namespace.upsert(vectors)
 
   return documents[0]
 }
 
+// Obtener los embeddings de un documento
 async function embedDocument(doc: Document) {
   try {
     const embeddings = await getEmbeddings(doc.pageContent)

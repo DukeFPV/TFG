@@ -1,3 +1,12 @@
+//**Revisado */
+/**
+ * Genera embeddings para el texto dado utilizando la API de OpenAI.
+ *
+ * @param text - El texto de entrada para generar embeddings.
+ * @returns Una promesa que se resuelve en un array de números que representan los embeddings.
+ * @throws Lanzará un error si la respuesta de OpenAI es inválida o si hay un problema con la llamada a la API.
+ */
+
 import { OpenAIApi, Configuration } from "openai-edge"
 
 const config = new Configuration({
@@ -26,5 +35,3 @@ export async function getEmbeddings(text: string) {
     throw error
   }
 }
-
-//*REVISADO*//
