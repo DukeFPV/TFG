@@ -57,10 +57,13 @@ export default function Contact() {
       {/* Contenedor principal de la página de contacto */}
       <div className="min-h-screen bg-gradient-to-br z-0 from-pink-400/70 via-indigo-400/70 to-neutral-50 flex flex-col justify-center items-left pl-20">
         {/* Background image */}
-        <div className="absolute right-0 top-1/2 -translate-y-3/4 mr-20 z-20">
+        <div
+          className="absolute right-0 top-1/2 -translate-y-3/4 mr-20 z-20"
+          aria-hidden="true"
+        >
           <Image
             src="/icons/contacto.png"
-            alt="Contacto decorative"
+            alt=""
             width={800}
             height={800}
             className="opacity-60"
@@ -68,7 +71,7 @@ export default function Contact() {
         </div>
         {/* Contenedor del formulario de contacto */}
         <div className="bg-pink-100 p-8 rounded-lg shadow-lg max-w-md w-full z-30">
-          <h1 className="text-2xl font-bold mb-4">Cuéntanos lo que quieras</h1>
+          <h2 className="text-2xl font-bold mb-4">Cuéntanos lo que quieras</h2>
           {/* Formulario de contacto, los estilos van definidos en cada contenedor y campo */}
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
@@ -86,6 +89,7 @@ export default function Contact() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-full"
                 placeholder="Tu nombre y apellidos"
                 required
+                aria-required="true"
               />
             </div>
             <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -104,6 +108,7 @@ export default function Contact() {
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="600123456"
                   required
+                  aria-required="true"
                 />
               </div>
               <div>
@@ -121,6 +126,7 @@ export default function Contact() {
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="ejemplo@email.com"
                   required
+                  aria-required="true"
                 />
               </div>
             </div>
@@ -138,13 +144,14 @@ export default function Contact() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Escribe aquí lo que nos quieras decir"
                 required
+                aria-required="true"
                 rows={4}
               ></textarea>
             </div>
             {/* Botón para enviar el formulario con el mismo estilo que ya se aplicó en la página principal para mantener coherencia */}
             <button
               type="submit"
-              className="border-black w-fit rounded-full border-2 bg-purple-400 text-nowrap px-20 sm:px-6 py-4 text-white transition-all hover:border-purple-400 hover:bg-transparent hover:text-black/90"
+              className="border-black w-fit rounded-full border-2 bg-purple-600 text-nowrap px-20 sm:px-6 py-4 text-white transition-all hover:border-purple-800 hover:bg-transparent hover:text-black/90"
             >
               Enviar mensaje
             </button>

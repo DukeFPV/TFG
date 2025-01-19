@@ -158,15 +158,30 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
     }
   }
 
+  const screensCycleMap = {
+    chat: "saved",
+    saved: "topics",
+    topics: "chat",
+  } as const
+
+  function handleArrowLeftClick() {
+    const nextScreen = screensCycleMap[currentScreen]
+    setCurrentScreen(nextScreen)
+  }
+
   // Función para renderizar la parte superior de la versión mobile de la aplicación
   const renderHeader = () => (
     <header className="p-4 border-b">
       <div className="flex flex-row align-middle justify-between">
         <div className="flex items-center">
-          <button onClick={() => setCurrentScreen("saved")} className="p-2">
+          <button
+            onClick={handleArrowLeftClick}
+            className="p-2"
+            aria-label="Volver a lista de chats guardados"
+          >
             <ArrowLeft size={24} />
           </button>
-          <h1 className="text-lg font-semibold ml-4">
+          <h1 className="text-lg font-semibold ml-24">
             {currentScreen === "saved"
               ? "Chats guardados"
               : currentScreen === "chat"
@@ -350,7 +365,7 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
 
   // --- Función para renderizar el footer/Nav de la aplicación ---
   const renderFooter = () => (
-    <footer className="flex justify-around p-4 border-t bg-purple-800 text-violet-400">
+    <footer className="flex justify-around p-4 border-t bg-purple-800 text-white/50">
       <button
         onClick={() => setCurrentScreen("chat")}
         className={`p-2 ${currentScreen === "chat" ? "text-purple-50" : ""}`}
@@ -386,9 +401,12 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
   return (
     <div className="flex flex-col overflow-hidden">
       {renderHeader()}
-      <div className="flex-1 overflow-hidden h-[calc(100vh-var(--header-height)-var(--bottom-nav-height))]">
+      <main
+        className="flex-1 overflow-hidden h-[calc(100vh-var(--header-height)-var(--bottom-nav-height))]"
+        id="mobile-main"
+      >
         {renderContent()}
-      </div>
+      </main>
       {renderFooter()}
     </div>
   )

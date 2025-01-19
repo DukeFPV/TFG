@@ -93,7 +93,10 @@ const ChatPage = async (props: { params: Params }) => {
           chats={userChats}
           currentChatId={currentChat?.id}
         >
-          <div className="flex h-[calc(100vh-var(--header-height))] max-h-[calc(100vh-var(--header-height))] overflow-hidden">
+          <main
+            className="flex h-[calc(100vh-var(--header-height))] max-h-[calc(100vh-var(--header-height))] overflow-hidden"
+            id="chat-main"
+          >
             <div className="hidden sm:block sm:max-w-xs h-full">
               <ChatSideBarLeft chats={userChats} chatId={currentChat?.id} />
             </div>
@@ -111,7 +114,7 @@ const ChatPage = async (props: { params: Params }) => {
             <div className="sm:flex-[1] sm:max-w-xs h-full">
               <ChatSideBarR chatId={currentChat.id} />
             </div>
-          </div>
+          </main>
         </ResponsiveChatWrapper>
       </ChatProviderWrapper>
     </QueryProvider>

@@ -37,3 +37,11 @@ export interface CustomMessage extends AIMessage {
   audioUrl?: string | null // Audio
   markdownBlocks?: string[] // Añadido para los bloques de markdown
 }
+
+export interface Chat {
+  id: number
+  title?: string
+  createdAt: string | Date
+  pdfUrl?: string
+  userId: string
+}

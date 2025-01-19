@@ -6,12 +6,8 @@ import { useCallback, useEffect, useRef } from "react"
 import * as React from "react"
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-// import { Conversation } from "@11labs/client"
-// import { useChatContext } from "@/context/ChatContext"
-// import {cn} from "@/lib/utils";
 import Image from "next/image"
 import { useChatContext } from "@/context/ChatContext"
-import { set } from "zod"
 import { cn } from "@/lib/utils"
 import { Pause, Play, Square } from "lucide-react"
 
@@ -54,55 +50,6 @@ export function ConvAI() {
     await endConversation()
   }, [endConversation])
 
-  //const { handleSTTText } = useChatContext()
-
-  // const {
-  //   startSession,
-  //   endSession,
-  //   status,
-  //   isSpeaking: isAiSpeaking,
-  // } = useConversation({
-  //   onMessage: ({ message, source }) => {
-  //     // console.log("[ElevenLabs] desde convAI onMessage", source, message)
-  //     // if (source === "user") {
-  //     //   // Aquí llega la transcripción
-  //     //   handleSTTText(message)
-  //     // }
-  //   },
-  //   onConnect: () => {
-  //     console.log("Conversación conectada (STT activo)")
-  //     setIsConnected(true)
-  //   },
-  //   onDisconnect: () => {
-  //     console.log("Conversación desconectada")
-  //     setIsConnected(false)
-  //     setIsSpeaking(false)
-  //   },
-  //   onModeChange: ({ mode }: { mode: "speaking" | "listening" }) => {
-  //     // 'speaking' | 'listening'
-  //     setIsSpeaking(mode === "speaking")
-  //   },
-  //   onError: (err) => {
-  //     console.error("ElevenLabs error =>", err)
-  //     alert("Error con ElevenLabs")
-  //   },
-  // })
-
-  // const handleStart = useCallback(async () => {
-  //   const hasPermission = await requestMicrophonePermission()
-  //   if (!hasPermission) {
-  //     alert("No hay permiso de micrófono")
-  //     return
-  //   }
-  //   const url = await getSignedUrl()
-  //   // Iniciamos la conversación
-  //   await startSession({ signedUrl: url })
-  // }, [startSession])
-
-  // const handleEnd = useCallback(async () => {
-  //   await endSession()
-  // }, [endSession])
-
   return (
     <div className="flex justify-center items-center gap-x-4">
       <Card className="rounded-3xl">
@@ -138,15 +85,17 @@ export function ConvAI() {
                       isConnected && !isAudioPlaying,
                   },
                 )}
-              ></div>
+              />
             </div>
+
             <div className="flex justify-center gap-4">
               {!isConnected ? (
                 <Button
                   variant="outline"
-                  className="rounded-full"
+                  className="rounded-full hover:bg-teal-100"
                   size="lg"
                   onClick={handleStart}
+                  aria-label="Empezar conversación"
                 >
                   Empezar conversación
                 </Button>
@@ -154,29 +103,35 @@ export function ConvAI() {
                 <>
                   <Button
                     variant="outline"
-                    className="rounded-full"
+                    className="rounded-full border-2 border-cyan-600 hover:bg-teal-100 hover:border-cyan-700"
                     size="lg"
                     onClick={handlePause}
+                    aria-label={isPaused ? "Reanudar audio" : "Pausar audio"}
                   >
                     {isPaused ? <Play /> : <Pause />}
                   </Button>
                   <Button
                     variant="outline"
-                    className="rounded-full"
+                    className="rounded-full border-2 border-rose-500 hover:bg-rose-100 hover:border-rose-600"
                     size="lg"
                     onClick={handleStop}
+                    aria-label="Detener audio"
                   >
                     <Square />
                   </Button>
                 </>
               )}
             </div>
+
             <Button
               variant="outline"
-              className="rounded-full bg-pink-300 border-pink-300 text-red-900"
+              className="rounded-full bg-rose-200 border-rose-300 
+                         text-red-950 hover:bg-rose-400 hover:border-rose-400"
               size="lg"
-              // disabled={status === "disconnected"}
               onClick={handleEnd}
+              disabled={!isConnected}
+              aria-disabled={!isConnected}
+              aria-label="Finalizar conversación"
             >
               Finalizar conversación
             </Button>

@@ -1,3 +1,37 @@
+//**Revisado */
+/**
+ * Un componente de diseño que gestiona diferentes paneles y su contenido.
+ *
+ * @component
+ * @param {object} props - Las propiedades del componente
+ * @param {ReactNode} props.children - Componentes hijos a renderizar
+ * @param {object} props.panelData - Datos requeridos para la visualización del panel
+ * @param {object} props.userData - Datos de información del usuario
+ * @param {object} props.healthData - Datos relacionados con la salud
+ * @param {object} props.bankData - Datos de información bancaria
+ * @param {object} props.conversationsHistory - Historial de conversaciones
+ * @param {object} props.savedChats - Datos de chats guardados
+ *
+ * @returns {JSX.Element} Un diseño responsive con una barra de navegación lateral y área de contenido principal
+ *
+ * @example
+ * <PanelLayout
+ *   panelData={panelData}
+ *   userData={userData}
+ *   healthData={healthData}
+ *   bankData={bankData}
+ *   conversationsHistory={conversationsHistory}
+ *   savedChats={savedChats}
+ *   {children}
+ * </PanelLayout>
+ *
+ *  @description Para ir a una sección específica:
+ *  const goHealthData = () => {
+ *    router.push("/panel-control/salud") <- "salud" es la sección
+ *  }
+ *
+ */
+
 "use client"
 import { useState } from "react"
 import { NavigationMenu } from "./NavigationMenu"
@@ -6,6 +40,7 @@ import { ConversationHistory } from "./ConversationHistory"
 import { UserData } from "./UserData"
 import DataForm from "./DataForm"
 import HealthForm from "./HealthForm"
+import { SavedChatsList } from "./SavedChatList"
 //import BankData from "./BankData"
 //import ConversationsHistory from "./ConversationsHistory"
 //import SavedChats from "./SavedChats"
@@ -70,14 +105,17 @@ export function BankData() {
 
 // Interfaz de TS Panel de Conversaciones
 interface PanelHistoryProps {
-  messages: any[]
+  chats: any[]
 }
 
 // Panel de Conversaciones
-export function ConversationsHistory({ messages }: PanelHistoryProps) {
+export function ConversationsHistory({ chats }: PanelHistoryProps) {
   return (
     <div className="space-y-6">
-      <ConversationHistory messages={messages} />
+      <h2 className="text-lg font-semibold text-gray-700 mb-4">
+        Chats Guardados
+      </h2>
+      <SavedChatsList chats={chats} />
     </div>
   )
 }
@@ -112,37 +150,11 @@ interface PanelLayoutProps {
   bankData: any
   conversationsHistory: PanelHistoryProps
   savedChats: any
+  activeSection?: string
 }
 
-/**
- * Un componente de diseño que gestiona diferentes paneles y su contenido.
- *
- * @component
- * @param {object} props - Las propiedades del componente
- * @param {ReactNode} props.children - Componentes hijos a renderizar
- * @param {object} props.panelData - Datos requeridos para la visualización del panel
- * @param {object} props.userData - Datos de información del usuario
- * @param {object} props.healthData - Datos relacionados con la salud
- * @param {object} props.bankData - Datos de información bancaria
- * @param {object} props.conversationsHistory - Historial de conversaciones
- * @param {object} props.savedChats - Datos de chats guardados
- *
- * @returns {JSX.Element} Un diseño responsive con una barra de navegación lateral y área de contenido principal
- *
- * @example
- * <PanelLayout
- *   panelData={panelData}
- *   userData={userData}
- *   healthData={healthData}
- *   bankData={bankData}
- *   conversationsHistory={conversationsHistory}
- *   savedChats={savedChats}
- * >
- *   {children}
- * </PanelLayout>
- */
-
 export function PanelLayout({
+  activeSection = "panel",
   children,
   panelData,
   userData,
@@ -151,7 +163,7 @@ export function PanelLayout({
   conversationsHistory,
   savedChats,
 }: PanelLayoutProps) {
-  const [activeTab, setActiveTab] = useState("panel")
+  const [activeTab, setActiveTab] = useState(activeSection)
 
   const renderContent = () => {
     switch (activeTab) {

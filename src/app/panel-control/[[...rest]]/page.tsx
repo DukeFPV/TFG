@@ -28,12 +28,19 @@
  */
 
 import { db } from "@/lib/db"
-import { messages, user_profiles } from "@/lib/db/schema"
+import { chats, messages, user_profiles } from "@/lib/db/schema"
 import { desc, eq } from "drizzle-orm"
 import { PanelLayout } from "@/components/PanelLayout"
 import { currentUser } from "@clerk/nextjs/server"
 
-export default async function PanelControl() {
+interface PageParams {
+  searchParams: {
+    tab?: string
+  }
+}
+
+export default async function PanelControl({ searchParams }: PageParams) {
+  const activeSection = (await searchParams.tab) || "panel"
   // Obtener el usuario actual de Clerk
   const user = await currentUser()
 
@@ -84,22 +91,32 @@ export default async function PanelControl() {
     duration: 0,
   }))
 
+  //Cargamos los chats guardados del usuario actual
+  const savedChats = await db
+    .select()
+    .from(chats)
+    .where(eq(chats.userId, user?.id || ""))
+    .orderBy(desc(chats.createdAt))
+    .limit(10)
+  const latestChats = savedChats[0]
+
   return (
-    <div className="max-w-7xl mx-auto">
+    <main id="panel-main" className="max-w-7xl mx-auto">
       <PanelLayout
+        activeSection={activeSection}
         panelData={{
           totalConversations: totalConversations[0].count,
           lastConversationDate: latestConversation?.createdAt?.toISOString(),
           messages: formattedConversations,
         }}
         conversationsHistory={{
-          messages: formattedConversations,
+          chats: savedChats,
         }}
         savedChats={{}}
         userData={{}}
         healthData={{}}
         bankData={{}}
       />
-    </div>
+    </main>
   )
 }

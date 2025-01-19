@@ -41,9 +41,13 @@ export default async function RootLayout({
         <html className={inter.className} lang="es">
           <body className="relative max-w-7xl m-auto">
             <NextUIProvider>
-              <Header />
-              {children}
-              <Toaster />
+              <header>
+                <Header />
+              </header>
+              <main id="main-content" tabIndex={-1}>
+                {children}
+                <Toaster />
+              </main>
               <Footer />
             </NextUIProvider>
           </body>

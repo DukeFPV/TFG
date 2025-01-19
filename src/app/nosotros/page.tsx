@@ -84,8 +84,14 @@ export default function QuienesSomos() {
       <main>
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           {/* Sección principal de contenido */}
-          <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-            <h2 className="text-lg text-center leading-6 font-medium text-gray-900">
+          <section
+            className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6"
+            aria-labelledby="section-descubrir"
+          >
+            <h2
+              id="section-descubrir"
+              className="text-lg text-center leading-6 font-medium text-gray-900"
+            >
               Descubre un poco del proyecto
             </h2>
             <p className="mt-1 text-center text-sm text-gray-500">
@@ -94,52 +100,80 @@ export default function QuienesSomos() {
 
             {/* Contenedor con información sobre el equipo y la aplicación */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div className="bg-gradient-to-r from-green-500 to-teal-500 rounded-lg p-4 shadow-lg flex flex-col justify-between">
+              <div
+                className="bg-gradient-to-r from-green-500 to-teal-500 rounded-lg p-4 shadow-lg flex flex-col justify-between"
+                role="region"
+                aria-labelledby="equipo-title"
+              >
                 <div>
-                  <h3 className="text-white text-center text-lg">El equipo</h3>
-                  <p className="text-white text-center text-opacity-80 mt-2">
+                  <h3
+                    className="text-white text-left sm:text-center text-lg"
+                    id="equipo-title"
+                  >
+                    El equipo
+                  </h3>
+                  <p className="text-white text-left sm:text-center text-opacity-80 mt-2">
                     El grupo de personas que hay detrás de SARA.
                   </p>
                 </div>
                 <a
                   href="#"
-                  className="text-sm text-right pr-10 text-teal-200 hover:text-teal-100 mt-4 inline-block"
+                  className="text-sm text-left sm:text-right pr-10 text-teal-50 hover:text-teal-950 mt-4 inline-block"
+                  aria-label="Saber más sobre el equipo de SARA"
                 >
-                  Saber más →
+                  Saber más sobre el equipo →
                 </a>
               </div>
               <div className="flex flex-col space-y-6">
-                <div className="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg p-4 shadow-lg">
-                  <h3 className="text-white text-lg">La aplicación</h3>
+                <div
+                  className="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg p-4 shadow-lg"
+                  aria-labelledby="historia-title"
+                >
+                  <h3 id="historia-title" className="text-white text-lg">
+                    La aplicación
+                  </h3>
                   <p className="text-white text-opacity-80 mt-2">
                     Un poco de historia de como llegamos a esta aplicación.
                   </p>
                   <a
                     href="#"
-                    className="text-sm text-blue-200 hover:text-blue-100 mt-4 inline-block"
+                    className="text-sm text-blue-50 hover:text-blue-950 mt-4 inline-block"
+                    aria-label="Saber más sobre la aplicación de SARA"
                   >
-                    Saber más →
+                    Saber más de la aplicación →
                   </a>
                 </div>
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 shadow-lg">
-                  <h3 className="text-white text-lg">Usuarios</h3>
+                <div
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 shadow-lg"
+                  aria-labelledby="opinion-title"
+                >
+                  <h3 id="opinion-title" className="text-white text-lg">
+                    Usuarios
+                  </h3>
                   <p className="text-white text-opacity-80 mt-2">
                     Lo que opinan de nosotros algunos usuarios.
                   </p>
                   <a
                     href="#"
-                    className="text-sm text-pink-200 hover:text-pink-100 mt-4 inline-block"
+                    className="text-sm text-pink-50 hover:text-pink-950 mt-4 inline-block"
+                    aria-label="Saber más sobre lo que opinan los usuarios de SARA"
                   >
-                    Saber más →
+                    Saber más de las opiniones →
                   </a>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
           {/* Sección de preguntas y respuestas con un accordeon importado de la libreria nextUI */}
-          <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mt-6">
-            <h2 className="text-lg text-center leading-6 font-medium text-gray-900">
+          <section
+            className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mt-6"
+            aria-labelledby="section-preguntas"
+          >
+            <h2
+              id="section-preguntas"
+              className="text-lg text-center leading-6 font-medium text-gray-900"
+            >
               Preguntas y respuestas
             </h2>
             <div className="mt-2">
@@ -150,28 +184,28 @@ export default function QuienesSomos() {
               <Accordion variant="splitted">
                 <AccordionItem
                   key="1"
-                  aria-label="Respuesta 1"
+                  aria-label="Pregunta: ¿Qué puede hacer SARA por mí?"
                   title="Que puede hacer SARA por mi"
                 >
                   {defaultContent1}
                 </AccordionItem>
                 <AccordionItem
                   key="2"
-                  aria-label="Respuesta 2"
+                  aria-label="Pregunta: ¿Es seguro utilizar SARA?"
                   title="Es seguro utilizar SARA"
                 >
                   {defaultContent2}
                 </AccordionItem>
                 <AccordionItem
                   key="3"
-                  aria-label="Respuesta 3"
+                  aria-label="Pregunta: ¿Cómo puedo pedir que borre los chats?"
                   title="Como puedo pedir que borre los chats"
                 >
                   {defaultContent3}
                 </AccordionItem>
               </Accordion>
             </div>
-          </div>
+          </section>
         </div>
       </main>
     </div>
