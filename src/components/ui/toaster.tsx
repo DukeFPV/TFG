@@ -1,3 +1,19 @@
+//**Revisado */
+/**
+ * Un componente que renderiza un sistema de notificaciones toast.
+ * Utiliza el hook useToast para gestionar y mostrar las notificaciones toast.
+ *
+ * El componente mapea todos los toasts activos y los renderiza con sus
+ * respectivos títulos, descripciones y botones de acción si se proporcionan.
+ *
+ * @returns Un contenedor ToastProvider con componentes Toast y un ToastViewport
+ *
+ * @example
+ * ```tsx
+ * <Toaster />
+ * ```
+ */
+
 "use client"
 
 import { useToast } from "@/components/hooks/use-toast"

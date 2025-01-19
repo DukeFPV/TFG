@@ -1,4 +1,21 @@
-// Se importan las librerías necesarias
+//**Revisado */
+/**
+ * Componente Home - Página principal de la aplicación
+ *
+ * Este componente renderiza la página principal con las siguientes secciones:
+ * - Una sección hero con encabezado principal, subtítulo y botón CTA
+ * - Mensaje de advertencia sobre el uso de IA
+ * - Sección promocional de WhatsApp
+ *
+ * El componente utiliza diseño responsive con diferentes layouts e imágenes para móvil/escritorio:
+ * - La imagen de fondo cambia entre versiones móvil/escritorio
+ * - La imagen hero tiene versiones separadas para móvil/escritorio
+ * - El estilo del texto y botones se adapta al tamaño de la pantalla
+ *
+ * @component
+ * @returns {JSX.Element} El componente de página Home renderizado
+ */
+
 import React from "react"
 import Image from "next/image"
 import Balancer from "react-wrap-balancer"

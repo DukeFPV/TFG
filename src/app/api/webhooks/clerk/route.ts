@@ -1,10 +1,33 @@
+//**Revisado */
+/**
+ * Maneja las solicitudes POST de los webhooks de Clerk para procesar eventos relacionados con usuarios.
+ *
+ * Este endpoint maneja específicamente el evento 'user.created' creando un nuevo
+ * perfil de usuario en la base de datos con los datos recibidos de Clerk.
+ *
+ * @param req - La solicitud HTTP entrante que contiene la carga útil del webhook
+ * @returns Una respuesta JSON indicando éxito (200) o fallo (500)
+ * @throws Devolverá un código de estado 500 si falla el procesamiento del webhook
+ *
+ * @example
+ * Carga útil del webhook para user.created:
+ * {
+ *   type: "user.created",
+ *   data: {
+ *     id: string,
+ *     firstName: string,
+ *     lastName: string,
+ *     emailAddresses: Array<{emailAddress: string}>
+ *   }
+ * }
+ */
+
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { user_profiles } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 
 // Importar funciones para verificar el webhook de Clerk si es necesario
-
 export async function POST(req: Request) {
   try {
     const payload = await req.json()

@@ -132,7 +132,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
 
     audioRef.current = new Audio(url)
 
-    // Registramos eventos si quieres controlar el estado
+    // Registramos eventos para controlar los estados
     audioRef.current.addEventListener("play", () => setIsAudioPlaying(true))
     audioRef.current.addEventListener("pause", () => setIsAudioPlaying(false))
     audioRef.current.addEventListener("ended", () => setIsAudioPlaying(false))

@@ -1,10 +1,4 @@
 //**Revisado */
-
-import { NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
-import { db } from "@/lib/db"
-import { messages } from "@/lib/db/schema"
-
 /**
  * Maneja las solicitudes POST para los mensajes que se envían de forma manual para iniciar o finalizar la conversación.
  *
@@ -13,6 +7,12 @@ import { messages } from "@/lib/db/schema"
  * @throws {401} No autorizado si el usuario no está autenticado.
  * @throws {500} Error del servidor si hay un problema al guardar el mensaje.
  */
+
+import { NextResponse } from "next/server"
+import { auth } from "@clerk/nextjs/server"
+import { db } from "@/lib/db"
+import { messages } from "@/lib/db/schema"
+
 export async function POST(req: Request) {
   const { userId } = await auth()
   if (!userId) {

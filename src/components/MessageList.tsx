@@ -113,7 +113,7 @@ const MessageList = ({ messages }: Props) => {
 
   // Mantener un registro de los mensajes cuyos audios ya se han reproducido
   const playedMessages = useRef<Set<string>>(new Set())
-  console.log("playedMessages 115 MessagesList", playedMessages)
+  //console.log("playedMessages 116 MessagesList", playedMessages)
 
   // Reproducir audio automáticamente para mensajes con `audioUrl`
   const { playAudio } = useChatContext()

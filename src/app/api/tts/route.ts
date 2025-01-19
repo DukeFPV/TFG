@@ -1,4 +1,15 @@
 //**REVISADO */
+/**
+ * Maneja solicitudes POST para generar una corriente de audio a partir del texto proporcionado utilizando ElevenLabs TTS.
+ *
+ * @param req - El objeto NextRequest que contiene la carga JSON con el texto a convertir.
+ * @returns Un NextResponse que contiene el audio generado en formato MPEG con cabeceras apropiadas,
+ *          o una respuesta de error JSON si falta el texto o falla la generación de TTS.
+ *
+ * @throws Retornará un error 400 si el campo `text` no se proporciona en el cuerpo de la solicitud.
+ * @throws Retornará un error 500 si hay un problema durante el proceso de generación de TTS.
+ * @ignore Se ha eliminado la importación de las funciones de utilidad de S3.
+ */
 
 import { NextRequest, NextResponse } from "next/server"
 import { ElevenLabsClient } from "elevenlabs"
@@ -19,17 +30,6 @@ if (!XI_API_KEY) {
 const client = new ElevenLabsClient({
   apiKey: XI_API_KEY,
 })
-
-/**
- * Maneja solicitudes POST para generar una corriente de audio a partir del texto proporcionado utilizando ElevenLabs TTS.
- *
- * @param req - El objeto NextRequest que contiene la carga JSON con el texto a convertir.
- * @returns Un NextResponse que contiene el audio generado en formato MPEG con cabeceras apropiadas,
- *          o una respuesta de error JSON si falta el texto o falla la generación de TTS.
- *
- * @throws Retornará un error 400 si el campo `text` no se proporciona en el cuerpo de la solicitud.
- * @throws Retornará un error 500 si hay un problema durante el proceso de generación de TTS.
- */
 
 export async function POST(req: NextRequest) {
   const { text } = await req.json()

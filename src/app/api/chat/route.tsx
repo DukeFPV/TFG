@@ -1,3 +1,36 @@
+//**Revisado */
+/**
+ * Maneja las solicitudes POST para las interacciones de chat con SARA.
+ *
+ * @async
+ * @param {Request} req - El objeto de solicitud HTTP entrante que contiene:
+ *   - messages: Array de mensajes de chat entre usuario e IA
+ *   - chatId: Identificador único para la sesión de chat
+ *
+ * @returns {Promise<Response>} Una respuesta en streaming que contiene la respuesta de la IA o mensaje de error
+ *   - 200: Respuesta exitosa con mensaje de IA en streaming
+ *   - 400: Solicitud incorrecta (ID de chat inválido)
+ *   - 401: No autorizado (usuario no autenticado)
+ *   - 404: No encontrado (perfil de usuario o chat no encontrado)
+ *   - 500: Error interno del servidor
+ *
+ * @throws {Error} Cuando hay un problema con:
+ *   - Autenticación
+ *   - Operaciones de base de datos
+ *   - Procesamiento de mensajes
+ *   - Interacción con la API de OpenAI
+ *
+ * @description
+ * Este endpoint:
+ * 1. Verifica la autenticación del usuario
+ * 2. Recupera el perfil del usuario de la base de datos
+ * 3. Valida el ID del chat
+ * 4. Obtiene el contexto de la conversación
+ * 5. Procesa los mensajes con OpenAI
+ * 6. Transmite la respuesta al cliente
+ * 7. Guarda el historial de la conversación
+ */
+
 import { streamText, convertToCoreMessages, CoreMessage } from "ai"
 import { saveChat } from "@/lib/utils/queries"
 import { db } from "@/lib/db/index"
@@ -8,7 +41,7 @@ import { NextResponse } from "next/server"
 import { getContext } from "@/lib/context"
 import { auth } from "@clerk/nextjs/server"
 
-// Metodo alternativo para  manejar los logs
+// Metodo alternativo para  manejar los logs dentro de la función
 function log(message: string) {
   console.log(message)
 }
@@ -46,7 +79,7 @@ export async function POST(req: Request) {
     // log("chatId de chatId = " + JSON.stringify(chatId)) //Log para debug
     // log("Log de messages = " + JSON.stringify(messages)) //Log para debug
 
-    // Validate chatId
+    // Validar chatId
     if (!chatId) {
       return NextResponse.json(
         { error: "Chat ID is required" },
@@ -95,6 +128,8 @@ export async function POST(req: Request) {
       For example, if a user reports difficulties in completing a specific task, you can provide additional step-by-step process guidance to facilitate its completion.
       In addition, you can also chat with users and additional prompts, always responding in the language in which they are speaking to you, 
       if you do not recognize the language you will always answer in Spanish. Your name is SARA and you will always respond by referring to yourself as a girl.
+      //?Probar funcionalidad de esta parte
+      If the user asks you for help with online banking, you should indicate that at this moment you only have help available for Caixabank and add the context in the answer.
       Here are some details about the user:
       - Name: ${userName}
       - Age: ${profile.age}

@@ -1,3 +1,24 @@
+/**
+ * Maneja las peticiones POST para buscar centros de salud según los filtros proporcionados.
+ * @param req - El objeto de solicitud HTTP que contiene los criterios de búsqueda en formato JSON
+ * @returns {Promise<NextResponse>} Una Promesa que se resuelve en una NextResponse que contiene:
+ *   - En caso de éxito: Objeto JSON con un array de centros de salud que coinciden
+ *   - En caso de error: Objeto JSON con mensaje de error y código de estado 500
+ * @throws Devolverá una respuesta 500 si hay un error al procesar la solicitud
+ * @example
+ * {
+ *   id?: string,
+ *   name?: string,
+ *   province?: string,
+ *   municipality?: string,
+ *   locality?: string,
+ *   address?: string,
+ *   postal_code?: string,
+ *   phone?: string,
+ *   management_dependency?: string
+ * }
+ */
+
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { healthCenters } from "@/lib/db/schema"
@@ -33,6 +54,7 @@ export async function POST(req: Request) {
     const formData: SearchFormData = await req.json()
     const filters: any[] = []
 
+    // Construir filtros de búsqueda
     if (formData.id) filters.push(eq(healthCenters.id, formData.id))
     if (formData.name)
       filters.push(ilike(healthCenters.name, `%${formData.name}%`))

@@ -1,3 +1,33 @@
+//**Revisado */
+/**
+ * Maneja las peticiones POST para avanzar, retroceder, salir o reiniciar pasos en un tutorial guiado.
+ *
+ * @param req - Objeto de solicitud HTTP entrante que contiene action y chatId en el body
+ * @returns Un objeto NextResponse con:
+ * - Para avanzar/retroceder: Información actualizada del paso incluyendo texto, imagen, botones y número del paso actual
+ * - Para salir: Mensaje de salida con el progreso actual
+ * - Para reiniciar: Mensaje de reinicio e información del primer paso
+ * - Para errores: Mensaje de error apropiado y código de estado
+ *
+ * @throws Devolverá respuestas de error para:
+ * - 401 si el usuario no está autenticado
+ * - 400 si el body de la petición es inválido
+ * - 404 si no se encuentra el perfil del usuario
+ * - 500 para errores internos del servidor
+ *
+ * La función soporta las siguientes acciones:
+ * - "advance": Avanzar al siguiente paso
+ * - "back": Ir al paso anterior
+ * - "exit": Salir del tutorial guardando el progreso
+ * - "reset": Reiniciar tutorial desde el principio
+ *
+ * Cada respuesta de paso incluye:
+ * - text: Instrucciones para el paso actual
+ * - image: URL opcional de imagen para ayuda visual
+ * - buttons: Opciones de navegación disponibles
+ * - currentStep: Número de paso actual
+ */
+
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { user_profiles, messages } from "@/lib/db/schema"

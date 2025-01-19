@@ -1,3 +1,32 @@
+//**Revisado */
+/**
+ * Componente Panel Control que gestiona la autenticación de usuarios y el historial de conversaciones.
+ *
+ * Este componente realiza las siguientes operaciones:
+ * 1. Obtiene el usuario actual desde la autenticación de Clerk
+ * 2. Crea o verifica el perfil de usuario en la base de datos
+ * 3. Carga las conversaciones recientes y estadísticas de conversación
+ * 4. Permite navegar a traves de <PanelLayout> en las diferentes secciones
+ * 5. Navegación dinámica a través de las secciones de la aplicación [[...rest]]
+ *
+ * @returns {JSX.Element} Un componente de diseño de panel con historial de conversaciones y datos de usuario
+ *
+ * @example
+ * ```tsx
+ * <PanelControl panelData= {
+ *   savedChats={{}}
+ *   userData={{}}
+ *   healthData={{}}
+ *   bankData={{}}
+ * }/>
+ * ```
+ *
+ * @throws {Error} Puede lanzar un error si fallan las operaciones de base de datos
+ *
+ * @async
+ * @function PanelControl
+ */
+
 import { db } from "@/lib/db"
 import { messages, user_profiles } from "@/lib/db/schema"
 import { desc, eq } from "drizzle-orm"

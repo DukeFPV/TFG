@@ -1,3 +1,24 @@
+//**Revisado */
+/**
+ * Maneja las solicitudes POST para la creación de mensajes.
+ *
+ * @async
+ * @param {Request} req - El objeto de solicitud HTTP entrante
+ * @returns {Promise<NextResponse>} Respuesta JSON con:
+ * - En éxito: El objeto mensaje creado conteniendo id, content, role, createdAt e image
+ * - En error de autenticación: estado 401 con mensaje de error
+ * - En error de validación: estado 400 con detalles de validación
+ * - En otros errores: estado 500 con mensaje de error
+ *
+ * @throws {ZodError} Cuando el cuerpo de la solicitud falla en la validación del esquema
+ *
+ * La función:
+ * 1. Autentica al usuario
+ * 2. Valida el cuerpo de la solicitud contra MessageSchema
+ * 3. Inserta el mensaje en la base de datos con imagen opcional
+ * 4. Devuelve el mensaje creado o una respuesta de error apropiada
+ */
+
 import { db } from "@/lib/db"
 import { messages } from "@/lib/db/schema"
 import { auth } from "@clerk/nextjs/server"
@@ -10,7 +31,7 @@ const MessageSchema = z.object({
   chatId: z.number(),
   content: z.string(),
   role: z.enum(["user", "assistant", "system"]),
-  image: z.string().nullable(), // Añadido
+  image: z.string().nullable(),
 })
 
 export async function POST(req: Request) {
@@ -23,8 +44,10 @@ export async function POST(req: Request) {
     const body = await req.json()
     const parsed = MessageSchema.parse(body) // Validar los datos
 
+    // Extraer los campos requeridos del cuerpo de la solicitud
     const { chatId, content, role, image } = parsed
 
+    // Insertar el mensaje en la base de datos
     const message = await db
       .insert(messages)
       .values({
@@ -54,6 +77,7 @@ export async function POST(req: Request) {
   }
 }
 
+// Peticiones GET para obtener mensajes
 export async function GET(req: Request) {
   const { userId } = await auth()
   if (!userId) {

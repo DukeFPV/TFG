@@ -1,3 +1,18 @@
+//**Revisado */
+/**
+ * Maneja la solicitud POST para actualizar el centro de salud seleccionado por el usuario.
+ *
+ * @param req - Objeto de solicitud Next.js que contiene los datos de selección del centro de salud
+ * @returns NextResponse con mensaje de éxito/error y código de estado apropiado:
+ * - 200: Selección guardada con éxito
+ * - 400: Falta healthCenterId
+ * - 401: Usuario no autenticado
+ * - 404: Centro de salud o perfil de usuario no encontrado
+ * - 500: Error del servidor al guardar la selección
+ *
+ * @throws Lanzará un error si falla el procesamiento de la solicitud
+ */
+
 import { NextResponse, NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { user_profiles, healthCenters } from "@/lib/db/schema"
@@ -28,6 +43,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Verificar si el centro de salud existe
     const center = await db
       .select()
       .from(healthCenters)
@@ -41,6 +57,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Verificar si el usuario tiene un perfil
     const userProfile = await db
       .select()
       .from(user_profiles)
@@ -54,6 +71,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Guardar la selección del usuario en la base de datos
     await db
       .update(user_profiles)
       .set({ selectedHealthCenterId: healthCenterId })
@@ -72,6 +90,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// Función DELETE para borrar la selección del usuario
 export async function DELETE(req: NextRequest) {
   try {
     const { userId } = getAuth(req)
@@ -83,6 +102,7 @@ export async function DELETE(req: NextRequest) {
       )
     }
 
+    // Verificar si el usuario tiene un perfil
     const userProfile = await db
       .select()
       .from(user_profiles)
@@ -96,6 +116,7 @@ export async function DELETE(req: NextRequest) {
       )
     }
 
+    // Borrar la selección del usuario en la base de datos
     await db
       .update(user_profiles)
       .set({ selectedHealthCenterId: null })
@@ -114,6 +135,7 @@ export async function DELETE(req: NextRequest) {
   }
 }
 
+// Función GET para obtener la selección del usuario
 export async function GET(req: NextRequest) {
   try {
     const { userId } = getAuth(req)
@@ -125,6 +147,7 @@ export async function GET(req: NextRequest) {
       )
     }
 
+    // Verificar si el usuario tiene
     const userProfile = await db
       .select({ selectedHealthCenterId: user_profiles.selectedHealthCenterId })
       .from(user_profiles)

@@ -194,6 +194,9 @@ importers:
       react-resizable-panels:
         specifier: ^2.1.7
         version: 2.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-textarea-autosize:
+        specifier: ^8.5.7
+        version: 8.5.7(@types/react@18.3.12)(react@18.3.1)
       react-wrap-balancer:
         specifier: ^1.1.1
         version: 1.1.1(react@18.3.1)
@@ -6121,8 +6124,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-textarea-autosize@8.5.6:
-    resolution: {integrity: sha512-aT3ioKXMa8f6zHYGebhbdMD2L00tKeRX1zuVuDx9YQK/JLLRSaSxq3ugECEmUB9z2kvk6bFSIoRHLkkUv0RJiw==}
+  react-textarea-autosize@8.5.7:
+    resolution: {integrity: sha512-2MqJ3p0Jh69yt9ktFIaZmORHXw4c4bxSIhCeWiFwmJ9EYKgLmuNII3e9c9b2UO+ijl4StnpZdqpxNIhTdHvqtQ==}
     engines: {node: '>=10'}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -8815,7 +8818,7 @@ snapshots:
       '@react-types/textfield': 3.10.0(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-textarea-autosize: 8.5.6(@types/react@18.3.12)(react@18.3.1)
+      react-textarea-autosize: 8.5.7(@types/react@18.3.12)(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
 
@@ -13946,7 +13949,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.12
 
-  react-textarea-autosize@8.5.6(@types/react@18.3.12)(react@18.3.1):
+  react-textarea-autosize@8.5.7(@types/react@18.3.12)(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.26.0
       react: 18.3.1

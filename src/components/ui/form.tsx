@@ -1,3 +1,16 @@
+//**Revisado */
+/**
+ * Hook personalizado para acceder al contexto y estado del campo del formulario
+ * @returns Un objeto que contiene:
+ * - id: El ID del campo del formulario
+ * - name: El nombre del campo del contexto
+ * - formItemId: ID generado para el elemento del formulario
+ * - formDescriptionId: ID generado para la descripción del formulario
+ * - formMessageId: ID generado para los mensajes del formulario
+ * - fieldState: El estado actual del campo desde react-hook-form
+ * @throws Error si se usa fuera de un componente FormField
+ */
+
 "use client"
 
 import * as React from "react"
@@ -19,18 +32,18 @@ const Form = FormProvider
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
   name: TName
 }
 
 const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue
+  {} as FormFieldContextValue,
 )
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
@@ -69,7 +82,7 @@ type FormItemContextValue = {
 }
 
 const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue
+  {} as FormItemContextValue,
 )
 
 const FormItem = React.forwardRef<
