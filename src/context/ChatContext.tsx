@@ -233,7 +233,6 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
     }
 
     try {
-      console.log(`Fetching messages for chatId: ${chatId}`)
       const messagesResponse = await fetch(`/api/messages?chatId=${chatId}`)
       if (!messagesResponse.ok) throw new Error("Error al obtener mensajes")
       const messagesData = await messagesResponse.json()
@@ -294,7 +293,7 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
         return
       }
 
-      console.log("Llamando a /api/advance-step con chatId:", chatId)
+      // console.log("Llamando a /api/advance-step con chatId:", chatId)
 
       const response = await fetch("/api/advance-step", {
         method: "POST",
@@ -396,11 +395,11 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
         return
       }
 
-      console.log(
-        "Llamando a /api/advance-step con chatId:",
-        chatId,
-        "acción: reset",
-      )
+      // console.log(
+      //   "Llamando a /api/advance-step con chatId:",
+      //   chatId,
+      //   "acción: reset",
+      // )
 
       const response = await fetch("/api/advance-step", {
         method: "POST",
@@ -599,17 +598,13 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
           })
         }
 
-        // Process any remaining content
+        // Terminar de procesar el contenido acumulado
         if (accumulatedContent.slice(lastProcessedLength)) {
           processStreamingTTS(accumulatedContent.slice(lastProcessedLength))
         }
 
-        // After streaming completes, process TTS
+        // Después de terminar, enviar el contenido completo a TTS
         if (audioPlay && accumulatedContent) {
-          console.log(
-            "Processing TTS for accumulated content:",
-            accumulatedContent,
-          )
           const audioUrl = await handleTTS(accumulatedContent)
           if (audioUrl) {
             setMessages((prevMessages) =>
@@ -623,13 +618,12 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
               ),
             )
           }
-          console.log("TTS audio URL:", audioUrl)
+          //console.log("TTS audio URL:", audioUrl)
         }
 
         return accumulatedContent
       } catch (err: any) {
         if (err.name === "AbortError") {
-          console.log("Solicitud abortada")
           toast.error("La solicitud fue cancelada.")
         } else {
           console.error("Error al enviar mensaje:", err)

@@ -305,7 +305,7 @@ export default function HealthForm() {
         const res = await fetch("/api/user-selection", { method: "GET" })
         if (res.ok) {
           const data = await res.json()
-          console.log("Initial selection data:", data)
+
           if (data.selectedHealthCenterId) {
             const centersResponse = await fetch("/api/health-centers", {
               method: "POST",
@@ -843,7 +843,7 @@ export default function HealthForm() {
                         onChange={() => {
                           if (!isReadOnly) {
                             // Evitar cambiar selección en modo lectura
-                            console.log(`Radio button for row ${index} clicked`)
+
                             setSelectedRow(index)
                           }
                         }}

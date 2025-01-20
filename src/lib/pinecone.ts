@@ -38,7 +38,7 @@ type PDFPage = {
 
 export async function loadS3IntoPinecone(fileKey: string) {
   // 1. Obtener el pdf -> descargar y leer el contenido
-  console.log("Descargando el archivo desde S3")
+  //console.log("Descargando el archivo desde S3")
   const file_name = await downLoadFromS3(fileKey)
 
   if (!file_name) {
@@ -79,7 +79,7 @@ async function embedDocument(doc: Document) {
       },
     } as PineconeRecord
   } catch (error) {
-    console.log("Error en los embeddings Pinecone", error)
+    //console.log("Error en los embeddings Pinecone", error)
     throw error
   }
 }
