@@ -137,6 +137,8 @@ const MessageList = ({ messages }: Props) => {
               "justify-end pl-10": message.role === "user",
               "justify-start pr-10": message.role === "assistant",
             })}
+            role="region"
+            aria-label={`Mensaje de ${message.role === "user" ? "usuario" : "asistente"}`}
           >
             <div
               className={cn(
@@ -178,28 +180,35 @@ const MessageList = ({ messages }: Props) => {
                     {message.buttons.map((button, index) => {
                       let onClick: () => void = () => {}
                       let isDisabled = false
+                      let ariaLabel = button.label
 
                       switch (button.action) {
                         case "back":
                           onClick = goBackStep
                           isDisabled = isAtFirstStep // Deshabilita el botón si es el primer paso para evitar ir atrás
+                          ariaLabel = "Regresar al paso anterior"
                           break
                         case "advance":
                           onClick = advanceStep
+                          ariaLabel = "Avanzar al siguiente paso"
                           break
                         case "exit":
                           onClick = exitStepByStep
+                          ariaLabel = "Salir de la guía paso a paso"
                           break
                         case "reset":
                           onClick = () => handleReiniciarClick(message.id)
+                          ariaLabel = "Reiniciar la guía paso a paso"
                         default:
                           break
                       }
                       return (
                         <button
+                          type="button"
                           key={index}
                           onClick={onClick}
                           disabled={isDisabled}
+                          aria-label={ariaLabel}
                           className={cn("px-4 py-2 sm:px-8 sm:py-2 border-2", {
                             "bg-purple-200 text-black rounded-md  hover:bg-purple-100 hover:border-purple-600 border-purple-200":
                               button.label === "Atrás" && !isDisabled,

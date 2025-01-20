@@ -22,7 +22,7 @@
 
 "use client"
 
-import React, { FC } from "react"
+import React, { FC, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
@@ -55,10 +55,21 @@ const ImageModal: FC<ImageModalProps> = ({
   width,
   height,
 }) => {
+  // Tecla de escape para cerrar el modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    }
+    if (isOpen) {
+      window.addEventListener("keydown", handleEsc)
+      return () => window.removeEventListener("keydown", handleEsc)
+    }
+  }, [isOpen, onClose])
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          aria-labelledby="modal-title"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
           initial="hidden"
           animate="visible"
@@ -67,6 +78,7 @@ const ImageModal: FC<ImageModalProps> = ({
           onClick={onClose} // Cerrar modal al hacer clic en el backdrop
         >
           <motion.div
+            aria-labelledby="modal-title"
             className="relative"
             initial="hidden"
             animate="visible"
@@ -76,6 +88,7 @@ const ImageModal: FC<ImageModalProps> = ({
             onClick={(e) => e.stopPropagation()} // Evitar cerrar al hacer clic dentro del modal
           >
             <Image
+              id="modal-title"
               src={src}
               alt={alt}
               width={width}
@@ -88,6 +101,7 @@ const ImageModal: FC<ImageModalProps> = ({
             />
             {/* Botón de cerrar (opcional) */}
             <button
+              aria-label="Cerrar imagen"
               onClick={onClose}
               className="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1 hover:bg-gray-700 focus:outline-none"
             >

@@ -1,26 +1,6 @@
 //**Revisado */
-"use client"
-import { useState } from "react"
-import {
-  Activity,
-  BarChart2,
-  BookOpen,
-  ChevronDown,
-  ChevronUp,
-  CreditCard,
-  LogOut,
-  MessageSquare,
-  User,
-} from "lucide-react"
-import { SignOutButton } from "@clerk/nextjs"
-
-interface NavigationMenuProps {
-  activeTab: string
-  onTabChange: (tab: string) => void
-}
-
 /**
- * Componente de menú de navegación que proporciona vistas tanto móvil como de escritorio.
+ * Componente de menú de navegación del panel de control que proporciona vistas tanto móvil como de escritorio.
  *
  * @component
  * @param {Object} props - Propiedades del componente
@@ -40,11 +20,32 @@ interface NavigationMenuProps {
  * - Funcionalidad de cierre de sesión
  */
 
+"use client"
+import { useRef, useState } from "react"
+import {
+  Activity,
+  BarChart2,
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  CreditCard,
+  LogOut,
+  MessageSquare,
+  User,
+} from "lucide-react"
+import { SignOutButton } from "@clerk/nextjs"
+
+interface NavigationMenuProps {
+  activeTab: string
+  onTabChange: (tab: string) => void
+}
+
 export function NavigationMenu({
   activeTab,
   onTabChange,
 }: NavigationMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const menuItems = [
     {
@@ -82,10 +83,12 @@ export function NavigationMenu({
   const activeItem = menuItems.find((item) => item.id === activeTab)
 
   return (
-    <nav>
+    <nav ref={menuRef} aria-label="Menú principal">
       {/* Mobile Dropdown */}
       <div className="sm:hidden">
         <button
+          aria-expanded={isOpen}
+          aria-controls="navigation-menu"
           onClick={() => setIsOpen(!isOpen)}
           className={` w-full border-2 border-purple-600 text-center justify-items-center rounded-full mr-5 cursor-pointer ease-in transition-all duration-500 ${
             activeTab ? "bg-purple-600 text-purple-50" : ""
@@ -97,9 +100,9 @@ export function NavigationMenu({
               <span>{activeItem?.label}</span>
             </div>
             {isOpen ? (
-              <ChevronUp className="w-5 h-5" />
+              <ChevronUp aria-hidden="true" className="w-5 h-5" />
             ) : (
-              <ChevronDown className="w-5 h-5" />
+              <ChevronDown aria-hidden="true" className="w-5 h-5" />
             )}
           </div>
         </button>
@@ -140,7 +143,9 @@ export function NavigationMenu({
           >
             <div className="flex items-center space-x-2 hover:text-purple-50 py-2 px-4">
               {item.icon}
-              <span>{item.label}</span>
+              <span aria-current={activeTab === item.id ? "page" : undefined}>
+                {item.label}
+              </span>
             </div>
           </li>
         ))}
@@ -151,11 +156,14 @@ export function NavigationMenu({
         <SignOutButton>
           <div className="border-2 border-red-400 hover:border-red-500 text-center justify-items-center rounded-full mx-5">
             <button className="flex items-center space-x-2 text-red-400 hover:text-red-600 py-2 px-4">
-              <LogOut className="w-5 h-5" />
+              <LogOut aria-hidden="true" className="w-5 h-5" />
               <span className="hidden sm:inline">Salir de la aplicación</span>
             </button>
           </div>
         </SignOutButton>
+      </div>
+      <div role="status" aria-live="polite" className="sr-only">
+        {isOpen ? "Menú expandido" : "Menú contraído"}
       </div>
     </nav>
   )

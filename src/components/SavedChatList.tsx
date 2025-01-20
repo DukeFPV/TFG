@@ -57,7 +57,10 @@ export function SavedChatsList({ chats }: SavedChatsListProps) {
   }
 
   return (
-    <div className="w-full overflow-y-auto rounded-md">
+    <nav
+      aria-label="Lista de chats guardados"
+      className="w-full overflow-y-auto rounded-md"
+    >
       {isLoading ? (
         <div
           className="flex items-center justify-center h-40"
@@ -97,6 +100,6 @@ export function SavedChatsList({ chats }: SavedChatsListProps) {
           <p className="text-gray-500">No hay chats guardados</p>
         </div>
       )}
-    </div>
+    </nav>
   )
 }

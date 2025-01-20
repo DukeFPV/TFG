@@ -49,13 +49,6 @@ import { usePathname, useRouter } from "next/navigation"
 import { UserButton, useUser } from "@clerk/nextjs"
 import { useClerk } from "@clerk/nextjs"
 
-// Iconos
-import microIcon from "/public/icons/microphone.svg"
-import microVoice from "/public/icons/voice.svg"
-import microData from "/public/icons/data.svg"
-import microGoals from "/public/icons/goals.svg"
-import microUi from "/public/icons/browser_ui.svg"
-
 type NavItem = {
   label: string
   link?: string
@@ -96,7 +89,7 @@ const protectedNavItems: NavItem[] = [
       },
       {
         label: "Historial",
-        link: "/panel-control/historial", // <- Ajuste, renombrado
+        link: "/panel-control?tab=historial", // <- Ajuste, renombrado
         iconImage: <History size={18} />,
       },
       { label: "Micrófono", link: "#", iconImage: <Mic size={18} /> },

@@ -186,21 +186,35 @@ export function PanelLayout({
     <div className="min-h-screen rounded-3xl bg-purple-50">
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[320px_1fr] gap-8">
-          <aside className="bg-purple-100 rounded-3xl shadow-md p-6 h-fit">
+          <aside
+            role="navigation"
+            aria-label="Menú principal"
+            className="bg-purple-100 rounded-3xl shadow-md p-6 h-fit"
+          >
             <h2 className="text-xl font-semibold mb-4 text-center">
               Panel de control
             </h2>
             <NavigationMenu activeTab={activeTab} onTabChange={setActiveTab} />
           </aside>
-          <main className="space-y-8">
-            <section className="bg-white rounded-3xl shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">
+          <main
+            role="main"
+            aria-label="Contenido principal"
+            className="space-y-8"
+          >
+            <section
+              aria-labelledby="section-heading"
+              className="bg-white rounded-3xl shadow-md p-6"
+            >
+              <h2 id="section-heading" className="text-xl font-semibold mb-4">
                 {menuItems.find((item) => item.id === activeTab)?.label}
               </h2>
               {renderContent()}
             </section>
           </main>
         </div>
+      </div>
+      <div role="status" aria-live="polite" className="sr-only">
+        {`Sección actual: ${menuItems.find((item) => item.id === activeTab)?.label}`}
       </div>
     </div>
   )

@@ -95,6 +95,15 @@ const ChatComponent = ({ chatId }: Props) => {
     setLineCount(lines <= 0 ? 1 : lines)
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      if (!e.shiftKey) {
+        e.preventDefault()
+        handleSubmit(e)
+      }
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const message = input.trim()
@@ -193,6 +202,7 @@ const ChatComponent = ({ chatId }: Props) => {
             <TextareaAutosize
               value={input}
               onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
               onHeightChange={handleHeightChange}
               ref={textareaRef}
               minRows={1}
