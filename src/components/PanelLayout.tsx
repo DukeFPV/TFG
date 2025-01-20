@@ -36,13 +36,11 @@
 import { useState } from "react"
 import { NavigationMenu } from "./NavigationMenu"
 import { ControlPanel } from "./ControlPanel"
-import { ConversationHistory } from "./ConversationHistory"
 import { UserData } from "./UserData"
 import DataForm from "./DataForm"
 import HealthForm from "./HealthForm"
 import { SavedChatsList } from "./SavedChatList"
 //import BankData from "./BankData"
-//import ConversationsHistory from "./ConversationsHistory"
 //import SavedChats from "./SavedChats"
 
 interface PanelDataProps {

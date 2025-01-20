@@ -28,6 +28,7 @@ import Link from "next/link"
 import { ConvAI } from "./ConvAI"
 import { useState } from "react"
 import { useChatContext } from "@/context/ChatContext"
+import { useRouter } from "next/navigation"
 
 // Configuración de las tarjetas de funcionalidades
 const cardsConfig = [
@@ -72,6 +73,7 @@ type ChatSideBarRProps = {
 const ChatSideBarR = ({ chatId }: ChatSideBarRProps) => {
   const { submitExternalMessage, isSubmitting, error } = useChatContext()
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const handleCardClick = async (text: string, shouldAdvanceStep: boolean) => {
     if (submitExternalMessage && !isLoading) {
@@ -108,7 +110,12 @@ const ChatSideBarR = ({ chatId }: ChatSideBarRProps) => {
 
         {/* Sección de botones */}
         <div className="hidden sm:space-y-2 sm:flex sm:flex-col sm:items-center">
-          <button className="w-full max-w-[208px] h-10 bg-transparent border-2 border-purple-500 hover:bg-purple-200 hover:border-0 text-gray-800 font-semibold py-2 px-4 rounded-3xl flex items-center justify-center">
+          <button
+            className="w-full max-w-[208px] h-10 bg-transparent border-2 border-purple-500 hover:bg-purple-200 hover:border-0 text-gray-800 font-semibold py-2 px-4 rounded-3xl flex items-center justify-center"
+            onClick={() => {
+              router.push("/panel-control?tab=historial")
+            }}
+          >
             <p className="text-xs lg:text-sm font-semibold mr-1">
               Consulta el historial
             </p>

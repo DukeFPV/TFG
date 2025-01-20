@@ -34,13 +34,12 @@ import { PanelLayout } from "@/components/PanelLayout"
 import { currentUser } from "@clerk/nextjs/server"
 
 interface PageParams {
-  searchParams: {
-    tab?: string
-  }
+  searchParams: Promise<{ tab?: string }>
 }
 
 export default async function PanelControl({ searchParams }: PageParams) {
-  const activeSection = (await searchParams.tab) || "panel"
+  const params = await searchParams
+  const activeSection = params.tab || "panel" //{ params: Promise<{ providerId: number }> }
   // Obtener el usuario actual de Clerk
   const user = await currentUser()
 

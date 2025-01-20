@@ -160,13 +160,27 @@ const ChatComponent = ({ chatId }: Props) => {
   }
 
   return (
-    <div className="flex flex-col h-full max-h-screen overflow-hidden w-full transition-all duration-300">
+    <div
+      className="flex flex-col h-full max-h-screen overflow-hidden w-full transition-all duration-300"
+      role="main"
+      aria-label="Chat con Sara"
+    >
       {/* Contenedor de mensajes */}
-      <div id="message-container" className="flex-1 overflow-y-auto px-4">
+      <div
+        id="message-container"
+        className="flex-1 overflow-y-auto px-4"
+        role="log"
+        aria-live="polite"
+        aria-label="Historial de mensajes"
+      >
         {isLoading ? (
-          <LoadingBubble />
+          <div role="status" aria-label="Cargando mensajes">
+            <LoadingBubble />
+          </div>
         ) : error ? (
-          <div className="text-red-500">{error}</div>
+          <div className="text-red-500" role="alert" aria-live="assertive">
+            {error}
+          </div>
         ) : (
           <MessageList messages={messages ?? []} />
         )}
@@ -183,6 +197,10 @@ const ChatComponent = ({ chatId }: Props) => {
               ref={textareaRef}
               minRows={1}
               maxRows={4}
+              placeholder="Escribe tu mensaje aquí"
+              aria-label="Campo de mensaje"
+              aria-required="true"
+              aria-invalid={input.trim().length === 0}
               className={cn(
                 "w-full p-2 px-3 ps-5 border border-gray-300 focus:outline-none focus:border-purple-500 resize-none max-h-32 transition-all duration-200",
                 {
@@ -193,6 +211,7 @@ const ChatComponent = ({ chatId }: Props) => {
             />
             <Button
               type="submit"
+              aria-label={isSubmitting ? "Cancelar envío" : "Enviar mensaje"}
               className={`ml-2 ${
                 isSubmitting ? "bg-red-600" : "bg-purple-600"
               }`}
@@ -210,6 +229,13 @@ const ChatComponent = ({ chatId }: Props) => {
             <Button
               type="button"
               onClick={handleTTSControl}
+              aria-label={
+                !audioPlay
+                  ? "Activar lectura por voz"
+                  : audioPlay && !isAudioPlaying
+                    ? "Desactivar lectura por voz"
+                    : "Detener lectura actual"
+              }
               className={cn(
                 "sm:hidden ml-2 text-white rounded-full transition-colors",
                 {
@@ -227,7 +253,13 @@ const ChatComponent = ({ chatId }: Props) => {
             </Button>
           </div>
         </form>
-        {isSubmitting && <LoadingBubble />} {/* Indicador de envío */}
+        {/* Indicador de envío */}
+        {isSubmitting && (
+          <div role="status" aria-live="polite" className="mt-2">
+            <LoadingBubble />
+            <span className="sr-only">Enviando mensaje...</span>
+          </div>
+        )}
       </div>
     </div>
   )

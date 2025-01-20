@@ -29,9 +29,17 @@
 
 "use client"
 
-import { useState, ReactNode } from "react"
+import { useState, ReactNode, ReactElement } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import {
+  History,
+  Mic,
+  AudioLines,
+  Speech,
+  Settings,
+  MonitorCog,
+} from "lucide-react"
 import { IoIosArrowDown, IoMdMenu, IoMdClose } from "react-icons/io"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 // import { Switch } from "@nextui-org/react"
@@ -52,7 +60,7 @@ type NavItem = {
   label: string
   link?: string
   children?: NavItem[]
-  iconImage?: string
+  iconImage?: string | ReactElement
 }
 
 // Contenido de la barra de navegación pública
@@ -75,7 +83,7 @@ const protectedNavItems: NavItem[] = [
       {
         label: "Interfaz",
         link: "#",
-        iconImage: microUi,
+        iconImage: <MonitorCog size={18} />,
         children: [
           { label: "Sugerencias", iconImage: "", link: "#" },
           { label: "Modo Oscuro", iconImage: "", link: "#" },
@@ -83,16 +91,16 @@ const protectedNavItems: NavItem[] = [
       },
       {
         label: "Mis Datos",
-        link: "/panel-control?tab=usuario", // <- Ajuste
-        iconImage: microData,
+        link: "/panel-control", // <- Ajuste
+        iconImage: <Settings size={18} />,
       },
       {
         label: "Historial",
-        link: "/panel-control?tab=historial", // <- Ajuste, renombrado
-        iconImage: microGoals,
+        link: "/panel-control/historial", // <- Ajuste, renombrado
+        iconImage: <History size={18} />,
       },
-      { label: "Micrófono", link: "#", iconImage: microIcon },
-      { label: "Voz de Sara", link: "#", iconImage: microVoice },
+      { label: "Micrófono", link: "#", iconImage: <Mic size={18} /> },
+      { label: "Voz de Sara", link: "#", iconImage: <Speech size={18} /> },
     ],
   },
 ]
@@ -101,12 +109,6 @@ export default function Navbar() {
   const { isSignedIn, user } = useUser()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [animationParent] = useAutoAnimate()
-  const router = useRouter()
-
-  function handleLinkClick(href: string) {
-    closeMenu()
-    router.push(href)
-  }
 
   // Comprueba si la página actual es la página de inicio para renderizar el estilizado correcto
   const pathname = usePathname()
@@ -153,11 +155,11 @@ export default function Navbar() {
                   : "text-neutral-800 hover:text-purple-500"
               }`}
             >
-              <button onClick={() => handleLinkClick(d.link ?? "#")}>
+              <Link href={d.link ?? "#"}>
                 <p className="flex cursor-pointer items-center gap-2 ">
                   <span>{d.label}</span>
                 </p>
-              </button>
+              </Link>
             </span>
           ))}
           {isSignedIn &&
@@ -170,29 +172,32 @@ export default function Navbar() {
                     : "text-neutral-800 hover:text-purple-500"
                 }`}
               >
-                <button onClick={() => handleLinkClick(d.link ?? "#")}>
+                <Link href={d.link ?? "#"}>
                   <p className="flex cursor-pointer items-center gap-2 ">
                     <span>{d.label}</span>
                     {d.children && (
                       <IoIosArrowDown className="rotate-180 transition-all group-hover:rotate-0" />
                     )}
                   </p>
-                </button>
+                </Link>
                 {d.children && (
                   <div className="z-50 absolute right-0 top-10 hidden w-auto flex-col gap-1 rounded-lg bg-white py-3 shadow-md transition-all group-hover:flex">
                     {d.children.map((c, j) => (
-                      <button
+                      <Link
                         key={j}
-                        onClick={() => handleLinkClick(d.link ?? "#")}
+                        href={c.link ?? "#"}
                         className="flex cursor-pointer items-center py-1 pl-6 pr-8 text-neutral-800 hover:text-purple-500"
                       >
-                        {c.iconImage && (
-                          <Image src={c.iconImage} alt="item-icon" />
-                        )}
+                        {c.iconImage &&
+                          (typeof c.iconImage === "string" ? (
+                            <Image src={c.iconImage} alt="item-icon" />
+                          ) : (
+                            c.iconImage
+                          ))}
                         <span className="whitespace-nowrap pl-3">
                           {c.label}
                         </span>
-                      </button>
+                      </Link>
                     ))}
                   </div>
                 )}
@@ -282,14 +287,14 @@ function MobileNav({ closeMenu }: { closeMenu: () => void }) {
             aria-label="Cerrar menú"
           />
         </figure>
-        <div className="flex flex-col gap-4 transition-all items-start z-50">
+        <div className="flex flex-col gap-3 transition-all items-start z-50">
           {navItems.map((d, i) => (
             <button
               key={i}
               onClick={() => handleLinkClick(d.link ?? "#")}
-              className="flex cursor-pointer items-center py-1 pl-6 pr-8 text-neutral-400 hover:text-black text-left w-full"
+              className="flex cursor-pointer items-center py-1 pl-6 pr-8 text-neutral-800 hover:text-black text-left w-full"
             >
-              <span className="flex cursor-pointer items-center py-1 pl-6 pr-8 text-neutral-400 hover:text-black">
+              <span className="flex cursor-pointer items-center py-1 pl-6 pr-8 text-neutral-800 hover:text-black">
                 {d.label}
               </span>
             </button>
@@ -298,7 +303,7 @@ function MobileNav({ closeMenu }: { closeMenu: () => void }) {
             <>
               <button
                 onClick={() => handleLinkClick("/sara-ia")}
-                className="flex cursor-pointer items-center py-1 pl-6 pr-8 text-neutral-400 hover:text-black text-left w-full"
+                className="flex cursor-pointer justify-center py-1 pl-4 pr-8 pb-8 text-purple-900 hover:text-black text-left w-full"
               >
                 Chat con SARA
               </button>
@@ -326,17 +331,17 @@ function MobileNav({ closeMenu }: { closeMenu: () => void }) {
         </div>
 
         {isSignedIn ? (
-          <section className="flex flex-col items-center gap-8 mt-40">
+          <section className="flex flex-col items-center gap-6 mt-8">
             <span className="text-neutral-800">Hola!👋 {user?.firstName}</span>
             <button
               onClick={handleSignOut}
-              className="w-full max-w-[180px] text-neutral-400 border-cyan-600 border-2 px-3 py-2 rounded-full transition-all hover:text-white/90 hover:border-cyan-300"
+              className="w-full max-w-[180px] text-neutral-800 border-red-600 border-2 px-3 py-2 rounded-full transition-all hover:text-white/90 hover:border-cyan-300"
             >
               Desconectar
             </button>
           </section>
         ) : (
-          <section className="flex flex-col items-center gap-8 mt-40">
+          <section className="flex flex-col items-center gap-6 mt-4">
             <button
               onClick={() => handleLinkClick("/sign-in")}
               className="text-center w-full max-w-[180px] text-neutral-400 border-purple-800 border-2 px-3 py-2 rounded-full transition-all hover:text-black/90 mt-10"
@@ -365,7 +370,7 @@ function SingleNavItemMobile({
   closeMenu,
 }: {
   label: string
-  iconImage?: string
+  iconImage?: string | ReactElement
   link?: string
   children?: ReactNode
   closeMenu: () => void
@@ -388,16 +393,19 @@ function SingleNavItemMobile({
   return (
     <div
       ref={animationParent}
-      className="relative px-2 py-3 transition-all w-full"
+      className="relative px-2 py-1 transition-all w-full"
     >
       <button
         onClick={toggleItem}
-        className="relative flex cursor-pointer items-center gap-2 text-neutral-400 hover:text-black w-full text-left"
+        className="relative flex cursor-pointer items-center gap-2 text-neutral-800 hover:text-black w-full text-left"
         aria-label={`Abrir submenú de ${label}`}
       >
-        {iconImage && (
-          <Image src={iconImage} alt="item-icon" width={20} height={20} />
-        )}
+        {iconImage &&
+          (typeof iconImage === "string" ? (
+            <Image src={iconImage} alt="item-icon" width={18} height={18} />
+          ) : (
+            iconImage
+          ))}
         <span>{label}</span>
         {children && (
           <IoIosArrowDown

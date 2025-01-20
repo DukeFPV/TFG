@@ -190,6 +190,8 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
 
         {isOpen && (
           <Button
+            aria-label="Crear nuevo chat"
+            role="button"
             onClick={async () => {
               const newId = await createNewChat()
               if (newId) {
@@ -206,6 +208,8 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
 
         {isOpen && isAdmin && (
           <Button
+            aria-label="Subir nuevo contenido"
+            role="button"
             onClick={openFileUploadModal}
             className="w-full bg-green-100 hover:bg-green-300 hover:font-semibold text-green-900 border-green border"
           >
@@ -215,7 +219,9 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
         )}
       </div>
 
-      <div
+      <nav
+        role="navigation"
+        aria-label="Lista de conversaciones"
         className={cn("flex flex-col gap-2 mt-10 flex-1 overflow-y-auto", {
           "mx-5": isOpen,
         })}
@@ -225,7 +231,11 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
             const isUploadedChat = chat.pdfName && chat.pdfName !== "New Chat"
             const isSelected = chat.id === chatId
             return (
-              <div key={chat.id} className="flex items-center gap-2">
+              <div
+                role="listitem"
+                key={chat.id}
+                className="flex items-center gap-2"
+              >
                 {/* Botón para borrar el chat (solo admin) */}
                 {isAdmin && (
                   <button onClick={() => deleteChat(chat.id)}>
@@ -258,7 +268,7 @@ const ChatSideBarLeft = ({ chats, chatId }: Props) => {
               </div>
             )
           })}
-      </div>
+      </nav>
 
       {isOpen && ( // TODO Enlaces de navegación
         <div className="mt-4">

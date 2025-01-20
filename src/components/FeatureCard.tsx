@@ -61,10 +61,13 @@ const FeatureCard = React.memo(
         className={`${backgroundColor} p-2 rounded-xl shadow-md flex flex-col items-left gap-1 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
         onClick={handleClick}
         disabled={isLoading}
+        aria-label={`${title}: ${description}`}
+        role="button"
       >
         <Image
           src={icon}
           alt={`${title} icon`}
+          aria-label={`${title} icon`}
           width={48}
           height={48}
           className="mb-1"

@@ -50,15 +50,17 @@ export default function Contact() {
 
       {/* Encabezado de la página */}
       <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">Contacto</h1>
+        <div className="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Contacto
+          </h1>
         </div>
       </header>
       {/* Contenedor principal de la página de contacto */}
-      <div className="min-h-screen bg-gradient-to-br z-0 from-pink-400/70 via-indigo-400/70 to-neutral-50 flex flex-col justify-center items-left pl-20">
+      <div className="min-h-screen bg-gradient-to-br from-pink-400/70 via-indigo-400/70 to-neutral-50 flex flex-col justify-center items-center sm:items-start px-4 sm:pl-20">
         {/* Background image */}
         <div
-          className="absolute right-0 top-1/2 -translate-y-3/4 mr-20 z-20"
+          className="hidden sm:block absolute right-0 top-1/2 -translate-y-3/4 mr-4 sm:mr-20 z-20"
           aria-hidden="true"
         >
           <Image
@@ -66,15 +68,17 @@ export default function Contact() {
             alt=""
             width={800}
             height={800}
-            className="opacity-60"
+            className="opacity-60 w-[300px] sm:w-[500px] md:w-[600px] lg:w-[800px]"
           />
         </div>
         {/* Contenedor del formulario de contacto */}
-        <div className="bg-pink-100 p-8 rounded-lg shadow-lg max-w-md w-full z-30">
-          <h2 className="text-2xl font-bold mb-4">Cuéntanos lo que quieras</h2>
+        <div className="bg-pink-100 p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-[90%] sm:max-w-md z-30">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4">
+            Cuéntanos lo que quieras
+          </h2>
           {/* Formulario de contacto, los estilos van definidos en cada contenedor y campo */}
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
               <label
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700"
@@ -86,13 +90,13 @@ export default function Contact() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-full"
+                className="w-full px-3 py-2 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Tu nombre y apellidos"
                 required
                 aria-required="true"
               />
             </div>
-            <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="phone"
@@ -151,7 +155,7 @@ export default function Contact() {
             {/* Botón para enviar el formulario con el mismo estilo que ya se aplicó en la página principal para mantener coherencia */}
             <button
               type="submit"
-              className="border-black w-fit rounded-full border-2 bg-purple-600 text-nowrap px-20 sm:px-6 py-4 text-white transition-all hover:border-purple-800 hover:bg-transparent hover:text-black/90"
+              className="w-full sm:w-auto rounded-full border-2 border-black bg-purple-600 px-6 sm:px-20 py-3 text-white transition-all hover:bg-transparent hover:text-black hover:border-purple-800"
             >
               Enviar mensaje
             </button>

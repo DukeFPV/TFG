@@ -537,7 +537,7 @@ export default function HealthForm() {
       return
     }
     if (!user) {
-      console.log("handleSave: user data is missing")
+      toast.error("Datos de usuario no identificado")
       return
     }
 
@@ -634,9 +634,9 @@ export default function HealthForm() {
   }, [selectedCA, selectedProvincia, selectedMunicipio])
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
+    <div className="md:max-w-6xl mx-auto p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Autocomplete
             value={selectedCA}
             options={comunidadesAutonomas}
@@ -781,41 +781,43 @@ export default function HealthForm() {
           />
         </div>
 
-        <button
-          type="submit"
-          className={`w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-700 ${
-            isReadOnly ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={isReadOnly} // Deshabilitar en modo lectura
-        >
-          Buscar
-        </button>
-        <button
-          type="button"
-          disabled={!isReadOnly} // Habilitar solo en modo lectura
-          onClick={handleDelete}
-          className={`w-[45%] border-2 border-red-600 text-purple-950 hover:text-white p-2 rounded-3xl hover:bg-red-700 mr-10 ${
-            !isReadOnly ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          Borrar
-        </button>
-        <button
-          type="button"
-          disabled={isReadOnly} // Deshabilitar en modo lectura
-          onClick={handleSave}
-          className={`w-[45%] border-2 border-lime-600 text-purple-950 hover:text-white p-2 rounded-3xl hover:bg-lime-700 ml-10 ${
-            isReadOnly ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          Guardar
-        </button>
+        <div className="flex flex-wrap justify-between gap-2 sm:mt-0">
+          <button
+            type="submit"
+            className={`w-full bg-purple-600 text-white p-2 rounded hover:bg-purple-800 ${
+              isReadOnly ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isReadOnly} // Deshabilitar en modo lectura
+          >
+            Buscar
+          </button>
+          <button
+            type="button"
+            disabled={!isReadOnly} // Habilitar solo en modo lectura
+            onClick={handleDelete}
+            className={`w-full sm:w-[40%] border-2 border-red-600 text-purple-950 hover:text-white p-2 rounded-3xl hover:bg-red-700 sm:mr-10 ${
+              !isReadOnly ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            Borrar
+          </button>
+          <button
+            type="button"
+            disabled={isReadOnly} // Deshabilitar en modo lectura
+            onClick={handleSave}
+            className={`w-full sm:w-[40%] border-2 border-lime-600 text-purple-950 hover:text-white p-2 rounded-3xl hover:bg-lime-700 sm:ml-10 ${
+              isReadOnly ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            Guardar
+          </button>
+        </div>
       </form>
 
       {results.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl font-bold mb-4">Resultados</h3>
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full table-auto">
               <thead>
                 <tr className="text-sm">
@@ -848,18 +850,71 @@ export default function HealthForm() {
                         value={index}
                         name="row-radio"
                         size="small"
+                        aria-label={`Seleccionar fila ${index + 1}`}
                         disabled={isReadOnly} // Deshabilitar en modo lectura
                       />
                     </td>
-                    <td className="px-4 py-2">{center.name}</td>
-                    <td className="px-4 py-2">{center.province}</td>
-                    <td className="px-4 py-2">{center.municipality}</td>
-                    <td className="px-4 py-2">{center.address}</td>
-                    <td className="px-4 py-2">{center.phone}</td>
+                    <td scope="col" className="px-4 py-2">
+                      {center.name}
+                    </td>
+                    <td scope="col" className="px-4 py-2">
+                      {center.province}
+                    </td>
+                    <td scope="col" className="px-4 py-2">
+                      {center.municipality}
+                    </td>
+                    <td scope="col" className="px-4 py-2">
+                      {center.address}
+                    </td>
+                    <td scope="col" className="px-4 py-2">
+                      {center.phone}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+          {/* Vista “cards” (bloques) en mobile (< md) */}
+          <div className="block md:hidden">
+            {results.map((center, index) => (
+              <div
+                key={center.id}
+                className={`border p-2 mb-2 rounded shadow-sm text-sm ${
+                  selectedRow === index ? "bg-purple-200" : ""
+                }`}
+              >
+                <div className="flex items-center mb-2">
+                  <Radio
+                    checked={selectedRow === index}
+                    onChange={() => {
+                      if (!isReadOnly) setSelectedRow(index)
+                    }}
+                    value={index}
+                    name="row-radio-mobile"
+                    size="small"
+                    disabled={isReadOnly}
+                    aria-label={`Seleccionar item ${index + 1}`}
+                  />
+                  <span className="font-bold ml-2 text-sm">{center.name}</span>
+                </div>
+                <p className="mb-1">
+                  <span className="font-semibold text-sm">Provincia:</span>{" "}
+                  {center.province}
+                </p>
+                <p className="mb-1">
+                  <span className="font-semibold text-sm">Municipio:</span>{" "}
+                  {center.municipality}
+                </p>
+                <p className="mb-1">
+                  <span className="font-semibold text-sm">Dirección:</span>{" "}
+                  {center.address}
+                </p>
+                <p className="mb-1">
+                  <span className="font-semibold text-sm">Teléfono:</span>{" "}
+                  {center.phone}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       )}

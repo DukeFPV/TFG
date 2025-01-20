@@ -1,15 +1,15 @@
 //**Revisado */
 /**
- * Un componente de formulario para manejar los datos del perfil de usuario se utiliza en el panel de ajustes.
+ * Un componente de para manejar los datos del perfil de usuario se utiliza en el panel de ajustes.
  *
  * @component
- * @returns {JSX.Element} Un formulario con campos para fecha de nacimiento, género, provincia y número de teléfono
+ * @returns {JSX.Element} Un componente con campos para fecha de nacimiento, género, provincia y número de teléfono
  *
  * @description
- * Este componente proporciona una interfaz de formulario que:
+ * Este componente proporciona una interfaz que:
  * - Carga y muestra los datos existentes del perfil de usuario
  * - Permite a los usuarios actualizar su información personal
- * - Maneja el envío de formularios y la comunicación con la API
+ * - Maneja el envío y la comunicación con la API
  * - Proporciona cálculo de edad en tiempo real basado en la fecha de nacimiento
  *
  * @dependencies
@@ -127,7 +127,12 @@ export default function DataForm() {
 
   return (
     <>
-      <form className="gap-2" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="gap-2"
+        onSubmit={handleSubmit(onSubmit)}
+        role="form"
+        aria-label="Formulario de datos personales"
+      >
         <div className="flex flex-col ml-7 sm:ml-0 mb-5 sm:flex-row sm:justify-evenly">
           <div className="sm:flex sm:flex-col sm:mb-5">
             <div className="flex flex-col">
@@ -143,13 +148,15 @@ export default function DataForm() {
               </div>
             </div>
             <div className="flex flex-col mb-5">
-              <label>
+              <label htmlFor="genero">
                 <span className="font-semibold max-w-60">Género</span>
               </label>
               <select
+                id="genero"
                 className="border-2 border-purple-300 max-w-60 py-1 pl-2 rounded-xl"
                 {...register("Género")}
               >
+                <option value="">Selecciona una opción</option>
                 <option value="Hombre">Hombre</option>
                 <option value="Mujer">Mujer</option>
                 <option value="No Binario">No Binario</option>
