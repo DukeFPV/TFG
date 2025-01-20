@@ -1,4 +1,19 @@
-// /api/delete-chat/route.ts
+//**Revisado */
+/**
+ * Maneja las solicitudes DELETE para eliminar un chat y sus mensajes asociados.
+ * Requiere autenticación y privilegios de administrador.
+ *
+ * @param req - El objeto de solicitud entrante que contiene el chat_id como parámetro URL
+ * @returns NextResponse con:
+ * - 401 si el usuario no está autenticado
+ * - 403 si el usuario no es administrador
+ * - 400 si falta el chat_id o es inválido
+ * - 500 si hay un error interno del servidor
+ * - 200 con success:true si la eliminación es exitosa
+ *
+ * @throws Lanzará un error si fallan las operaciones de base de datos
+ */
+
 import { db } from "@/lib/db"
 import { chats, messages } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
@@ -12,6 +27,7 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 })
   }
 
+  // Verificar si el usuario es administrador
   const isAdmin = userId === "user_2ooPGvdai0IRYfKUmWh7T5y3rxp"
   if (!isAdmin) {
     return NextResponse.json(

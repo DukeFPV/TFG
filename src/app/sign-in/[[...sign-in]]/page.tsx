@@ -1,3 +1,6 @@
+//**Revisado */
+
+//Inicio de sesión con Clerk
 import { SignIn } from "@clerk/nextjs"
 
 export default function Page() {

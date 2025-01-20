@@ -1,3 +1,27 @@
+//**Revisado */
+/**
+ * Configuración para los estilos de variantes de toast utilizando class-variance-authority (cva).
+ *
+ * @constant
+ * @type {VariantProps}
+ *
+ * @property {Object} variants - Variantes visuales disponibles para el toast
+ * @property {Object} variants.variant - Opciones de variantes para el estilo del toast
+ * @property {string} variants.variant.default - Estilo predeterminado del toast con colores de fondo y primer plano
+ * @property {string} variants.variant.destructive - Estilo destructivo del toast con colores de advertencia/error
+ *
+ * @property {Object} defaultVariants - Configuración de variantes predeterminadas
+ * @property {string} defaultVariants.variant - Establece 'default' como la variante predeterminada
+ *
+ * Los estilos base incluyen:
+ * - Eventos de puntero habilitados
+ * - Diseño flexible con espaciado
+ * - Esquinas y bordes redondeados
+ * - Efectos de sombra
+ * - Animaciones de deslizamiento y transiciones
+ * - Animaciones de entrada/salida responsivas
+ */
+
 "use client"
 
 import * as React from "react"
@@ -17,7 +41,7 @@ const ToastViewport = React.forwardRef<
     ref={ref}
     className={cn(
       "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
-      className
+      className,
     )}
     {...props}
   />
@@ -37,7 +61,7 @@ const toastVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 )
 
 const Toast = React.forwardRef<
@@ -63,7 +87,7 @@ const ToastAction = React.forwardRef<
     ref={ref}
     className={cn(
       "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
-      className
+      className,
     )}
     {...props}
   />
@@ -78,7 +102,7 @@ const ToastClose = React.forwardRef<
     ref={ref}
     className={cn(
       "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
-      className
+      className,
     )}
     toast-close=""
     {...props}

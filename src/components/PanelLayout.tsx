@@ -1,11 +1,47 @@
+//**Revisado */
+/**
+ * Un componente de diseño que gestiona diferentes paneles y su contenido.
+ *
+ * @component
+ * @param {object} props - Las propiedades del componente
+ * @param {ReactNode} props.children - Componentes hijos a renderizar
+ * @param {object} props.panelData - Datos requeridos para la visualización del panel
+ * @param {object} props.userData - Datos de información del usuario
+ * @param {object} props.healthData - Datos relacionados con la salud
+ * @param {object} props.bankData - Datos de información bancaria
+ * @param {object} props.conversationsHistory - Historial de conversaciones
+ * @param {object} props.savedChats - Datos de chats guardados
+ *
+ * @returns {JSX.Element} Un diseño responsive con una barra de navegación lateral y área de contenido principal
+ *
+ * @example
+ * <PanelLayout
+ *   panelData={panelData}
+ *   userData={userData}
+ *   healthData={healthData}
+ *   bankData={bankData}
+ *   conversationsHistory={conversationsHistory}
+ *   savedChats={savedChats}
+ *   {children}
+ * </PanelLayout>
+ *
+ *  @description Para ir a una sección específica:
+ *  const goHealthData = () => {
+ *    router.push("/panel-control/salud") <- "salud" es la sección
+ *  }
+ *
+ */
+
 "use client"
 import { useState } from "react"
 import { NavigationMenu } from "./NavigationMenu"
 import { ControlPanel } from "./ControlPanel"
-import { ConversationHistory } from "./ConversationHistory"
 import { UserData } from "./UserData"
 import DataForm from "./DataForm"
 import HealthForm from "./HealthForm"
+import { SavedChatsList } from "./SavedChatList"
+//import BankData from "./BankData"
+//import SavedChats from "./SavedChats"
 
 interface PanelDataProps {
   totalConversations: number
@@ -30,6 +66,7 @@ export function PanelData({
     </div>
   )
 }
+
 // Panel de Datos de usuario
 export function UserProfile() {
   return (
@@ -40,18 +77,11 @@ export function UserProfile() {
   )
 }
 
-// panel de datos de salud
-export function HealthData() {
+// Panel de datos de salud
+export function HealthDataComponentWrapper() {
   return (
     <div className="space-y-6 max-w-6xl">
       <HealthForm />
-      {/* Añadir contenido de salud */}
-      {/* <div className="space-y-6">
-        <h3>
-          <span className="text-orange-600 font-semibold italic">TO-DO: </span>
-          Espacio para mostrar los datos de la salud
-        </h3>
-      </div> */}
     </div>
   )
 }
@@ -73,21 +103,20 @@ export function BankData() {
 
 // Interfaz de TS Panel de Conversaciones
 interface PanelHistoryProps {
-  messages: any[]
+  chats: any[]
 }
 
 // Panel de Conversaciones
-export function ConversationsHistory({ messages }: PanelHistoryProps) {
+export function ConversationsHistory({ chats }: PanelHistoryProps) {
   return (
     <div className="space-y-6">
-      <ConversationHistory messages={messages} />
+      <h2 className="text-lg font-semibold text-gray-700 mb-4">
+        Chats Guardados
+      </h2>
+      <SavedChatsList chats={chats} />
     </div>
   )
 }
-
-// TODO interface PanelSavedProps {
-//   savedMessages: any[];
-// }
 
 // Panel de Chats guardados
 export function SavedChats() {
@@ -95,9 +124,9 @@ export function SavedChats() {
     <div className="space-y-6">
       <h3>
         <span className="text-orange-600 font-semibold italic">TO-DO: </span>
-        Espacio para mostrar los chats guardados los chats
+        Espacio para mostrar los chats guardados
       </h3>
-      {/* Add saved chats components */}
+      {/* Añadir los chats guardados*/}
     </div>
   )
 }
@@ -119,9 +148,11 @@ interface PanelLayoutProps {
   bankData: any
   conversationsHistory: PanelHistoryProps
   savedChats: any
+  activeSection?: string
 }
 
 export function PanelLayout({
+  activeSection = "panel",
   children,
   panelData,
   userData,
@@ -130,22 +161,22 @@ export function PanelLayout({
   conversationsHistory,
   savedChats,
 }: PanelLayoutProps) {
-  const [activeTab, setActiveTab] = useState("panel")
+  const [activeTab, setActiveTab] = useState(activeSection)
 
   const renderContent = () => {
     switch (activeTab) {
       case "panel":
         return <PanelData {...panelData} />
       case "usuario":
-        return <UserProfile {...userData} />
+        return <UserProfile />
       case "salud":
-        return <HealthData {...healthData} />
+        return <HealthDataComponentWrapper />
       case "banca":
-        return <BankData {...bankData} />
+        return <BankData />
       case "historial":
         return <ConversationsHistory {...conversationsHistory} />
       case "chats":
-        return <SavedChats {...savedChats} />
+        return <SavedChats />
       default:
         return null
     }
@@ -155,21 +186,35 @@ export function PanelLayout({
     <div className="min-h-screen rounded-3xl bg-purple-50">
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[320px_1fr] gap-8">
-          <aside className="bg-purple-100 rounded-3xl shadow-md p-6 h-fit">
+          <aside
+            role="navigation"
+            aria-label="Menú principal"
+            className="bg-purple-100 rounded-3xl shadow-md p-6 h-fit"
+          >
             <h2 className="text-xl font-semibold mb-4 text-center">
               Panel de control
             </h2>
             <NavigationMenu activeTab={activeTab} onTabChange={setActiveTab} />
           </aside>
-          <main className="space-y-8">
-            <section className="bg-white rounded-3xl shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">
+          <main
+            role="main"
+            aria-label="Contenido principal"
+            className="space-y-8"
+          >
+            <section
+              aria-labelledby="section-heading"
+              className="bg-white rounded-3xl shadow-md p-6"
+            >
+              <h2 id="section-heading" className="text-xl font-semibold mb-4">
                 {menuItems.find((item) => item.id === activeTab)?.label}
               </h2>
               {renderContent()}
             </section>
           </main>
         </div>
+      </div>
+      <div role="status" aria-live="polite" className="sr-only">
+        {`Sección actual: ${menuItems.find((item) => item.id === activeTab)?.label}`}
       </div>
     </div>
   )

@@ -1,4 +1,15 @@
-// src/app/layout.tsx
+//**Revisado */
+/**
+ * Componente de diseño raíz que envuelve toda la aplicación.
+ * Proporciona autenticación, gestión de estado y proveedores de UI.
+ *
+ * @component
+ * @async
+ * @param {Object} props - Propiedades del componente
+ * @param {React.ReactNode} props.children - Componentes hijos que se renderizarán dentro del diseño
+ * @returns {Promise<JSX.Element>} El componente de diseño renderizado
+ *
+ */
 
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
@@ -30,9 +41,13 @@ export default async function RootLayout({
         <html className={inter.className} lang="es">
           <body className="relative max-w-7xl m-auto">
             <NextUIProvider>
-              <Header />
-              {children}
-              <Toaster />
+              <header>
+                <Header />
+              </header>
+              <main id="main-content" tabIndex={-1}>
+                {children}
+                <Toaster />
+              </main>
               <Footer />
             </NextUIProvider>
           </body>

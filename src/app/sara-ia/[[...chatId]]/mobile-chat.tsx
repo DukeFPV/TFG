@@ -1,3 +1,38 @@
+//**Revisado */
+/**
+ * Componente MobileChat - Interfaz de chat adaptada para dispositivos móviles.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {Array} [props.initialChats=[]] - Array de objetos de chat iniciales a mostrar
+ *
+ * @remarks
+ * Este componente maneja la interfaz de chat móvil con tres pantallas principales:
+ * - Lista de chats guardados
+ * - Chat activo
+ * - Temas/Funcionalidades
+ *
+ * El componente gestiona la navegación entre pantallas, la selección de chats, el envío
+ * de mensajes y la creación de nuevos chats. Incluye una cabecera con controles de
+ * navegación y un pie con pestañas de selección de pantalla.
+ *
+ * @states
+ * - currentScreen: Gestiona qué pantalla se muestra actualmente ("saved"|"chat"|"topics")
+ * - activeCategory: Controla la categoría seleccionada en la vista de temas
+ * - currentChatId: Almacena el ID del chat activo
+ * - isLoading: Indica estados de carga durante las operaciones
+ *
+ * @features
+ * - Navegación y selección de chats
+ * - Creación de nuevos chats
+ * - Filtrado por categorías
+ * - Tarjetas de funcionalidades predefinidas para acciones rápidas
+ * - Actualizaciones de chat en tiempo real
+ * - Enrutamiento basado en URL
+ *
+ * @returns Componente React con interfaz de chat móvil
+ */
+
 "use client"
 
 import React, { useEffect, useState } from "react"
@@ -78,8 +113,11 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
   ]
 
   // Función para manejar el click en una FeatureCard
-  const handleFeatureClick = async (text: string) => {
-    console.log("FeatureCard clicked with text:", text)
+  const handleFeatureClick = async (
+    text: string,
+    shouldAdvanceStep: boolean,
+  ) => {
+    //console.log("FeatureCard clicked with text:", text)
     try {
       setIsLoading(true)
 
@@ -110,7 +148,7 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
       }
 
       // Enviar el mensaje predefinido
-      await submitExternalMessage(text)
+      await submitExternalMessage(text, shouldAdvanceStep)
       toast.success("Mensaje enviado correctamente")
     } catch (error) {
       console.error("Error al enviar el mensaje externo:", error)
@@ -120,14 +158,30 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
     }
   }
 
+  const screensCycleMap = {
+    chat: "saved",
+    saved: "topics",
+    topics: "chat",
+  } as const
+
+  function handleArrowLeftClick() {
+    const nextScreen = screensCycleMap[currentScreen]
+    setCurrentScreen(nextScreen)
+  }
+
+  // Función para renderizar la parte superior de la versión mobile de la aplicación
   const renderHeader = () => (
     <header className="p-4 border-b">
       <div className="flex flex-row align-middle justify-between">
         <div className="flex items-center">
-          <button onClick={() => setCurrentScreen("saved")} className="p-2">
+          <button
+            onClick={handleArrowLeftClick}
+            className="p-2"
+            aria-label="Volver a lista de chats guardados"
+          >
             <ArrowLeft size={24} />
           </button>
-          <h1 className="text-lg font-semibold ml-4">
+          <h1 className="text-lg font-semibold ml-24">
             {currentScreen === "saved"
               ? "Chats guardados"
               : currentScreen === "chat"
@@ -147,6 +201,7 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
     </header>
   )
 
+  // --- Función para renderizar los chats guardados --- //TODO: en la versión de escritorio
   const renderSavedChats = () => (
     <div className="flex-1 overflow-y-auto h-[calc(100vh-var(--header-height)-var(--bottom-nav-height))]">
       {isLoading ? (
@@ -181,6 +236,7 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
     </div>
   )
 
+  // Función para crear un nuevo chat
   const createNewChat = async () => {
     try {
       const response = await fetch("/api/create-chat/", {
@@ -207,6 +263,7 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
     }
   }
 
+  // Función para renderizar el chat
   const renderChat = () => (
     <div className="overflow-hidden h-[calc(100vh-var(--header-height)-var(--bottom-nav-height))] flex flex-col">
       {isLoading ? (
@@ -225,6 +282,43 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
     </div>
   )
 
+  // Configuración de las tarjetas de funcionalidades //TODO Implementar en un componente separado de utils
+  const cardsConfig = [
+    {
+      backgroundColor: "bg-cyan-50",
+      icon: "/icons/salud.svg",
+      title: "Salud digital",
+      description: "Te puedo guiar paso a paso como pedir la cita.",
+      text: "¿Cómo puedo pedir cita en mi centro de salud paso a paso?",
+      shouldAdvanceStep: true, // Solo esta tarjeta inicia paso a paso //TODO Únicamente integrado el SERGAS
+    },
+    {
+      backgroundColor: "bg-yellow-50",
+      icon: "/icons/banca.svg",
+      title: "Banca digital",
+      description: "Aprender a usar la banca digital",
+      text: "¿Cómo me puedes ayudar para utilizar mi banco?",
+      shouldAdvanceStep: false,
+    },
+    {
+      backgroundColor: "bg-green-50",
+      icon: "/icons/buscar.svg",
+      title: "Buscar en internet",
+      description: "Te puedo ayudar a buscar",
+      text: "Necesito que busques en internet algo para mí",
+      shouldAdvanceStep: false,
+    },
+    {
+      backgroundColor: "bg-purple-50",
+      icon: "/icons/any.svg",
+      title: "Cualquier pregunta",
+      description: "Pregúntame lo que quieras",
+      text: "Quiero saber en qué cosas puedes asistirme",
+      shouldAdvanceStep: false,
+    },
+  ]
+
+  // Función para renderizar las FeatureCards
   const renderTopics = () => (
     <div className="flex-1 overflow-hidden h-[calc(100vh-var(--header-height)-var(--bottom-nav-height))] place-self-center p-4 mx-10">
       <div className="flex justify-around mb-10">
@@ -241,50 +335,21 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
         ))}
       </div>
       <div className="grid grid-cols-2 gap-4 max-w-80">
-        <FeatureCard
-          backgroundColor="bg-cyan-50"
-          icon="/icons/salud.svg"
-          title="Salud digital"
-          description="Te puedo guiar paso a paso como pedir la cita."
-          text="¿Cómo me puedes ayudar en temas de salud?"
-          onClick={() =>
-            handleFeatureClick("¿Cómo me puedes ayudar en temas de salud?")
-          }
-        />
-        <FeatureCard
-          backgroundColor="bg-yellow-50"
-          icon="/icons/banca.svg"
-          title="Banca digital"
-          description="Aprender a usar la banca digital"
-          text="¿Cómo me puedes ayudar para utilizar mi banco?"
-          onClick={() =>
-            handleFeatureClick("¿Cómo me puedes ayudar para utilizar mi banco?")
-          }
-        />
-        <FeatureCard
-          backgroundColor="bg-green-50"
-          icon="/icons/buscar.svg"
-          title="Buscar en internet"
-          description="Te puedo ayudar a buscar"
-          text="Necesito que busques en internet algo para mí"
-          onClick={() =>
-            handleFeatureClick("Necesito que busques en internet algo para mí")
-          }
-        />
-        <FeatureCard
-          backgroundColor="bg-purple-50"
-          icon="/icons/any.svg"
-          title="Cualquier pregunta"
-          description="Pregúntame lo que quieras"
-          text="Quiero saber en qué cosas puedes asistirme"
-          onClick={() =>
-            handleFeatureClick("Quiero saber en qué cosas puedes asistirme")
-          }
-        />
+        {cardsConfig.map((card, index) => (
+          <FeatureCard
+            key={index}
+            {...card}
+            onClick={() =>
+              handleFeatureClick(card.text, card.shouldAdvanceStep)
+            }
+            isLoading={isLoading}
+          />
+        ))}
       </div>
     </div>
   )
 
+  // --- Función para renderizar el contenido de la pantalla actual ---
   const renderContent = () => {
     switch (currentScreen) {
       case "saved":
@@ -298,8 +363,9 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
     }
   }
 
+  // --- Función para renderizar el footer/Nav de la aplicación ---
   const renderFooter = () => (
-    <footer className="flex justify-around p-4 border-t bg-purple-800 text-violet-400">
+    <footer className="flex justify-around p-4 border-t bg-purple-800 text-white/50">
       <button
         onClick={() => setCurrentScreen("chat")}
         className={`p-2 ${currentScreen === "chat" ? "text-purple-50" : ""}`}
@@ -335,9 +401,12 @@ const MobileChat: React.FC<Props> = ({ initialChats = [] }) => {
   return (
     <div className="flex flex-col overflow-hidden">
       {renderHeader()}
-      <div className="flex-1 overflow-hidden h-[calc(100vh-var(--header-height)-var(--bottom-nav-height))]">
+      <main
+        className="flex-1 overflow-hidden h-[calc(100vh-var(--header-height)-var(--bottom-nav-height))]"
+        id="mobile-main"
+      >
         {renderContent()}
-      </div>
+      </main>
       {renderFooter()}
     </div>
   )

@@ -1,3 +1,27 @@
+//**Revisado */
+/**
+ * Componente para gestionar la subida de archivos con funcionalidad de arrastrar y soltar.
+ * Diseñado específicamente para la subida de archivos PDF con integración S3.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {Function} [props.onUploadSuccess] - Función callback opcional que recibe el ID del chat creado después de una subida exitosa
+ *
+ * @remarks
+ * - Solo acepta archivos PDF
+ * - Tiene un límite de tamaño de archivo de 10MB
+ * - Solo se muestra para usuarios administradores (verifica contra ADMIN_ID)
+ * - Se integra con S3 para el almacenamiento de archivos
+ * - Crea una instancia de chat después de una subida exitosa
+ *
+ * @example
+ * ```tsx
+ * <FileUpload onUploadSuccess={(chatId) => console.log(chatId)} />
+ * ```
+ *
+ * @returns {JSX.Element | null} Devuelve la interfaz de subida de archivos para usuarios administradores, null para usuarios no administradores
+ */
+
 "use client"
 import { uploadToS3 } from "@/lib/s3"
 import { useMutation } from "@tanstack/react-query"
@@ -9,12 +33,14 @@ import toast from "react-hot-toast"
 import { useRouter } from "next/navigation"
 import { useUser } from "@clerk/nextjs"
 
+// ID del usuario administrador
 const ADMIN_ID = "user_2ooPGvdai0IRYfKUmWh7T5y3rxp"
 
 interface FileUploadProps {
   onUploadSuccess?: (chat_id: number) => void
 }
 
+// Componente para subir archivos
 const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
   const router = useRouter()
   const { user } = useUser()
@@ -29,6 +55,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
       file_name: string
     }) => {
       const response = await axios.post("/api/create-chat", {
+        // Crear chat con el archivo subido
         file_key,
         file_name,
       })
@@ -36,6 +63,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
     },
   })
 
+  // Configuración de Dropzone para subir archivos
   const { getRootProps, getInputProps } = useDropzone({
     accept: { "application/pdf": [".pdf"] },
     maxFiles: 1,
@@ -61,13 +89,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess }) => {
               onUploadSuccess(chat_id)
             } else {
               // Por si no se pasa la función, navegación por defecto
-              router.push(`/sara-ia/${chat_id}`)
+              router.push(`/sara-ia/${chat_id}`) // Redirigir a la página del chat
               router.refresh()
             }
           },
           onError: (err) => {
             toast.error("Error al crear el chat")
-            console.log("Error en mutate de FileUpload", err)
           },
         })
       } catch (error) {

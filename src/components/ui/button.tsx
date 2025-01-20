@@ -1,7 +1,31 @@
+//**Revisado */
+/**
+ * Define variantes de estilo para botones usando class-variance-authority (cva).
+ *
+ * @constant
+ * @type  - {(props?: ButtonVariantsProps) => string}
+ *
+ * @property {Object} variants - Opciones de variantes disponibles para personalización de botones
+ * @property {Object} variants.variant - Variantes de estilo visual
+ * @property {string} variants.variant.default - Estilo de botón primario con color de fondo
+ * @property {string} variants.variant.destructive - Estilo de botón rojo/peligro
+ * @property {string} variants.variant.outline - Botón con borde y efectos hover
+ * @property {string} variants.variant.secondary - Estilo de botón alternativo
+ * @property {string} variants.variant.ghost - Botón transparente con efectos hover
+ * @property {string} variants.variant.link - Botón que aparece como enlace de texto
+ *
+ * @property {Object} variants.size - Variantes de tamaño para el botón
+ * @property {string} variants.size.default - Tamaño estándar de botón (h-10)
+ * @property {string} variants.size.sm - Tamaño pequeño de botón (h-9)
+ * @property {string} variants.size.lg - Tamaño grande de botón (h-11)
+ * @property {string} variants.size.icon - Botón cuadrado para iconos (h-10 w-10)
+ *
+ * @property {Object} defaultVariants - Estilos por defecto si no se especifican variantes
+ */
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
@@ -30,7 +54,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 )
 
 export interface ButtonProps
@@ -49,7 +73,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     )
-  }
+  },
 )
 Button.displayName = "Button"
 

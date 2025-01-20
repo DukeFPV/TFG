@@ -1,3 +1,23 @@
+//**Revisado */
+/**
+ * Hook para gestionar el estado de las notificaciones de toast.
+ * @author: https://shadow-panda.dev/docs/components/toast
+ *
+ * @param state - El estado actual que contiene las notificaciones toast
+ * @param action - La acción a realizar sobre el estado
+ * @returns Un nuevo estado después de aplicar la acción
+ *
+ * Acciones:
+ * - ADD_TOAST: Añade un nuevo toast al inicio de la lista, manteniendo el límite de toasts
+ * - UPDATE_TOAST: Actualiza un toast existente fusionando las nuevas propiedades
+ * - DISMISS_TOAST: Marca los toast(s) especificados como cerrados y los pone en cola para su eliminación
+ * - REMOVE_TOAST: Elimina completamente los toast(s) especificados del estado
+ *
+ * @remarks
+ * La acción DISMISS_TOAST incluye efectos secundarios al llamar a addToRemoveQueue().
+ * Esto potencialmente podría extraerse en una acción separada para una mejor separación de responsabilidades.
+ */
+
 "use client"
 
 // Inspired by react-hot-toast library

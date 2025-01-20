@@ -1,10 +1,45 @@
+//**Revisado */
+/**
+ * Componente Panel Control que gestiona la autenticación de usuarios y el historial de conversaciones.
+ *
+ * Este componente realiza las siguientes operaciones:
+ * 1. Obtiene el usuario actual desde la autenticación de Clerk
+ * 2. Crea o verifica el perfil de usuario en la base de datos
+ * 3. Carga las conversaciones recientes y estadísticas de conversación
+ * 4. Permite navegar a traves de <PanelLayout> en las diferentes secciones
+ * 5. Navegación dinámica a través de las secciones de la aplicación [[...rest]]
+ *
+ * @returns {JSX.Element} Un componente de diseño de panel con historial de conversaciones y datos de usuario
+ *
+ * @example
+ * ```tsx
+ * <PanelControl panelData= {
+ *   savedChats={{}}
+ *   userData={{}}
+ *   healthData={{}}
+ *   bankData={{}}
+ * }/>
+ * ```
+ *
+ * @throws {Error} Puede lanzar un error si fallan las operaciones de base de datos
+ *
+ * @async
+ * @function PanelControl
+ */
+
 import { db } from "@/lib/db"
-import { messages, user_profiles } from "@/lib/db/schema"
+import { chats, messages, user_profiles } from "@/lib/db/schema"
 import { desc, eq } from "drizzle-orm"
 import { PanelLayout } from "@/components/PanelLayout"
 import { currentUser } from "@clerk/nextjs/server"
 
-export default async function PanelControl() {
+interface PageParams {
+  searchParams: Promise<{ tab?: string }>
+}
+
+export default async function PanelControl({ searchParams }: PageParams) {
+  const params = await searchParams
+  const activeSection = params.tab || "panel" //{ params: Promise<{ providerId: number }> }
   // Obtener el usuario actual de Clerk
   const user = await currentUser()
 
@@ -55,22 +90,32 @@ export default async function PanelControl() {
     duration: 0,
   }))
 
+  //Cargamos los chats guardados del usuario actual
+  const savedChats = await db
+    .select()
+    .from(chats)
+    .where(eq(chats.userId, user?.id || ""))
+    .orderBy(desc(chats.createdAt))
+    .limit(10)
+  const latestChats = savedChats[0]
+
   return (
-    <div className="max-w-7xl mx-auto">
+    <main id="panel-main" className="max-w-7xl mx-auto">
       <PanelLayout
+        activeSection={activeSection}
         panelData={{
           totalConversations: totalConversations[0].count,
           lastConversationDate: latestConversation?.createdAt?.toISOString(),
           messages: formattedConversations,
         }}
         conversationsHistory={{
-          messages: formattedConversations,
+          chats: savedChats,
         }}
         savedChats={{}}
         userData={{}}
         healthData={{}}
         bankData={{}}
       />
-    </div>
+    </main>
   )
 }

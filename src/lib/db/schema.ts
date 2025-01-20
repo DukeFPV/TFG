@@ -2,7 +2,6 @@ import {
   pgTable,
   serial,
   text,
-  date,
   timestamp,
   varchar,
   integer,
@@ -15,44 +14,6 @@ export const userSystemEnum = pgEnum("user_system_enum", [
   "system",
   "assistant",
 ])
-
-export const chats = pgTable("chats", {
-  id: serial("id").primaryKey(),
-  pdfName: text("pdf_name").notNull(),
-  pdfUrl: text("pdf_url").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  userId: varchar("user_id", { length: 256 }).notNull(),
-  fileKey: text("file_key").notNull(),
-  isPublic: boolean("is_public").notNull().default(false),
-})
-
-export const messages = pgTable("messages", {
-  id: serial("id").primaryKey(),
-  chatId: integer("chat_id")
-    .references(() => chats.id)
-    .notNull(),
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  role: userSystemEnum("role").notNull(),
-})
-
-export const user_profiles = pgTable("user_profiles", {
-  id: serial("id").primaryKey(),
-  clerkUserId: varchar("clerk_user_id", { length: 256 }).notNull().unique(), // Añadido .notNull()
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  birthday: date("birthday"),
-  age: integer("age").notNull(),
-  health: text("health").notNull(),
-  bank: text("bank").notNull(),
-  provincia: text("provincia").notNull(),
-  genero: text("genero").notNull(),
-  telefono: text("telefono").notNull(),
-  selectedHealthCenterId: integer("selected_health_center_id").references(
-    () => healthCenters.id,
-  ),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-})
 
 export const healthCenters = pgTable("health_centers", {
   id: serial("id").primaryKey(),
@@ -72,7 +33,25 @@ export const healthCenters = pgTable("health_centers", {
   teachingAccreditation: boolean("teaching_accreditation"),
 })
 
-// Tabla separada para selecciones de centros de salud
+export const user_profiles = pgTable("user_profiles", {
+  id: serial("id").primaryKey(),
+  clerkUserId: varchar("clerk_user_id", { length: 256 }).notNull().unique(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  birthday: text("birthday"),
+  age: integer("age").notNull(),
+  health: text("health").notNull(),
+  bank: text("bank").notNull(),
+  provincia: text("provincia").notNull(),
+  genero: text("genero").notNull(),
+  telefono: text("telefono").notNull(),
+  selectedHealthCenterId: integer("selected_health_center_id").references(
+    () => healthCenters.id,
+  ),
+  currentStep: integer("current_step").default(1),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+})
+
 export const userHealthCenterSelections = pgTable(
   "user_health_center_selections",
   {
@@ -84,6 +63,27 @@ export const userHealthCenterSelections = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
 )
+
+export const chats = pgTable("chats", {
+  id: serial("id").primaryKey(),
+  pdfName: text("pdf_name").notNull(),
+  pdfUrl: text("pdf_url").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  userId: varchar("user_id", { length: 256 }).notNull(),
+  fileKey: text("file_key").notNull(),
+  isPublic: boolean("is_public").notNull().default(false),
+})
+
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  chatId: integer("chat_id")
+    .references(() => chats.id)
+    .notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  role: userSystemEnum("role").notNull(),
+  image: text("image"), // Columna de imagen opcional
+})
 
 export type InsertChat = typeof chats.$inferInsert
 export type SelectChat = typeof chats.$inferSelect

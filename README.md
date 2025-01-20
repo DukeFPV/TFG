@@ -16,6 +16,7 @@ SARA IA es una aplicación web diseñada para ayudar a las personas mayores en e
 - **Contacto**: Un formulario para que los usuarios puedan enviar mensajes y consultas.
 - **Quiénes Somos**: Información sobre el equipo detrás de SARA y la historia del proyecto.
 - **Chat con SARA**: Acceso a la interfaz de chat donde los usuarios pueden interactuar con la IA de SARA.
+  - **Ajustes**: Acceso a los ajustes de los datos de usuario en la base de datos.
 
 ## Tecnologías Utilizadas
 
@@ -25,24 +26,99 @@ SARA IA es una aplicación web diseñada para ayudar a las personas mayores en e
 - **OpenAI**: Plataforma de inteligencia artificial utilizada para el asistente virtual.
 - **Drizzle ORM**: ORM para la interacción con la base de datos SQL.
 - **NextUI**: Biblioteca de componentes UI para React.
+- **NeonDatabase**: Base de datos para PostgreSQL.
+- **Pinecone**: Base de datos vectorial.
+- **Clerk**: Para la autenticación y registro de usuarios.
+- **ElevenLabs**: Para la tecnología de TTS.
 
-## Proyectos en los que se Basa
+## Proyectos en los que se basa
 
 El desarrollo de SARA IA ha sido influenciado e inspirado por los siguientes proyectos:
 
-1. [GPT-4 Vision and Next.js Tutorial - Create Your Own AI Coding Bot](https://www.youtube.com/watch?v=z9PF8NdM4XU&t) - *Autor: Sam Meech-Ward*
-2. [Easiest Database Setup in Next.js 14 with Turso & Drizzle](https://www.youtube.com/watch?v=4ZhtoOFKFP8&t) - *Autor: Sam Meech-Ward*
-3. [Kinde: The Best Auth Solution Next.js 14](https://www.youtube.com/watch?v=sjcLxYbw5BQ&t) - *Autor: Sam Meech-Ward*
-4. [Build ChatGPT AI Tool in React JS | React JS Project with Working Example using OpenAI API](https://www.youtube.com/watch?v=vAO1fxifJIs) - *Autor: ZAINKEEPSCODE*
-5. [NEXT.JS 14: Server Actions, React Server Components, Paginación y MÁS!](https://www.youtube.com/watch?v=m6KESRxAdK4) - *Autor: MiduDev*
-6. [Tutorial Next.js 14 paso a paso, para Principiantes](https://www.youtube.com/watch?v=jMy4pVZMyLM) - *Autor: MiduDev*
-7. [Desarrollando El Componente Chat | Next.js 13](https://www.youtube.com/watch?v=soJU2_SKy1I&t) - *Autor: MiduDev*
-8. [Build and Deploy Navbar Dropdown Navigation with Tailwind CSS and Next.js](https://youtu.be/lo_BJ6dl7fw?t=571) - *Autor: react with utkarsh*
-9. [Build and Deploy a Full Stack AI SaaS | Next JS 13, DrizzleORM, OpenAI, Stripe, TypeScript, Tailwind] (https://www.youtube.com/watch?v=bZFedu-0emE&t=11228s) - *Autor: Elliott Chong*
+1. [GPT-4 Vision and Next.js Tutorial - Create Your Own AI Coding Bot](https://www.youtube.com/watch?v=z9PF8NdM4XU&t) - _Autor: Sam Meech-Ward_
+2. [Easiest Database Setup in Next.js 14 with Turso & Drizzle](https://www.youtube.com/watch?v=4ZhtoOFKFP8&t) - _Autor: Sam Meech-Ward_
+3. [Kinde: The Best Auth Solution Next.js 14](https://www.youtube.com/watch?v=sjcLxYbw5BQ&t) - _Autor: Sam Meech-Ward_
+4. [Build ChatGPT AI Tool in React JS | React JS Project with Working Example using OpenAI API](https://www.youtube.com/watch?v=vAO1fxifJIs) - _Autor: ZAINKEEPSCODE_
+5. [NEXT.JS 14: Server Actions, React Server Components, Paginación y MÁS!](https://www.youtube.com/watch?v=m6KESRxAdK4) - _Autor: MiduDev_
+6. [Tutorial Next.js 14 paso a paso, para Principiantes](https://www.youtube.com/watch?v=jMy4pVZMyLM) - _Autor: MiduDev_
+7. [Desarrollando El Componente Chat | Next.js 13](https://www.youtube.com/watch?v=soJU2_SKy1I&t) - _Autor: MiduDev_
+8. [Build and Deploy Navbar Dropdown Navigation with Tailwind CSS and Next.js](https://youtu.be/lo_BJ6dl7fw?t=571) - _Autor: react with utkarsh_
+9. [Build and Deploy a Full Stack AI SaaS | Next JS 13, DrizzleORM, OpenAI, Stripe, TypeScript, Tailwind](https://www.youtube.com/watch?v=bZFedu-0emE&t=11228s) - _Autor: Elliott Chong_
+10. [Learn AI Skills - Here's everything you need to know about RAG](https://www.youtube.com/watch?v=cYRcdsqFAmY) - _Autor: Mckay Wrigley_
+11. [Build an AI Text-to-Speech (TTS) App Using Next.js and ElevenLabs (2024)](https://youtu.be/JgoWMTa0pa4?si=VQVpcscR2lJYxLSh) - _Autor: Code Spirit_
+12. [Quick Guide Parse CSV File in React JS and Next JS With Code](https://youtu.be/3jDCr_nhUO0?si=krnYHDhQYeNtXox9) - _Autor: Developers Hive_
+13. [Build and Deploy a RAG Chatbot with JavaScript, LangChain.js, Next.js, Vercel, OpenAI](https://youtu.be/d-VKYF4Zow0?si=KlYKtChtKGhmmgOQ) - _Autor: freeCodeCamp.org_
+
+## Instalación y Configuración
+
+Clona el repositorio:
+
+1. Copiar código
+
+   ```console
+   git clone https://github.com/DukeFPV/TFG.git
+   ```
+
+   ```console
+   cd sara-ia
+   ```
+
+   Instala las dependencias:
+
+2. Copiar código
+
+   ```console
+   pnpm install
+   ```
+
+   Configura las variables de entorno creando un archivo .env.local en la raíz del proyecto y añade las siguientes líneas:
+
+3. Copiar código
+
+```console
+# Acceso NeonDatabase
+DATABASE_AUTH_TOKEN=
+# used for database migrations
+DATABASE_URL=
+# used for server side fetching
+DATABASE_AUTHENTICATED_URL=
+# used for client side fetching
+NEXT_PUBLIC_DATABASE_AUTHENTICATED_URL=
+
+# Datos de acceso a S3
+NEXT_PUBLIC_S3_ACCESS_KEY_ID=
+NEXT_PUBLIC_S3_SECRET_ACCESS_KEY=
+NEXT_PUBLIC_S3_BUCKET_NAME=
+NEXT_PUBLIC_S3_REGION_NAME=
+
+# Datos de acceso a Pinecone
+PINECONE_CLOUD=
+PINECONE_REGION=
+PINECONE_INDEX=
+PINECONE_API_KEY=
+
+# Datos de acceso a OpenAI
+OPENAI_API_KEY=
+
+# Datos de acceso a ElevenLabs
+XI_API_KEY=
+
+#Datos de acceso a Google
+GOOGLE_APPLICATION_CREDENTIALS=
+GCP_PROJECT_ID=
+```
+
+Inicia el servidor de desarrollo:
+
+4. Copiar código
+
+   ```console
+   pnpm run dev
+   ```
+
+   Abre tu navegador y ve a <http://localhost:3000>.
 
 ## Empezar
-
-Abre [http://localhost:3000](http://localhost:3000) con tu navegador para ver el resultado.
 
 Puedes empezar a editar la página modificando `app/page.tsx`. La página se actualiza automáticamente a medida que editas el archivo.
 
@@ -62,52 +138,6 @@ El despliegue se ha realizado en la [Plataforma Vercel](https://vercel.com/new?u
 
 Consulta la [documentación sobre despliegue en Next.js](https://nextjs.org/docs/deployment) para más detalles.
 
-## Instalación y Configuración
-
-Clona el repositorio:
-
-1. Copiar código
-
-    ```console
-    git clone https://github.com/tu-usuario/sara-ia.git
-    ```
-
-    ```console
-    cd sara-ia
-    ```
-
-    Instala las dependencias:
-
-2. Copiar código  
-
-    ```console
-    pnpm install
-    ```  
-
-    Configura las variables de entorno creando un archivo .env.local en la raíz del proyecto y añade las siguientes líneas:
-
-3. Copiar código  
-
-```console
-   OPENAI_API_KEY=tu-api-key  
-   DATABASE_URL=tu-database-url  
-   DATABASE_AUTH_TOKEN=tu-auth-token  
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=clave-publica-clerk
-   CLERK_SECRET_KEY=clerk-key
-   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-```
-
-   Inicia el servidor de desarrollo:
-
-4. Copiar código  
-
-    ```console
-    pnpm run dev 
-    ```
-
-    Abre tu navegador y ve a <http://localhost:3000>.
-
 ## Contribución
 
 Las contribuciones son bienvenidas. Por favor, abre un issue para discutir el cambio que deseas realizar antes de enviar una pull request.
@@ -118,4 +148,4 @@ Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo LICENSE
 
 ## Contacto
 
-Si tienes alguna pregunta o sugerencia, no dudes en ponerte en contacto a través de correo electrónico o visita nuestra página de Contacto.
+Si tienes alguna pregunta o sugerencia, no dudes en ponerte en contacto a través de correo electrónico o visita la página de Contacto.
