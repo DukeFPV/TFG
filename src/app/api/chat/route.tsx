@@ -31,7 +31,7 @@
  * 7. Guarda el historial de la conversación
  */
 
-import { streamText, convertToCoreMessages, CoreMessage } from "ai"
+import { streamText, type ModelMessage } from "ai"
 import { saveChat } from "@/lib/utils/queries"
 import { db } from "@/lib/db/index"
 import { chats, user_profiles } from "@/lib/db/schema"
@@ -74,7 +74,12 @@ export async function POST(req: Request) {
     const profile = userProfile[0]
     const userName = profile.name // Suponiendo que 'name' está disponible
 
-    const coreMessages = convertToCoreMessages(messages)
+    const coreMessages: ModelMessage[] = messages.map(
+      (message: { role: "system" | "user" | "assistant"; content: string }) => ({
+        role: message.role,
+        content: message.content,
+      }),
+    )
 
     // log("chatId de chatId = " + JSON.stringify(chatId)) //Log para debug
     // log("Log de messages = " + JSON.stringify(messages)) //Log para debug
@@ -118,7 +123,7 @@ export async function POST(req: Request) {
     // log("Log de context = " + JSON.stringify(context)) //Log para debug
 
     // Definición de los mensajes iniciales que SARA utiliza para entender su contexto y cómo debe interactuar, se mantienen en ingles para facilitar la comprensión de la API de OpenAI
-    const prompt: CoreMessage[] = [
+    const prompt: ModelMessage[] = [
       {
         // Mensaje de configuración del sistema que define el comportamiento de SARA
         role: "system",
@@ -189,7 +194,7 @@ export async function POST(req: Request) {
       },
     })
 
-    return response.toDataStreamResponse()
+    return response.toTextStreamResponse()
   } catch (error) {
     console.error("Error in POST /api/chat:", error)
     log("error en chat/route " + (error as Error).message)

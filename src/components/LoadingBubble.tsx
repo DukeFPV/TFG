@@ -1,7 +1,7 @@
 //**Revisado */
 
 // Este componente es una versión de LoadingBubble, que se utiliza para mostrar la animación de carga
-const LoadingBubble = (): JSX.Element => {
+const LoadingBubble = () => {
   return (
     <div
       className="m-2.5 w-[60px] aspect-[4/1] animate-loading"

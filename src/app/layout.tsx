@@ -12,7 +12,6 @@
  */
 
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import { NextUIProvider } from "@nextui-org/react"
 import "./globals.css"
 import { ClerkProvider } from "@clerk/nextjs"
@@ -21,8 +20,6 @@ import Provider from "@/components/Provider"
 import { Toaster } from "react-hot-toast"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
-
-const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Sara IA",
@@ -38,7 +35,7 @@ export default async function RootLayout({
   return (
     <ClerkProvider localization={esES}>
       <Provider>
-        <html className={inter.className} lang="es">
+        <html lang="es">
           <body className="relative max-w-7xl m-auto">
             <NextUIProvider>
               <header>

@@ -14,7 +14,7 @@ import { UserProfile } from "@clerk/nextjs"
 export function UserData() {
   return (
     <>
-      <UserProfile routing="virtual" />
+      <UserProfile routing="path" path="/user-profile" />
     </>
   )
 }

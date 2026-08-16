@@ -565,37 +565,22 @@ export const ChatProvider = ({ children, chatId }: ChatProviderProps) => {
           const { done, value } = await reader.read()
           if (done) break
 
-          const chunk = new TextDecoder().decode(value)
-          const lines = chunk.split("\n")
+          accumulatedContent += new TextDecoder().decode(value, { stream: true })
 
-          lines.forEach((line) => {
-            if (line.startsWith('0:"')) {
-              const match = line.match(/^0:"(.*)"$/)
-              if (match && match[1]) {
-                let textChunk = match[1]
-                textChunk = textChunk.replace(/\\n/g, `\n`)
-                accumulatedContent += textChunk
+          // Process TTS for new content when enough has accumulated
+          const newContent = accumulatedContent.slice(lastProcessedLength)
+          if (newContent.length >= CHUNK_SIZE) {
+            processStreamingTTS(newContent)
+            lastProcessedLength = accumulatedContent.length
+          }
 
-                // Process TTS for new content when enough has accumulated
-                const newContent = accumulatedContent.slice(lastProcessedLength)
-                if (newContent.length >= CHUNK_SIZE) {
-                  processStreamingTTS(newContent)
-                  lastProcessedLength = accumulatedContent.length
-                }
-
-                setMessages((prevMessages) =>
-                  prevMessages.map((msg) =>
-                    msg.id === assistantId
-                      ? {
-                          ...msg,
-                          content: accumulatedContent,
-                        }
-                      : msg,
-                  ),
-                )
-              }
-            }
-          })
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+              msg.id === assistantId
+                ? { ...msg, content: accumulatedContent }
+                : msg,
+            ),
+          )
         }
 
         // Terminar de procesar el contenido acumulado
