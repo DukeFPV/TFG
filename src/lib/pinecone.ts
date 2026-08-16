@@ -14,7 +14,8 @@
 
 import { Pinecone, PineconeRecord } from "@pinecone-database/pinecone"
 import { downLoadFromS3 } from "./s3-server"
-import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf"
+import { readFile } from "node:fs/promises"
+import { PDFParse } from "pdf-parse"
 import {
   Document,
   RecursiveCharacterTextSplitter,
@@ -45,8 +46,13 @@ export async function loadS3IntoPinecone(fileKey: string) {
     throw new Error("Error al descargar el archivo desde S3")
   }
 
-  const loader = new PDFLoader(file_name)
-  const pages = (await loader.load()) as PDFPage[]
+  const parser = new PDFParse({ data: await readFile(file_name) })
+  const parsedPdf = await parser.getText()
+  await parser.destroy()
+  const pages: PDFPage[] = parsedPdf.pages.map((page) => ({
+    pageContent: page.text,
+    metadata: { loc: { pageNumber: page.num } },
+  }))
 
   // 2. Dividir el pdf en segmentos
   const documents = await Promise.all(pages.map(prepareDocument))
@@ -59,7 +65,7 @@ export async function loadS3IntoPinecone(fileKey: string) {
   const pineconeIndex = client.Index("sara-ia")
   const namespace = pineconeIndex.namespace(convertToAscii(fileKey))
 
-  await namespace.upsert(vectors)
+  await namespace.upsert({ records: vectors })
 
   return documents[0]
 }
@@ -87,7 +93,8 @@ async function embedDocument(doc: Document) {
 // Preparar el documento para ser vectorizado
 async function prepareDocument(page: PDFPage) {
   // Se elimina la advertencia de eslint sobre el uso de const en lugar de let
-  let { pageContent, metadata } = page
+  let { pageContent } = page
+  const { metadata } = page
   pageContent = pageContent.replace(/\n/g, " ")
 
   // Dividir el documento en segmentos

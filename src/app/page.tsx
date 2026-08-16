@@ -19,9 +19,9 @@
 import React from "react"
 import Image from "next/image"
 import Balancer from "react-wrap-balancer"
-import heroImage from "/public/icons/hero2.png"
-import heroImageMobile from "/public/icons/hero2-mobile.png"
-import imgWhatsApp from "/public/icons/whatsapp.png"
+import heroImage from "../../public/icons/hero2.png"
+import heroImageMobile from "../../public/icons/hero2-mobile.png"
+import imgWhatsApp from "../../public/icons/whatsapp.png"
 
 // Se crea el componente Home que contiene la página principal
 export default function Home() {

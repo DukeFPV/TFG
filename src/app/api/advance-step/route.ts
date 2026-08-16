@@ -75,7 +75,7 @@ export async function POST(req: Request) {
       )
     }
 
-    let currentStep = userProfileResult[0].currentStep ?? 1
+    const currentStep = userProfileResult[0].currentStep ?? 1
 
     if (action === "advance") {
       if (currentStep < stepsSergas.length) {
